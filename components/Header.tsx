@@ -6,7 +6,7 @@ import UserDropdown from "./UserDropdown";
 
 export default function Header() {
 	return (
-		<header className="sticky top-0 header">
+		<header className="sticky top-0 header backdrop-blur-sm shadow bg-slate-950/80">
 			<div className="container header-wrapper">
 				<Link href="/">
 					<Image
