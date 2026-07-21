@@ -112,7 +112,8 @@ export async function getNews(
 		const usedArticles = new Set<string>();
 		const companyNews: MarketNewsArticle[] = [];
 
-		for (let round = 0; round < MAX_NEWS_ARTICLES; round += 1) {
+		const maxRounds = Math.max(MAX_NEWS_ARTICLES, cleanedSymbols.length);
+		for (let round = 0; round < maxRounds && companyNews.length < MAX_NEWS_ARTICLES; round += 1) {
 			const symbol = cleanedSymbols[round % cleanedSymbols.length];
 			let articles = articlesBySymbol.get(symbol);
 
