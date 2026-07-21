@@ -7,7 +7,7 @@ import { getNews } from "../actions/finnhub.actions";
 import { getWatchlistSymbolsByUserId } from "../actions/watchlist.actions";
 import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailer";
 import { getAllUsersForNewsEmail } from "../actions/user.actions";
-import { formatDateToday } from "../utils";
+import { getFormattedTodayDate } from "../utils";
 
 export const sendSignUpEmail = inngest.createFunction(
 	{
@@ -124,7 +124,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 					if (!newsContent) return false;
 					return await sendNewsSummaryEmail({
 						email: user.email,
-						date: formatDateToday(),
+						date: getFormattedTodayDate(),
 						newsContent,
 					});
 				}),
