@@ -4,7 +4,7 @@ import {
 	PERSONALIZED_WELCOME_EMAIL_PROMPT,
 } from "@/lib/inngest/prompts";
 import { getNews } from "../actions/finnhub.actions";
-import { getWatchlistSymbolsByEmail } from "../actions/watchlist.actions";
+import { getWatchlistSymbolsByUserId } from "../actions/watchlist.actions";
 import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailer";
 import { getAllUsersForNewsEmail } from "../actions/user.actions";
 import { formatDateToday } from "../utils";
@@ -75,7 +75,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 		const newsByUser = await step.run("fetch-news-for-users", async () =>
 			Promise.all(
 				users.map(async (user) => {
-					const symbols = await getWatchlistSymbolsByEmail(user.email);
+					const symbols = await getWatchlistSymbolsByUserId(user.id);
 					let news: MarketNewsArticle[] = [];
 
 					try {
