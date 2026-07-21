@@ -119,7 +119,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 		}
 		// 4. TODO: Send each user's summary email.
 		await step.run("send-news-emails", async () => {
-			await Promise.all(
+			const results = await Promise.allSettled(
 				userNewsSummaries.map(async ({ user, newsContent }) => {
 					if (!newsContent) return false;
 					return await sendNewsSummaryEmail({
@@ -129,6 +129,15 @@ export const sendDailyNewsSummary = inngest.createFunction(
 					});
 				}),
 			);
+
+			results.forEach((result, index) => {
+				if (result.status === "rejected") {
+					console.error(
+						`Failed to send news email for ${userNewsSummaries[index].user.id}:`,
+						result.reason,
+					);
+				}
+			});
 		});
 
 		return {
