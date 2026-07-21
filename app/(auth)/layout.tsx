@@ -1,8 +1,20 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { auth } from "@/lib/better-auth/auth";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
+	const session = await auth.api.getSession({ headers: await headers() });
+
+	if (session?.user) redirect("/");
+
+	
 	return (
 		<main className="auth-layout">
 			<section className="auth-left-section scroll-hide-default">
