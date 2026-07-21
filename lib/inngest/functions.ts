@@ -124,7 +124,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 					if (!newsContent) return false;
 					return await sendNewsSummaryEmail({
 						email: user.email,
-						date: formatDateToday,
+						date: formatDateToday(),
 						newsContent,
 					});
 				}),
