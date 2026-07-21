@@ -81,7 +81,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 					try {
 						news = await getNews(symbols);
 					} catch (error: unknown) {
-						console.error(`Error fetching news for ${user.email}:`, error);
+						console.error(`Error fetching news for ${user.id}:`, error);
 					}
 
 					return { user, news: news.slice(0, 6) };
@@ -112,8 +112,8 @@ export const sendDailyNewsSummary = inngest.createFunction(
 					(part && "text" in part ? part.text : null) || "No market news.";
 
 				userNewsSummaries.push({ user, newsContent });
-			} catch (e) {
-				console.error("Failed to summarize news for:", user.email);
+			} catch {
+				console.error("Failed to summarize news for:", user.id);
 				userNewsSummaries.push({ user, newsContent: null });
 			}
 		}
