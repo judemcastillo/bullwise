@@ -101,18 +101,25 @@ export const formatArticle = (
 	isCompanyNews: boolean,
 	symbol?: string,
 	index: number = 0,
-): MarketNewsArticle => ({
-	id: article.id + index,
-	headline: article.headline.trim(),
-	summary:
-		article.summary.trim().substring(0, isCompanyNews ? 200 : 150) + "...",
-	source: article.source || (isCompanyNews ? "Company News" : "Market News"),
-	url: article.url,
-	datetime: article.datetime,
-	image: article.image || "",
-	category: isCompanyNews ? "company" : article.category || "general",
-	related: isCompanyNews ? symbol || "" : article.related || "",
-});
+): MarketNewsArticle => {
+	const summary = article.summary.trim();
+	const summaryLimit = isCompanyNews ? 200 : 150;
+
+	return {
+		id: article.id + index,
+		headline: article.headline.trim(),
+		summary:
+			summary.length > summaryLimit
+				? `${summary.substring(0, summaryLimit)}...`
+				: summary,
+		source: article.source || (isCompanyNews ? "Company News" : "Market News"),
+		url: article.url,
+		datetime: article.datetime,
+		image: article.image || "",
+		category: isCompanyNews ? "company" : article.category || "general",
+		related: isCompanyNews ? symbol || "" : article.related || "",
+	};
+};
 
 export const formatChangePercent = (changePercent?: number) => {
 	if (!changePercent) return "";
