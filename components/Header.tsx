@@ -4,7 +4,7 @@ import React from "react";
 import NavItems from "./NavItems";
 import UserDropdown from "./UserDropdown";
 
-export default function Header() {
+export default function Header({ user }: { user: User }) {
 	return (
 		<header className="sticky top-0 header backdrop-blur-sm shadow bg-slate-950/80">
 			<div className="container header-wrapper">
@@ -18,9 +18,9 @@ export default function Header() {
 					/>
 				</Link>
 				<nav className="hidden sm:block ">
-					<NavItems/>
+					<NavItems />
 				</nav>
-				<UserDropdown/>
+				<UserDropdown user={user} />
 			</div>
 		</header>
 	);
