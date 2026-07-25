@@ -9,6 +9,12 @@ const NEXT_PUBLIC_FINNHUB_API_KEY =
 	process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? "";
 const MAX_NEWS_ARTICLES = 6;
 
+type FinnhubCompanyProfile = {
+	name?: string;
+	ticker?: string;
+	exchange?: string;
+};
+
 function isRawNewsArticle(value: unknown): value is RawNewsArticle {
 	if (typeof value !== "object" || value === null) return false;
 
@@ -167,8 +173,6 @@ export const searchStocks = cache(
 
 			const trimmed = typeof query === "string" ? query.trim() : "";
 
-			let results: FinnhubSearchResult[] = [];
-
 			if (!trimmed) {
 				// Fetch top 10 popular symbols' profiles
 				const top = POPULAR_STOCK_SYMBOLS.slice(0, 10);
@@ -177,49 +181,49 @@ export const searchStocks = cache(
 						try {
 							const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${encodeURIComponent(sym)}&token=${token}`;
 							// Revalidate every hour
-							const profile = await fetchJSON<any>(url, 3600);
-							return { sym, profile } as { sym: string; profile: any };
+							const profile = await fetchJSON<FinnhubCompanyProfile>(
+								url,
+								3600,
+							);
+							return { sym, profile };
 						} catch (e) {
 							console.error("Error fetching profile2 for", sym, e);
-							return { sym, profile: null } as { sym: string; profile: any };
+							return { sym, profile: null };
 						}
 					}),
 				);
 
-				results = profiles
+				return profiles
 					.map(({ sym, profile }) => {
 						const symbol = sym.toUpperCase();
 						const name: string | undefined =
 							profile?.name || profile?.ticker || undefined;
 						const exchange: string | undefined = profile?.exchange || undefined;
 						if (!name) return undefined;
-						const r: FinnhubSearchResult = {
+						const stock: StockWithWatchlistStatus = {
 							symbol,
-							description: name,
-							displaySymbol: symbol,
+							name,
+							exchange: exchange || "US",
 							type: "Common Stock",
+							isInWatchlist: false,
 						};
-						// We don't include exchange in FinnhubSearchResult type, so carry via mapping later using profile
-						// To keep pipeline simple, attach exchange via closure map stage
-						// We'll reconstruct exchange when mapping to final type
-						(r as any).__exchange = exchange; // internal only
-						return r;
+						return stock;
 					})
-					.filter((x): x is FinnhubSearchResult => Boolean(x));
-			} else {
-				const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(trimmed)}&token=${token}`;
-				const data = await fetchJSON<FinnhubSearchResponse>(url, 1800);
-				results = Array.isArray(data?.result) ? data.result : [];
+					.filter((stock): stock is StockWithWatchlistStatus =>
+						Boolean(stock),
+					)
+					.slice(0, 15);
 			}
+
+			const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(trimmed)}&token=${token}`;
+			const data = await fetchJSON<FinnhubSearchResponse>(url, 1800);
+			const results = Array.isArray(data?.result) ? data.result : [];
 
 			const mapped: StockWithWatchlistStatus[] = results
 				.map((r) => {
 					const upper = (r.symbol || "").toUpperCase();
 					const name = r.description || upper;
-					const exchangeFromProfile = (r as any).__exchange as
-						| string
-						| undefined;
-					const exchange = exchangeFromProfile || "US";
+					const exchange = "US";
 					const type = r.type || "Stock";
 					const item: StockWithWatchlistStatus = {
 						symbol: upper,
