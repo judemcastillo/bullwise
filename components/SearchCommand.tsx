@@ -39,6 +39,7 @@ export default function SearchCommand({
 	const handleSearch = useCallback(async () => {
 		if (!isSearchMode) return setStocks(initialStocks);
 
+		setLoading(true);
 		try {
 			const results = await searchStocks(searchTerm.trim());
 			setStocks(results);
