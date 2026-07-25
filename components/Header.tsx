@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import NavItems from "./NavItems";
-import UserDropdown from "./UserDropdown";
+import HeaderNavigation from "./HeaderNavigation";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 
 export default async function Header({ user }: { user: User }) {
@@ -19,10 +18,7 @@ export default async function Header({ user }: { user: User }) {
 						className="h-8 w-auto cursor-pointer"
 					/>
 				</Link>
-				<nav className="hidden sm:block ">
-					<NavItems initialStocks={initialStocks} />
-				</nav>
-				<UserDropdown user={user} initialStocks={initialStocks} />
+				<HeaderNavigation user={user} initialStocks={initialStocks} />
 			</div>
 		</header>
 	);

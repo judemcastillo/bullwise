@@ -56,8 +56,8 @@ declare global {
     };
 
     type SearchCommandProps = {
-        renderAs?: 'button' | 'text';
-        label?: string;
+        open: boolean;
+        setOpen: React.Dispatch<React.SetStateAction<boolean>>;
         initialStocks: StockWithWatchlistStatus[];
     };
 
@@ -166,15 +166,6 @@ declare global {
 
     type WatchlistNewsProps = {
         news?: MarketNewsArticle[];
-    };
-
-    type SearchCommandProps = {
-        open?: boolean;
-        setOpen?: (open: boolean) => void;
-        renderAs?: 'button' | 'text';
-        buttonLabel?: string;
-        buttonVariant?: 'primary' | 'secondary';
-        className?: string;
     };
 
     type AlertData = {

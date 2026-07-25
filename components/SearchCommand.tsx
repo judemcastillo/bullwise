@@ -1,24 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	CommandDialog,
 	CommandEmpty,
 	CommandInput,
 	CommandList,
 } from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
 import { Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export default function SearchCommand({
-	renderAs = "button",
-	label = "Add stock",
+	open,
+	setOpen,
 	initialStocks,
 }: SearchCommandProps) {
-	const [open, setOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [stocks, setStocks] =
@@ -36,9 +34,9 @@ export default function SearchCommand({
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, []);
+	}, [setOpen]);
 
-	const handleSearch = async () => {
+	const handleSearch = useCallback(async () => {
 		if (!isSearchMode) return setStocks(initialStocks);
 
 		try {
@@ -50,13 +48,13 @@ export default function SearchCommand({
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [initialStocks, isSearchMode, searchTerm]);
 
 	const debouncedSearch = useDebounce(handleSearch, 300);
 
 	useEffect(() => {
 		debouncedSearch();
-	}, [searchTerm]);
+	}, [debouncedSearch]);
 
 	const handleSelectStock = () => {
 		setOpen(false);
@@ -65,69 +63,58 @@ export default function SearchCommand({
 	};
 
 	return (
-		<>
-			{renderAs === "text" ? (
-				<span onClick={() => setOpen(true)} className="search-text">
-					{label}
-				</span>
-			) : (
-				<Button onClick={() => setOpen(true)} className="search-btn">
-					{label}
-				</Button>
-			)}
-			<CommandDialog
-				open={open}
-				onOpenChange={setOpen}
-				className="search-dialog"
-			>
-				<div className="search-field bg-gray-800! pb-1 flex flex-row justify-between items-center gap-0!">
-					<div className="p-1  grow-3!">
-						<CommandInput
-							value={searchTerm}
-							onValueChange={setSearchTerm}
-							placeholder="Search stocks..."
-							className="search-input border-0!  bg-gray-800! "
-						/>
-					</div>
-					<div>{loading && <Loader2 className="search-loader" />}</div>
+		<CommandDialog
+			open={open}
+			onOpenChange={setOpen}
+			className="search-dialog"
+		>
+			<div className="search-field bg-gray-800! pb-1 flex flex-row justify-between items-center gap-0!">
+				<div className="p-1  grow-3!">
+					<CommandInput
+						value={searchTerm}
+						onValueChange={setSearchTerm}
+						placeholder="Search stocks..."
+						className="search-input border-0!  bg-gray-800! "
+					/>
 				</div>
-				<CommandList className="search-list">
-					{loading ? (
-						<CommandEmpty className="search-list-empty">
-							Loading stocks...
-						</CommandEmpty>
-					) : displayStocks?.length === 0 ? (
-						<div className="search-list-indicator">
-							{isSearchMode ? "No results found" : "No stocks available"}
+				<div>{loading && <Loader2 className="search-loader" />}</div>
+			</div>
+			<CommandList className="search-list">
+				{loading ? (
+					<CommandEmpty className="search-list-empty">
+						Loading stocks...
+					</CommandEmpty>
+				) : displayStocks?.length === 0 ? (
+					<div className="search-list-indicator">
+						{isSearchMode ? "No results found" : "No stocks available"}
+					</div>
+				) : (
+					<ul>
+						<div className="search-count">
+							{isSearchMode ? "Search results" : "Popular stocks"}
+							{` `}({displayStocks?.length || 0})
 						</div>
-					) : (
-						<ul>
-							<div className="search-count">
-								{isSearchMode ? "Search results" : "Popular stocks"}
-								{` `}({displayStocks?.length || 0})
-							</div>
-							{displayStocks?.map((stock, i) => (
-								<li key={stock.symbol} className="search-item">
-									<Link
-										href={`/stocks/${stock.symbol}`}
-										onClick={handleSelectStock}
-										className="search-item-link"
-									>
-										<TrendingUp className="h-4 w-4 text-gray-500" />
-										<div className="flex-1">
-											<div className="search-item-name">{stock.name}</div>
-											<div className="text-sm text-gray-500">
-												{stock.symbol} | {stock.exchange} | {stock.type}
-											</div>
+						{displayStocks?.map((stock) => (
+							<li key={stock.symbol} className="search-item">
+								<Link
+									href={`/stocks/${stock.symbol}`}
+									onClick={handleSelectStock}
+									className="search-item-link"
+								>
+									<TrendingUp className="h-4 w-4 text-gray-500" />
+									<div className="flex-1">
+										<div className="search-item-name">{stock.name}</div>
+										<div className="text-sm text-gray-500">
+											{stock.symbol} | {stock.exchange} | {stock.type}
 										</div>
-										{/*<Star />*/}
-									</Link>
-								</li>
-							))}
-						</ul>
-					)}
-				</CommandList>
-			</CommandDialog>
-		</>
+									</div>
+									{/*<Star />*/}
+								</Link>
+							</li>
+						))}
+					</ul>
+				)}
+			</CommandList>
+		</CommandDialog>
 	);
 }

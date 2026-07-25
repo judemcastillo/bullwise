@@ -5,13 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import React from "react";
-import UserDropdown from "./UserDropdown";
-import SearchCommand from "./SearchCommand";
 
 export default function NavItems({
-	initialStocks,
+	onOpenSearch,
 }: {
-	initialStocks: StockWithWatchlistStatus[];
+	onOpenSearch: () => void;
 }) {
 	const pathname: string = usePathname();
 
@@ -26,11 +24,9 @@ export default function NavItems({
 				if (label === "Search")
 					return (
 						<li key="search-trigger">
-							<SearchCommand
-								renderAs="text"
-								label="Search"
-								initialStocks={initialStocks}
-							/>
+							<span onClick={onOpenSearch} className="search-text">
+								Search
+							</span>
 						</li>
 					);
 				return (

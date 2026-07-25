@@ -18,10 +18,10 @@ import { signOut } from "@/lib/actions/auth.actions";
 
 export default function UserDropdown({
 	user,
-	initialStocks,
+	onOpenSearch,
 }: {
 	user: User;
-	initialStocks: StockWithWatchlistStatus[];
+	onOpenSearch: () => void;
 }) {
 	const router = useRouter();
 
@@ -77,7 +77,7 @@ export default function UserDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuSeparator className="hidden sm:block bg-gray-600" />
 				<nav className="sm:hidden">
-					<NavItems initialStocks={initialStocks} />
+					<NavItems onOpenSearch={onOpenSearch} />
 				</nav>
 			</DropdownMenuContent>
 		</DropdownMenu>
