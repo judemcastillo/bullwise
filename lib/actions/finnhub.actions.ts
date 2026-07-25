@@ -216,12 +216,10 @@ export const searchStocks = cache(
 				.map((r) => {
 					const upper = (r.symbol || "").toUpperCase();
 					const name = r.description || upper;
-					const exchangeFromDisplay =
-						(r.displaySymbol as string | undefined) || undefined;
 					const exchangeFromProfile = (r as any).__exchange as
 						| string
 						| undefined;
-					const exchange = exchangeFromDisplay || exchangeFromProfile || "US";
+					const exchange = exchangeFromProfile || "US";
 					const type = r.type || "Stock";
 					const item: StockWithWatchlistStatus = {
 						symbol: upper,
