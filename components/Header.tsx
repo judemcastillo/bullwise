@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import NavItems from "./NavItems";
-import UserDropdown from "./UserDropdown";
+import HeaderNavigation from "./HeaderNavigation";
+import { searchStocks } from "@/lib/actions/finnhub.actions";
 
-export default function Header({ user }: { user: User }) {
+export default async function Header({ user }: { user: User }) {
+	const initialStocks = await searchStocks();
 	return (
 		<header className="sticky top-0 header backdrop-blur-sm shadow bg-slate-950/80">
 			<div className="container header-wrapper">
@@ -17,10 +18,7 @@ export default function Header({ user }: { user: User }) {
 						className="h-8 w-auto cursor-pointer"
 					/>
 				</Link>
-				<nav className="hidden sm:block ">
-					<NavItems />
-				</nav>
-				<UserDropdown user={user} />
+				<HeaderNavigation user={user} initialStocks={initialStocks} />
 			</div>
 		</header>
 	);
