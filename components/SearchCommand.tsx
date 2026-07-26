@@ -11,11 +11,13 @@ import { Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 import { useDebounce } from "@/hooks/useDebounce";
+import WatchlistButton from "./WatchlistButton";
 
 export default function SearchCommand({
 	open,
 	setOpen,
 	initialStocks,
+	onWatchlistChange,
 }: SearchCommandProps) {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -63,13 +65,18 @@ export default function SearchCommand({
 		setStocks(initialStocks);
 	};
 
+	const handleWatchlistChange = (symbol: string, isAdded: boolean) => {
+		setStocks((currentStocks) =>
+			currentStocks.map((stock) =>
+				stock.symbol === symbol ? { ...stock, isInWatchlist: isAdded } : stock,
+			),
+		);
+		onWatchlistChange?.(symbol, isAdded);
+	};
+
 	return (
-		<CommandDialog
-			open={open}
-			onOpenChange={setOpen}
-			className="search-dialog"
-		>
-			<div className="search-field bg-gray-800! pb-0 flex flex-row justify-between items-center gap-0!">
+		<CommandDialog open={open} onOpenChange={setOpen} className="search-dialog">
+			<div className="search-field bg-gray-800! flex flex-row justify-between items-center gap-0! py-2">
 				<div className="p-1  grow-3!">
 					<CommandInput
 						value={searchTerm}
@@ -96,11 +103,14 @@ export default function SearchCommand({
 							{` `}({displayStocks?.length || 0})
 						</div>
 						{displayStocks?.map((stock) => (
-							<li key={stock.symbol} className="search-item">
+							<li
+								key={stock.symbol}
+								className="search-item flex items-center px-2 hover:bg-accent"
+							>
 								<Link
 									href={`/stocks/${stock.symbol}`}
 									onClick={handleSelectStock}
-									className="search-item-link"
+									className="search-item-link grow px-0"
 								>
 									<TrendingUp className="h-4 w-4 text-gray-500" />
 									<div className="flex-1">
@@ -109,8 +119,14 @@ export default function SearchCommand({
 											{stock.symbol} | {stock.exchange} | {stock.type}
 										</div>
 									</div>
-									{/*<Star />*/}
 								</Link>
+								<WatchlistButton
+									symbol={stock.symbol}
+									company={stock.name}
+									isInWatchlist={stock.isInWatchlist}
+									onWatchlistChange={handleWatchlistChange}
+									type="icon"
+								/>
 							</li>
 						))}
 					</ul>

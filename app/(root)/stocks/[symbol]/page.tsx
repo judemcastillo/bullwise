@@ -1,11 +1,8 @@
 import TradingViewWidget from "@/components/TradingViewWidget";
 import WatchlistButton from "@/components/WatchlistButton";
 import { auth } from "@/lib/better-auth/auth";
-import {
-	addToWatchlist,
-	getWatchlistSymbolsByUserId,
-	removeFromWatchlist,
-} from "@/lib/actions/watchlist.actions";
+import { getWatchlistSymbolsByUserId } from "@/lib/actions/watchlist.actions";
+import { searchStocks } from "@/lib/actions/finnhub.actions";
 import {
 	BASELINE_WIDGET_CONFIG,
 	CANDLE_CHART_WIDGET_CONFIG,
@@ -29,21 +26,14 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 
 	if (!session?.user) redirect("/sign-in");
 
-	const watchlistSymbols = await getWatchlistSymbolsByUserId(session.user.id);
+	const [watchlistSymbols, matchingStocks] = await Promise.all([
+		getWatchlistSymbolsByUserId(session.user.id),
+		searchStocks(normalizedSymbol),
+	]);
 	const isInWatchlist = watchlistSymbols.includes(normalizedSymbol);
-
-	const handleWatchlistChange = async (
-		changedSymbol: string,
-		isAdded: boolean,
-	) => {
-		"use server";
-
-		if (isAdded) {
-			await addToWatchlist(changedSymbol, changedSymbol);
-		} else {
-			await removeFromWatchlist(changedSymbol);
-		}
-	};
+	const company =
+		matchingStocks.find((stock) => stock.symbol === normalizedSymbol)?.name ??
+		normalizedSymbol;
 
 	return (
 		<div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
@@ -71,9 +61,8 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 				<WatchlistButton
 					key={normalizedSymbol}
 					symbol={normalizedSymbol}
-					company={normalizedSymbol}
+					company={company}
 					isInWatchlist={isInWatchlist}
-					onWatchlistChange={handleWatchlistChange}
 				/>
 				<TradingViewWidget
 					scriptUrl={`${TRADING_VIEW_EMBED_URL}technical-analysis.js`}
