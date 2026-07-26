@@ -69,7 +69,7 @@ export default function SearchCommand({
 			onOpenChange={setOpen}
 			className="search-dialog"
 		>
-			<div className="search-field bg-gray-800! pb-1 flex flex-row justify-between items-center gap-0!">
+			<div className="search-field bg-gray-800! pb-0 flex flex-row justify-between items-center gap-0!">
 				<div className="p-1  grow-3!">
 					<CommandInput
 						value={searchTerm}
