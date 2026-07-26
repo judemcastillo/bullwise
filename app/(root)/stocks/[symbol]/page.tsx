@@ -1,0 +1,66 @@
+import TradingViewWidget from "@/components/TradingViewWidget";
+import WatchlistButton from "@/components/WatchlistButton";
+import {
+	BASELINE_WIDGET_CONFIG,
+	CANDLE_CHART_WIDGET_CONFIG,
+	COMPANY_FINANCIALS_WIDGET_CONFIG,
+	COMPANY_PROFILE_WIDGET_CONFIG,
+	SYMBOL_INFO_WIDGET_CONFIG,
+	TECHNICAL_ANALYSIS_WIDGET_CONFIG,
+} from "@/lib/constants";
+
+const TRADING_VIEW_EMBED_URL =
+	"https://s3.tradingview.com/external-embedding/embed-widget-";
+
+const StockDetails = async ({ params }: StockDetailsPageProps) => {
+	const { symbol } = await params;
+
+	return (
+		<div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+			<section className="flex min-w-0 flex-col gap-6">
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}symbol-info.js`}
+					config={SYMBOL_INFO_WIDGET_CONFIG(symbol)}
+					height={170}
+				/>
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}advanced-chart.js`}
+					config={CANDLE_CHART_WIDGET_CONFIG(symbol)}
+					height={600}
+					className="custom-chart"
+				/>
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}advanced-chart.js`}
+					config={BASELINE_WIDGET_CONFIG(symbol)}
+					height={600}
+					className="custom-chart"
+				/>
+			</section>
+
+			<section className="flex min-w-0 flex-col gap-6">
+				<WatchlistButton
+					symbol={symbol}
+					company={symbol}
+					isInWatchlist={false}
+				/>
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}technical-analysis.js`}
+					config={TECHNICAL_ANALYSIS_WIDGET_CONFIG(symbol)}
+					height={400}
+				/>
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}symbol-profile.js`}
+					config={COMPANY_PROFILE_WIDGET_CONFIG(symbol)}
+					height={440}
+				/>
+				<TradingViewWidget
+					scriptUrl={`${TRADING_VIEW_EMBED_URL}financials.js`}
+					config={COMPANY_FINANCIALS_WIDGET_CONFIG(symbol)}
+					height={464}
+				/>
+			</section>
+		</div>
+	);
+};
+
+export default StockDetails;
