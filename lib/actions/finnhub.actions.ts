@@ -3,6 +3,10 @@
 import { formatArticle, getDateRange, validateArticle } from "@/lib/utils";
 import { cache } from "react";
 import { POPULAR_STOCK_SYMBOLS } from "../constants";
+import { auth } from "../better-auth/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getWatchlistSymbolsByUserId } from "./watchlist.actions";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const NEXT_PUBLIC_FINNHUB_API_KEY =
@@ -12,6 +16,10 @@ const MAX_NEWS_ARTICLES = 6;
 type FinnhubCompanyProfile = {
 	name?: string;
 	ticker?: string;
+	exchange?: string;
+};
+
+type FinnhubSearchResultWithExchange = FinnhubSearchResult & {
 	exchange?: string;
 };
 
@@ -161,6 +169,14 @@ export async function getNews(
 export const searchStocks = cache(
 	async (query?: string): Promise<StockWithWatchlistStatus[]> => {
 		try {
+			const session = await auth.api.getSession({
+				headers: await headers(),
+			});
+			if (!session?.user) redirect("/sign-in");
+
+			const userWatchlistSymbols = await getWatchlistSymbolsByUserId(
+				session.user.id,
+			);
 			const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
 			if (!token) {
 				// If no token, log and return empty to avoid throwing per requirements
@@ -173,6 +189,8 @@ export const searchStocks = cache(
 
 			const trimmed = typeof query === "string" ? query.trim() : "";
 
+			let results: FinnhubSearchResultWithExchange[] = [];
+
 			if (!trimmed) {
 				// Fetch top 10 popular symbols' profiles
 				const top = POPULAR_STOCK_SYMBOLS.slice(0, 10);
@@ -181,10 +199,7 @@ export const searchStocks = cache(
 						try {
 							const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${encodeURIComponent(sym)}&token=${token}`;
 							// Revalidate every hour
-							const profile = await fetchJSON<FinnhubCompanyProfile>(
-								url,
-								3600,
-							);
+							const profile = await fetchJSON<FinnhubCompanyProfile>(url, 3600);
 							return { sym, profile };
 						} catch (e) {
 							console.error("Error fetching profile2 for", sym, e);
@@ -193,44 +208,48 @@ export const searchStocks = cache(
 					}),
 				);
 
-				return profiles
+				results = profiles
 					.map(({ sym, profile }) => {
 						const symbol = sym.toUpperCase();
 						const name: string | undefined =
 							profile?.name || profile?.ticker || undefined;
 						const exchange: string | undefined = profile?.exchange || undefined;
 						if (!name) return undefined;
-						const stock: StockWithWatchlistStatus = {
+						const result: FinnhubSearchResultWithExchange = {
 							symbol,
-							name,
-							exchange: exchange || "US",
+							description: name,
+							displaySymbol: symbol,
 							type: "Common Stock",
-							isInWatchlist: false,
+							exchange,
 						};
-						return stock;
+						return result;
 					})
-					.filter((stock): stock is StockWithWatchlistStatus =>
-						Boolean(stock),
-					)
-					.slice(0, 15);
+					.filter((result): result is FinnhubSearchResultWithExchange =>
+						Boolean(result),
+					);
+			} else {
+				const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(
+					trimmed,
+				)}&token=${token}`;
+				const data = await fetchJSON<FinnhubSearchResponse>(url, 1800);
+				results = Array.isArray(data?.result) ? data.result : [];
 			}
-
-			const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(trimmed)}&token=${token}`;
-			const data = await fetchJSON<FinnhubSearchResponse>(url, 1800);
-			const results = Array.isArray(data?.result) ? data.result : [];
 
 			const mapped: StockWithWatchlistStatus[] = results
 				.map((r) => {
 					const upper = (r.symbol || "").toUpperCase();
 					const name = r.description || upper;
-					const exchange = "US";
+					const exchangeFromDisplay =
+						(r.displaySymbol as string | undefined) || undefined;
+					const exchangeFromProfile = r.exchange;
+					const exchange = exchangeFromProfile || exchangeFromDisplay || "US";
 					const type = r.type || "Stock";
 					const item: StockWithWatchlistStatus = {
 						symbol: upper,
 						name,
 						exchange,
 						type,
-						isInWatchlist: false,
+						isInWatchlist: userWatchlistSymbols.includes(upper),
 					};
 					return item;
 				})

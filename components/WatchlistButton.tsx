@@ -1,9 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+	addToWatchlist,
+	removeFromWatchlist,
+} from "@/lib/actions/watchlist.actions";
 import { Star, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
+import { toast } from "sonner";
 
 const WatchlistButton = ({
 	symbol,
@@ -13,46 +16,83 @@ const WatchlistButton = ({
 	type = "button",
 	onWatchlistChange,
 }: WatchlistButtonProps) => {
-	const [isAdded, setIsAdded] = useState(isInWatchlist);
+	const [isAdded, setIsAdded] = useState<boolean>(!!isInWatchlist);
+	const [isPending, setIsPending] = useState(false);
 
-	const toggleWatchlist = () => {
-		const nextIsAdded = !isAdded;
+	const handleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+		event.stopPropagation();
+		event.preventDefault();
+		if (isPending) return;
+
+		const wasAdded = isAdded;
+		const nextIsAdded = !wasAdded;
 		setIsAdded(nextIsAdded);
-		onWatchlistChange?.(symbol, nextIsAdded);
+		setIsPending(true);
+
+		try {
+			const result = wasAdded
+				? await removeFromWatchlist(symbol)
+				: await addToWatchlist(symbol, company);
+
+			if (!result.success) {
+				throw new Error(
+					"error" in result ? result.error : "Unable to update watchlist",
+				);
+			}
+
+			toast.success(
+				wasAdded ? "Removed from Watchlist" : "Added to Watchlist",
+				{
+					description: `${company} ${wasAdded ? "removed from" : "added to"} your watchlist`,
+				},
+			);
+			onWatchlistChange?.(symbol, nextIsAdded);
+		} catch (error) {
+			setIsAdded(wasAdded);
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Unable to update your watchlist",
+			);
+		} finally {
+			setIsPending(false);
+		}
 	};
 
 	const label = isAdded ? "Remove from Watchlist" : "Add to Watchlist";
 
 	if (type === "icon") {
 		return (
-			<Button
+			<button
 				type="button"
-				variant="ghost"
-				size="icon"
-				className={cn("watchlist-icon-btn", isAdded && "watchlist-icon-added")}
+				title={`${label}: ${symbol}`}
 				aria-label={`${label}: ${company}`}
 				aria-pressed={isAdded}
-				onClick={toggleWatchlist}
+				className={`watchlist-icon-btn ${isAdded ? "watchlist-icon-added" : ""}`}
+				disabled={isPending}
+				onClick={handleClick}
 			>
 				{showTrashIcon && isAdded ? (
 					<Trash2 className="trash-icon" />
 				) : (
 					<Star className="star-icon" fill={isAdded ? "currentColor" : "none"} />
 				)}
-			</Button>
+			</button>
 		);
 	}
 
 	return (
-		<Button
+		<button
 			type="button"
-			className={cn("watchlist-btn", isAdded && "watchlist-remove")}
 			aria-label={`${label}: ${company}`}
 			aria-pressed={isAdded}
-			onClick={toggleWatchlist}
+			className={`watchlist-btn ${isAdded ? "watchlist-remove" : ""}`}
+			disabled={isPending}
+			onClick={handleClick}
 		>
-			{label}
-		</Button>
+			{showTrashIcon && isAdded ? <Trash2 /> : null}
+			<span>{label}</span>
+		</button>
 	);
 };
 

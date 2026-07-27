@@ -2,8 +2,10 @@
 
 import Watchlist from "@/database/models/watchlist.model";
 import { auth } from "@/lib/better-auth/auth";
-import { revalidatePath } from "next/cache";
+import { getStocksDetails } from "@/lib/services/stock-data";
+
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 interface WatchlistSymbol {
 	symbol: string;
@@ -14,45 +16,59 @@ async function getCurrentUserId(): Promise<string> {
 		headers: await headers(),
 	});
 
-	if (!session?.user) throw new Error("Unauthorized");
+	if (!session?.user) redirect("/sign-in");
 
 	return session.user.id;
 }
 
-export async function addToWatchlist(
-	symbol: string,
-	company: string,
-): Promise<void> {
+export async function addToWatchlist(symbol: string, company: string) {
 	const userId = await getCurrentUserId();
 	const normalizedSymbol = symbol.trim().toUpperCase();
+	const normalizedCompany = company.trim();
 
-	await Watchlist.updateOne(
-		{ userId, symbol: normalizedSymbol },
-		{
-			$setOnInsert: {
-				userId,
-				symbol: normalizedSymbol,
-				company: company.trim(),
+	if (!normalizedSymbol || !normalizedCompany) {
+		return { success: false, error: "Symbol and company are required" };
+	}
+
+	try {
+		const result = await Watchlist.updateOne(
+			{ userId, symbol: normalizedSymbol },
+			{
+				$setOnInsert: {
+					userId,
+					symbol: normalizedSymbol,
+					company: normalizedCompany,
+				},
 			},
-		},
-		{ upsert: true },
-	);
+			{ upsert: true, runValidators: true },
+		);
 
-	revalidatePath(`/stocks/${encodeURIComponent(normalizedSymbol)}`);
-	revalidatePath("/watchlist");
+		if (result.upsertedCount === 0) {
+			return { success: false, error: "Stock already exists" };
+		}
+
+		return { success: true, message: "Stock added to watchlist" };
+	} catch (e) {
+		console.error("Error adding to watchlist", e);
+		throw new Error("Failed to add stock to watchlist");
+	}
 }
 
-export async function removeFromWatchlist(symbol: string): Promise<void> {
+export async function removeFromWatchlist(symbol: string) {
 	const userId = await getCurrentUserId();
 	const normalizedSymbol = symbol.trim().toUpperCase();
 
-	await Watchlist.deleteOne({
-		userId,
-		symbol: normalizedSymbol,
-	});
+	try {
+		await Watchlist.deleteOne({
+			userId,
+			symbol: normalizedSymbol,
+		});
 
-	revalidatePath(`/stocks/${encodeURIComponent(normalizedSymbol)}`);
-	revalidatePath("/watchlist");
+		return { success: true, message: "Stock removed from watchlist" };
+	} catch (error) {
+		console.error("Error removing from watchlist:", error);
+		throw new Error("Failed to remove stock from watchlist");
+	}
 }
 
 export async function getWatchlistSymbolsByUserId(
@@ -69,3 +85,66 @@ export async function getWatchlistSymbolsByUserId(
 		return [];
 	}
 }
+
+// Get user's watchlist
+export const getUserWatchlist = async () => {
+	const userId = await getCurrentUserId();
+
+	try {
+		const watchlist = await Watchlist.find({ userId })
+			.sort({ addedAt: -1 })
+			.lean();
+
+		return JSON.parse(JSON.stringify(watchlist));
+	} catch (error) {
+		console.error("Error fetching watchlist:", error);
+		throw new Error("Failed to fetch watchlist");
+	}
+};
+
+// Get user's watchlist with stock data
+export const getWatchlistWithData = async (): Promise<StockWithData[]> => {
+	const userId = await getCurrentUserId();
+
+	try {
+		const watchlist = await Watchlist.find({ userId })
+			.sort({ addedAt: -1 })
+			.lean();
+
+		if (watchlist.length === 0) return [];
+
+		const stocksWithData: StockWithData[] = await Promise.all(
+			watchlist.map(async (item): Promise<StockWithData> => {
+				const stockData = await getStocksDetails(item.symbol);
+
+				if (!stockData) {
+					console.warn(`Failed to fetch data for ${item.symbol}`);
+					return {
+						userId: item.userId,
+						symbol: item.symbol,
+						company: item.company,
+						addedAt: item.addedAt,
+					};
+				}
+
+				return {
+					userId: item.userId,
+					company: stockData.company,
+					symbol: stockData.symbol,
+					addedAt: item.addedAt,
+					currentPrice: stockData.currentPrice,
+					priceFormatted: stockData.priceFormatted,
+					changeFormatted: stockData.changeFormatted,
+					changePercent: stockData.changePercent,
+					marketCap: stockData.marketCapFormatted,
+					peRatio: stockData.peRatio,
+				};
+			}),
+		);
+
+		return stocksWithData;
+	} catch (error) {
+		console.error("Error loading watchlist:", error);
+		throw new Error("Failed to fetch watchlist");
+	}
+};

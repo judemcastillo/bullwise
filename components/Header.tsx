@@ -1,13 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import HeaderNavigation from "./HeaderNavigation";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 
 export default async function Header({ user }: { user: User }) {
 	const initialStocks = await searchStocks();
 	return (
-		<header className="sticky top-0 header backdrop-blur-sm shadow bg-slate-950/80">
+		<header className="sticky top-0 header backdrop-blur-sm shadow-lg bg-slate-950/80 shadow-gray-800">
 			<div className="container header-wrapper">
 				<Link href="/">
 					<Image
