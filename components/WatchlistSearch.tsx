@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 
 export default function WatchlistSearch({
 	initialStocks,
+	stockMembershipKey,
 }: {
 	initialStocks: StockWithWatchlistStatus[];
+	stockMembershipKey: string;
 }) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
@@ -19,6 +21,7 @@ export default function WatchlistSearch({
 				Add stock
 			</Button>
 			<SearchCommand
+				key={stockMembershipKey}
 				open={open}
 				setOpen={setOpen}
 				initialStocks={initialStocks}

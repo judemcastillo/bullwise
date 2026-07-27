@@ -23,8 +23,8 @@ const Watchlist = async () => {
 						stocks,commodities,futures and clicking the star icon to add them.
 					</p>
 					<WatchlistSearch
-						key={stockMembershipKey}
 						initialStocks={initialStocks}
+						stockMembershipKey={stockMembershipKey}
 					/>
 				</div>
 			</section>
@@ -37,8 +37,8 @@ const Watchlist = async () => {
 				<div className="flex items-center justify-between">
 					<h2 className="watchlist-title">Watchlist</h2>
 					<WatchlistSearch
-						key={stockMembershipKey}
 						initialStocks={initialStocks}
+						stockMembershipKey={stockMembershipKey}
 					/>
 				</div>
 				<WatchlistTable
