@@ -113,18 +113,25 @@ export const getWatchlistWithData = async (): Promise<StockWithData[]> => {
 
 		if (watchlist.length === 0) return [];
 
-		const stocksWithData = await Promise.all(
-			watchlist.map(async (item) => {
+		const stocksWithData: StockWithData[] = await Promise.all(
+			watchlist.map(async (item): Promise<StockWithData> => {
 				const stockData = await getStocksDetails(item.symbol);
 
 				if (!stockData) {
 					console.warn(`Failed to fetch data for ${item.symbol}`);
-					return item;
+					return {
+						userId: item.userId,
+						symbol: item.symbol,
+						company: item.company,
+						addedAt: item.addedAt,
+					};
 				}
 
 				return {
+					userId: item.userId,
 					company: stockData.company,
 					symbol: stockData.symbol,
+					addedAt: item.addedAt,
 					currentPrice: stockData.currentPrice,
 					priceFormatted: stockData.priceFormatted,
 					changeFormatted: stockData.changeFormatted,
@@ -135,7 +142,7 @@ export const getWatchlistWithData = async (): Promise<StockWithData[]> => {
 			}),
 		);
 
-		return JSON.parse(JSON.stringify(stocksWithData)) as StockWithData[];
+		return stocksWithData;
 	} catch (error) {
 		console.error("Error loading watchlist:", error);
 		throw new Error("Failed to fetch watchlist");
