@@ -18,10 +18,11 @@ async function fetchStockData<T>(
 	const response = await fetch(
 		`${FINNHUB_BASE_URL}/${path}${path.includes("?") ? "&" : "?"}token=${FINNHUB_API_KEY}`,
 		revalidateSeconds === undefined
-			? { cache: "no-store" }
+			? { cache: "no-store", signal: AbortSignal.timeout(8000) }
 			: {
 					cache: "force-cache",
 					next: { revalidate: revalidateSeconds },
+					signal: AbortSignal.timeout(8000),
 				},
 	);
 
