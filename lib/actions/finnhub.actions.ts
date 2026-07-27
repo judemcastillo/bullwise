@@ -249,9 +249,7 @@ export const searchStocks = cache(
 						name,
 						exchange,
 						type,
-						isInWatchlist: userWatchlistSymbols.includes(
-							r.symbol.toUpperCase(),
-						),
+						isInWatchlist: userWatchlistSymbols.includes(upper),
 					};
 					return item;
 				})
