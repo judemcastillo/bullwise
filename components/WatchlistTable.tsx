@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { cn, getChangeColorClass } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
 import { useState, type MouseEvent } from "react";
+import { BellPlus } from "lucide-react";
 
 export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	const router = useRouter();
@@ -34,12 +35,15 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	};
 
 	return (
-		<>
+		<div className="watchlist-table-shell">
 			<Table className="scrollbar-hide-default watchlist-table">
 				<TableHeader>
 					<TableRow className="table-header-row">
-						{WATCHLIST_TABLE_HEADER.map((label) => (
-							<TableHead className="table-header" key={label}>
+						{WATCHLIST_TABLE_HEADER.map((label, index) => (
+							<TableHead
+								className={cn("table-header", index === 0 && "w-12")}
+								key={label || "watchlist-status"}
+							>
 								{label}
 							</TableHead>
 						))}
@@ -54,7 +58,18 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 								router.push(`/stocks/${encodeURIComponent(item.symbol)}`)
 							}
 						>
-							<TableCell className="pl-4 table-cell">{item.company}</TableCell>
+							<TableCell className="table-cell watchlist-status-cell">
+								<WatchlistButton
+									symbol={item.symbol}
+									company={item.company}
+									isInWatchlist={true}
+									type="icon"
+									onWatchlistChange={handleWatchlistChange}
+								/>
+							</TableCell>
+							<TableCell className="table-cell company-cell">
+								<span title={item.company}>{item.company}</span>
+							</TableCell>
 							<TableCell className="table-cell">{item.symbol}</TableCell>
 							<TableCell className="table-cell">
 								{item.priceFormatted || "—"}
@@ -79,23 +94,14 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 									className="add-alert"
 									onClick={preventRowNavigation}
 								>
+									<BellPlus aria-hidden="true" />
 									Add Alert
 								</Button>
-							</TableCell>
-							<TableCell>
-								<WatchlistButton
-									symbol={item.symbol}
-									company={item.company}
-									isInWatchlist={true}
-									showTrashIcon={true}
-									type="icon"
-									onWatchlistChange={handleWatchlistChange}
-								/>
 							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
 			</Table>
-		</>
+		</div>
 	);
 }

@@ -259,8 +259,11 @@
 	.watchlist-remove {
 		@apply bg-red-500! hover:bg-red-500! text-gray-900!;
 	}
+	.watchlist-page {
+		@apply flex w-full flex-col;
+	}
 	.watchlist-empty-container {
-		@apply container gap-8 flex-col items-center md:mt-10 p-6 text-center;
+		@apply flex min-h-[360px] items-center justify-center rounded-xl border border-dashed border-gray-600 bg-gray-800/40 p-8 text-center;
 	}
 	.watchlist-empty {
 		@apply flex flex-col items-center justify-center text-center;
@@ -275,16 +278,28 @@
 		@apply text-gray-500 mb-6 max-w-md;
 	}
 	.watchlist-container {
-		@apply flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8;
+		@apply grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,2.2fr)_minmax(300px,0.8fr)];
 	}
 	.watchlist {
-		@apply lg:col-span-2 space-y-8;
+		@apply flex min-w-0 flex-col gap-4;
 	}
 	.watchlist-alerts {
-		@apply items-start gap-6 h-full flex-col w-full lg:col-span-1;
+		@apply flex min-w-0 flex-col gap-4;
+	}
+	.watchlist-section-heading {
+		@apply flex min-h-10 items-end justify-between gap-4;
+	}
+	.watchlist-eyebrow {
+		@apply mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-yellow-500;
+	}
+	.watchlist-primary-action {
+		@apply h-9 cursor-pointer rounded-md bg-yellow-500 px-4 font-semibold text-gray-900 hover:bg-yellow-400 disabled:cursor-not-allowed disabled:bg-yellow-500 disabled:opacity-60;
+	}
+	.watchlist .search-btn {
+		@apply h-9 rounded-md bg-yellow-500 px-4 py-0 text-sm font-semibold text-gray-900 hover:bg-yellow-400;
 	}
 	.watchlist-icon-btn {
-		@apply w-fit cursor-pointer hover:bg-transparent! text-gray-400 hover:text-yellow-500;
+		@apply flex size-7 cursor-pointer items-center justify-center rounded-full bg-gray-700 text-gray-400 hover:bg-gray-600! hover:text-yellow-500;
 	}
 	.watchlist-icon-added {
 		@apply !text-yellow-500 hover:!text-yellow-600;
@@ -299,46 +314,85 @@
 		@apply h-4 w-4;
 	}
 	.watchlist-title {
-		@apply text-xl md:text-2xl font-bold text-gray-100;
+		@apply text-xl font-bold tracking-tight text-gray-100 md:text-2xl;
+	}
+	.watchlist-table-shell {
+		@apply w-full overflow-hidden rounded-xl border border-gray-600 bg-gray-800;
 	}
 	.watchlist-table {
-		@apply !relative overflow-hidden !w-full bg-gray-800 border !border-gray-600 !rounded-lg;
+		@apply !relative min-w-[820px] !w-full bg-gray-800;
 	}
 	.table-header-row {
-		@apply text-gray-400 font-medium bg-gray-700 border-b border-gray-600 hover:bg-gray-700;
+		@apply h-11 border-b border-gray-600 bg-gray-700 text-xs font-medium uppercase tracking-wide text-gray-400 hover:bg-gray-700;
 	}
 	.table-header:first-child {
-		@apply pl-4;
+		@apply pl-3;
 	}
 	.table-row {
-		@apply border-b cursor-pointer text-gray-100 border-gray-600 hover:bg-gray-700/50 transition-colors;
+		@apply h-13 cursor-pointer border-b border-gray-600 text-gray-100 transition-colors hover:bg-gray-700/60;
 	}
 	.table-cell {
-		@apply font-medium text-base;
+		@apply px-2 py-2 text-sm font-medium;
+	}
+	.watchlist-status-cell {
+		@apply pl-3;
+	}
+	.company-cell {
+		@apply max-w-[190px];
+	}
+	.company-cell span {
+		@apply block truncate;
 	}
 	.add-alert {
-		@apply flex text-sm items-center whitespace-nowrap gap-1.5 px-3 w-fit py-2 text-yellow-600 border border-yellow-600/20 rounded font-medium bg-transparent hover:bg-transparent cursor-pointer transition-colors;
+		@apply flex h-8 w-fit cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-md border border-yellow-500/20 bg-yellow-500/10 px-3 py-0 text-xs font-semibold text-yellow-500 transition-colors hover:border-yellow-500/40 hover:bg-yellow-500/15;
+	}
+	.watchlist-news-section {
+		@apply flex flex-col gap-4;
+	}
+	.watchlist-section-count {
+		@apply rounded-full border border-gray-600 bg-gray-800 px-3 py-1 text-xs font-medium text-gray-400;
 	}
 	.watchlist-news {
-		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+		@apply grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
 	}
 	.news-item {
-		@apply bg-gray-800 rounded-lg border w-full border-gray-600  p-4 duration-200 hover:border-gray-600 cursor-pointer;
+		@apply flex min-h-[230px] w-full flex-col rounded-xl border border-gray-600 bg-gray-800 p-4 duration-200  hover:border-yellow-500/40;
+	}
+	.news-item-topline {
+		@apply mb-4 flex items-start justify-between gap-3;
+	}
+	.news-item-topline > svg {
+		@apply size-4 text-gray-500;
 	}
 	.news-tag {
-		@apply inline-block w-fit px-2 py-1 mb-5 rounded bg-gray-600/60 text-green-500 text-sm font-mono font-medium;
+		@apply inline-block w-fit rounded bg-teal-400/10 px-2 py-1 font-mono text-[11px] font-semibold text-teal-400;
 	}
 	.news-title {
-		@apply text-lg  font-semibold text-gray-100 leading-tight mb-3 line-clamp-2;
+		@apply mb-3 line-clamp-3 text-base font-semibold leading-snug text-gray-100;
 	}
 	.news-meta {
-		@apply flex items-center text-sm text-gray-500 mb-1;
+		@apply mb-3 flex flex-wrap items-center gap-1.5 text-xs text-gray-500;
 	}
 	.news-summary {
-		@apply text-gray-400 flex-1 text-base leading-relaxed mb-3 line-clamp-3;
+		@apply mb-4 line-clamp-3 flex-1 text-sm leading-relaxed text-gray-400;
 	}
 	.news-cta {
-		@apply text-sm align-bottom text-yellow-500 hover:text-gray-400;
+		@apply inline-flex w-fit items-center gap-1 text-xs font-semibold text-yellow-500 hover:text-yellow-400;
+	}
+	.news-cta svg {
+		@apply size-3.5;
+	}
+	.news-empty {
+		@apply flex min-h-40 items-center justify-center gap-4 rounded-xl border border-dashed border-gray-600 bg-gray-800/40 p-8 text-gray-500;
+	}
+	.news-empty > svg {
+		@apply size-8;
+	}
+	.news-empty h3 {
+		@apply font-semibold text-gray-400;
+	}
+	.news-empty p {
+		@apply mt-1 text-sm;
 	}
 	.alert-dialog {
 		@apply bg-gray-800 border-gray-600 text-gray-400 max-w-md;
@@ -347,10 +401,28 @@
 		@apply text-xl font-semibold text-gray-100;
 	}
 	.alert-list {
-		@apply overflow-y-auto w-full max-h-[911px] rounded-lg flex border border-gray-600 flex-col gap-4 bg-gray-800 p-3 flex-1;
+		@apply flex min-h-[360px] max-h-[640px] w-full flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-gray-600 bg-gray-800 p-3;
 	}
 	.alert-empty {
-		@apply px-6 py-8 text-center text-gray-500/50;
+		@apply flex h-full min-h-[334px] flex-col items-center justify-center px-6 py-8 text-center text-gray-500;
+	}
+	.alert-empty-icon {
+		@apply mb-4 flex size-12 items-center justify-center rounded-full border border-yellow-500/20 bg-yellow-500/10 text-yellow-500;
+	}
+	.alert-empty-icon svg {
+		@apply size-5;
+	}
+	.alert-empty h3 {
+		@apply text-base font-semibold text-gray-100;
+	}
+	.alert-empty > p {
+		@apply mt-2 max-w-[260px] text-sm leading-relaxed text-gray-500;
+	}
+	.alert-status-note {
+		@apply mt-5 flex items-center gap-2 rounded-lg border border-gray-600 bg-gray-700/60 px-3 py-2 text-left text-xs leading-relaxed text-gray-400;
+	}
+	.alert-status-note svg {
+		@apply size-4 shrink-0 text-teal-400;
 	}
 	.alert-item {
 		@apply p-4 rounded-lg bg-gray-700 border border-gray-600;
@@ -450,8 +522,8 @@
 }
 
 .custom-chart.tradingview-widget-container iframe {
-	border: 01px solid #30333a;
-	border-radius: 8px !important;
+	border: none;
+	border-radius: 0px !important;
 	overflow: hidden !important;
 }
 
