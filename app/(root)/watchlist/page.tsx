@@ -1,52 +1,69 @@
+import WatchlistAlerts from "@/components/WatchlistAlerts";
+import WatchlistNews from "@/components/WatchlistNews";
 import WatchlistSearch from "@/components/WatchlistSearch";
 import { WatchlistTable } from "@/components/WatchlistTable";
-import { searchStocks } from "@/lib/actions/finnhub.actions";
+import { getNews, searchStocks } from "@/lib/actions/finnhub.actions";
 import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
 import { Star } from "lucide-react";
 
 const Watchlist = async () => {
-	const watchlist = await getWatchlistWithData();
-	const initialStocks = await searchStocks();
+	const [watchlist, initialStocks] = await Promise.all([
+		getWatchlistWithData(),
+		searchStocks(),
+	]);
 	const stockMembershipKey = initialStocks
 		.map((stock) => `${stock.symbol}:${stock.isInWatchlist}`)
 		.join("|");
 
-	//Empty State
-	if (watchlist.length === 0) {
-		return (
-			<section className="flex watch-list-empty-container">
-				<div className="watchlist-empty">
-					<Star className="watchlist-star" />
-					<h2 className="empty-title">Your watchlist is empty</h2>
-					<p className="empty-description">
-						Start building your watchlist by searching for
-						stocks,commodities,futures and clicking the star icon to add them.
-					</p>
-					<WatchlistSearch
-						initialStocks={initialStocks}
-						stockMembershipKey={stockMembershipKey}
-					/>
-				</div>
-			</section>
-		);
+	let news: MarketNewsArticle[] = [];
+
+	try {
+		news = await getNews(watchlist.map((item) => item.symbol));
+	} catch (error) {
+		console.error("Unable to load watchlist news:", error);
 	}
 
 	return (
-		<section className="watchlist">
-			<div className="flex flex-col gap-6">
-				<div className="flex items-center justify-between">
-					<h2 className="watchlist-title">Watchlist</h2>
-					<WatchlistSearch
-						initialStocks={initialStocks}
-						stockMembershipKey={stockMembershipKey}
-					/>
-				</div>
-				<WatchlistTable
-					key={watchlist.map((item) => item.symbol).join("|")}
-					watchlist={watchlist}
-				/>
+		<div className="watchlist-page  gap-10">
+			<div className="watchlist-container">
+				<section className="watchlist" aria-labelledby="watchlist-heading">
+					<div className="watchlist-section-heading">
+						<div>
+							<p className="watchlist-eyebrow">Your market</p>
+							<h1 id="watchlist-heading" className="watchlist-title">
+								Watchlist
+							</h1>
+						</div>
+						<WatchlistSearch
+							initialStocks={initialStocks}
+							stockMembershipKey={stockMembershipKey}
+						/>
+					</div>
+
+					{watchlist.length > 0 ? (
+						<WatchlistTable
+							key={watchlist.map((item) => item.symbol).join("|")}
+							watchlist={watchlist}
+						/>
+					) : (
+						<div className="watchlist-empty-container">
+							<div className="watchlist-empty">
+								<Star className="watchlist-star" />
+								<h2 className="empty-title">Your watchlist is empty</h2>
+								<p className="empty-description">
+									Search for stocks and select the star to build your first
+									watchlist.
+								</p>
+							</div>
+						</div>
+					)}
+				</section>
+
+				<WatchlistAlerts />
 			</div>
-		</section>
+
+			<WatchlistNews news={news} />
+		</div>
 	);
 };
 
