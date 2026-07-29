@@ -103,13 +103,15 @@ export const getUserWatchlist = async () => {
 };
 
 // Get user's watchlist with stock data
-export const getWatchlistWithData = async (): Promise<StockWithData[]> => {
+export const getWatchlistWithData = async (
+	limit?: number,
+): Promise<StockWithData[]> => {
 	const userId = await getCurrentUserId();
 
 	try {
-		const watchlist = await Watchlist.find({ userId })
-			.sort({ addedAt: -1 })
-			.lean();
+		const query = Watchlist.find({ userId }).sort({ addedAt: -1 });
+		if (limit && limit > 0) query.limit(limit);
+		const watchlist = await query.lean();
 
 		if (watchlist.length === 0) return [];
 
@@ -129,6 +131,8 @@ export const getWatchlistWithData = async (): Promise<StockWithData[]> => {
 						symbol: stockData.symbol,
 						addedAt: item.addedAt,
 						currentPrice: stockData.currentPrice,
+						currency: stockData.currency,
+						logo: stockData.logo,
 						priceFormatted: stockData.priceFormatted,
 						changeFormatted: stockData.changeFormatted,
 						changePercent: stockData.changePercent,
