@@ -76,14 +76,16 @@ export default function StockChartCard({
 						<span
 							className={cn(
 								"inline-flex items-center gap-1 text-sm font-semibold",
-								isPositive ? "text-teal-400" : "text-red-500",
+								stock ? (isPositive ? "text-teal-400" : "text-red-500") : "text-gray-500",
 							)}
 						>
-							{isPositive ? (
-								<ArrowUpRight aria-hidden="true" />
-							) : (
-								<ArrowDownRight aria-hidden="true" />
-							)}
+							{stock ? (
+								isPositive ? (
+									<ArrowUpRight aria-hidden="true" />
+								) : (
+									<ArrowDownRight aria-hidden="true" />
+								)
+							) : null}
 							{stock
 								? `${formatNumberValue(Math.abs(stock.change))} (${stock.changeFormatted})`
 								: "Market data unavailable"}

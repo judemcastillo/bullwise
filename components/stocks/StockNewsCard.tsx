@@ -49,7 +49,7 @@ export default function StockNewsCard({
 								<div
 									className="stock-news-image"
 									role="img"
-									aria-label=""
+									aria-label={article.headline}
 									style={{ backgroundImage: `url("${article.image}")` }}
 								/>
 							) : (

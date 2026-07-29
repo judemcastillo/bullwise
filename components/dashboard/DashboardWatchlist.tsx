@@ -37,7 +37,8 @@ export default function DashboardWatchlist({
 				{watchlist.length > 0 ? (
 					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 h-full w-full">
 						{watchlist.map((stock) => {
-							const isPositive = (stock.changePercent ?? 0) >= 0;
+							const hasChange = stock.changePercent !== undefined;
+							const isPositive = hasChange && stock.changePercent >= 0;
 
 							return (
 								<Link
@@ -79,10 +80,14 @@ export default function DashboardWatchlist({
 									<p
 										className={cn(
 											"mt-1 flex items-center gap-0.5 text-[10px] font-medium",
-											isPositive ? "text-teal-400" : "text-red-500",
+											hasChange
+												? isPositive
+													? "text-teal-400"
+													: "text-red-500"
+												: "text-gray-500",
 										)}
 									>
-										{isPositive ? (
+										{!hasChange ? null : isPositive ? (
 											<ArrowUpRight className="size-3" aria-hidden="true" />
 										) : (
 											<ArrowDownRight className="size-3" aria-hidden="true" />
