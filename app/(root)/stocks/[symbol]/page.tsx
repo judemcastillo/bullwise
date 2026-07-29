@@ -27,8 +27,17 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 
 	const [watchlistSymbols, matchingStocks, stock, news, companyPeers] =
 		await Promise.all([
-			getWatchlistSymbolsByUserId(session.user.id),
-			searchStocks(normalizedSymbol),
+			getWatchlistSymbolsByUserId(session.user.id).catch((error) => {
+				console.error(
+					`Unable to load watchlist for ${session.user.id}:`,
+					error,
+				);
+				return [] as string[];
+			}),
+			searchStocks(normalizedSymbol).catch((error) => {
+				console.error(`Unable to search stocks for ${normalizedSymbol}:`, error);
+				return [];
+			}),
 			getStockDashboardData(normalizedSymbol).catch((error) => {
 				console.error(
 					`Unable to load dashboard data for ${normalizedSymbol}:`,
