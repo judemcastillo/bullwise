@@ -132,12 +132,77 @@ export const getChangeColorClass = (changePercent?: number) => {
 	return changePercent > 0 ? "text-green-500" : "text-red-500";
 };
 
+export const formatCurrencyValue = (
+	value?: number | null,
+	currency?: string | null,
+) => {
+	if (value === null || value === undefined || !Number.isFinite(value)) {
+		return "—";
+	}
+
+	if (!currency) {
+		return value.toLocaleString("en-US", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		});
+	}
+
+	try {
+		return new Intl.NumberFormat("en-US", {
+			style: "currency",
+			currency,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(value);
+	} catch {
+		return `${value.toLocaleString("en-US", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		})} ${currency}`;
+	}
+};
+
+export const formatCompactCurrencyValue = (
+	value?: number | null,
+	currency?: string | null,
+) => {
+	if (value === null || value === undefined || !Number.isFinite(value)) {
+		return "—";
+	}
+
+	try {
+		return new Intl.NumberFormat("en-US", {
+			style: currency ? "currency" : "decimal",
+			currency: currency || undefined,
+			notation: "compact",
+			maximumFractionDigits: 2,
+		}).format(value);
+	} catch {
+		return value.toLocaleString("en-US", {
+			notation: "compact",
+			maximumFractionDigits: 2,
+		});
+	}
+};
+
+export const formatNumberValue = (
+	value?: number | null,
+	suffix = "",
+) => {
+	if (value === null || value === undefined || !Number.isFinite(value)) {
+		return "—";
+	}
+
+	return `${value.toLocaleString("en-US", {
+		maximumFractionDigits: 2,
+	})}${suffix}`;
+};
+
+export const formatWebsiteLabel = (url: string) =>
+	url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
 export const formatPrice = (price: number) => {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "USD",
-		minimumFractionDigits: 2,
-	}).format(price);
+	return formatCurrencyValue(price, "USD");
 };
 
 export const getAlertText = (alert: Alert) => {

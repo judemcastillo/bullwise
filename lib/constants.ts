@@ -37,6 +37,12 @@ export const CONDITION_OPTIONS = [
 ];
 
 // TradingView Charts
+export const TRADING_VIEW_EMBED_URL =
+    'https://s3.tradingview.com/external-embedding/embed-widget-';
+
+export const STOCK_DETAILS_RELATED_LIMIT = 4;
+export const STOCK_DETAILS_NEWS_LIMIT = 3;
+
 export const MARKET_OVERVIEW_WIDGET_CONFIG = {
     colorTheme: 'dark', // dark mode
     dateRange: '12M', // last 12 months
@@ -125,6 +131,20 @@ export const TOP_STORIES_WIDGET_CONFIG = {
     height: '600',
 };
 
+export const TOP_STOCKS_WIDGET_CONFIG = {
+    colorTheme: 'dark',
+    dateRange: '1D',
+    exchange: 'US',
+    showChart: false,
+    locale: 'en',
+    largeChartUrl: '',
+    isTransparent: true,
+    showSymbolLogo: true,
+    showFloatingTooltip: true,
+    width: '100%',
+    height: 430,
+};
+
 export const MARKET_DATA_WIDGET_CONFIG = {
     title: 'Stocks',
     width: '100%',
@@ -182,11 +202,11 @@ export const SYMBOL_INFO_WIDGET_CONFIG = (symbol: string) => ({
 export const CANDLE_CHART_WIDGET_CONFIG = (symbol: string) => ({
     allow_symbol_change: false,
     calendar: false,
-    details: true,
+    details: false,
     hide_side_toolbar: true,
     hide_top_toolbar: false,
     hide_legend: false,
-    hide_volume: false,
+    hide_volume: true,
     hotlist: false,
     interval: 'D',
     locale: 'en',
@@ -196,13 +216,13 @@ export const CANDLE_CHART_WIDGET_CONFIG = (symbol: string) => ({
     theme: 'dark',
     timezone: 'Etc/UTC',
     backgroundColor: '#141414',
-    gridColor: '#141414',
+    gridColor: 'rgba(255, 255, 255, 0.06)',
     watchlist: [],
     withdateranges: false,
     compareSymbols: [],
     studies: [],
     width: '100%',
-    height: 600,
+    height: 450,
 });
 
 export const BASELINE_WIDGET_CONFIG = (symbol: string) => ({

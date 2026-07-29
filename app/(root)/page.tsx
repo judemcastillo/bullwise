@@ -1,51 +1,100 @@
+import DashboardNews from "@/components/dashboard/DashboardNews";
+import DashboardWatchlist from "@/components/dashboard/DashboardWatchlist";
 import TradingViewWidget from "@/components/TradingViewWidget";
+import { getNews } from "@/lib/actions/finnhub.actions";
+import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
 import {
-	HEATMAP_WIDGET_CONFIG,
-	MARKET_DATA_WIDGET_CONFIG,
 	MARKET_OVERVIEW_WIDGET_CONFIG,
-	TOP_STORIES_WIDGET_CONFIG,
+	TOP_STOCKS_WIDGET_CONFIG,
+	TRADING_VIEW_EMBED_URL,
 } from "@/lib/constants";
+import { unstable_rethrow } from "next/navigation";
 
-export default function Home() {
-	const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
+const DASHBOARD_WATCHLIST_LIMIT = 6;
+const MARKET_SUMMARY_HEIGHT = 450;
+const TOP_STOCKS_HEIGHT = 430;
+
+const MARKET_SUMMARY_WIDGET_CONFIG = {
+	...MARKET_OVERVIEW_WIDGET_CONFIG,
+	width: "100%",
+	height: MARKET_SUMMARY_HEIGHT,
+};
+
+export default async function Home() {
+	const [watchlist, news] = await Promise.all([
+		getWatchlistWithData(DASHBOARD_WATCHLIST_LIMIT).catch((error) => {
+			unstable_rethrow(error);
+			console.error("Unable to load dashboard watchlist:", error);
+			return [] as StockWithData[];
+		}),
+		getNews().catch((error) => {
+			unstable_rethrow(error);
+			console.error("Unable to load dashboard news:", error);
+			return [] as MarketNewsArticle[];
+		}),
+	]);
+
 	return (
-		<div className="flex min-h-screen home-wrapper">
-			<section className="grid w-full home-section gap-8">
-				<div className="md:col-span-1 xl:col-span-1">
-					<TradingViewWidget
-						title="Market Overview"
-						scriptUrl={`${scriptUrl}market-overview.js`}
-						config={MARKET_OVERVIEW_WIDGET_CONFIG}
-						className="custom-chart"
-					/>
+		<div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
+			<section className="min-w-0">
+				<div className="mb-3 flex items-center justify-between gap-4">
+					<h1 className="text-xl! font-semibold text-gray-100">
+						Market Summary
+					</h1>
+					<span className="text-xs font-medium text-gray-500">
+						Live market data
+					</span>
 				</div>
-
-				<div className="md:col-span-1 xl:col-span-2">
+				<div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-800">
 					<TradingViewWidget
-						title="Stock Heatmap"
-						scriptUrl={`${scriptUrl}stock-heatmap.js`}
-						config={HEATMAP_WIDGET_CONFIG}
-						
-					/>
-				</div>
-			</section>
-			<section className="grid w-full home-section gap-8">
-				<div className="md:col-span-1 xl:col-span-1 h-full">
-					<TradingViewWidget
-						scriptUrl={`${scriptUrl}timeline.js`}
-						config={TOP_STORIES_WIDGET_CONFIG}
-						className="custom-chart"
-					/>
-				</div>
-
-				<div className="md:col-span-1 xl:col-span-2 h-full">
-					<TradingViewWidget
-						scriptUrl={`${scriptUrl}market-quotes.js`}
-						config={MARKET_DATA_WIDGET_CONFIG}
-						
+						scriptUrl={`${TRADING_VIEW_EMBED_URL}market-overview.js`}
+						config={MARKET_SUMMARY_WIDGET_CONFIG}
+						height={MARKET_SUMMARY_HEIGHT}
+						className="!border-0"
 					/>
 				</div>
 			</section>
+
+			<DashboardWatchlist
+				watchlist={watchlist.map(({
+					changeFormatted,
+					changePercent,
+					company,
+					currency,
+					currentPrice,
+					logo,
+					symbol,
+				}) => ({
+					changeFormatted,
+					changePercent,
+					company,
+					currency,
+					currentPrice,
+					logo,
+					symbol,
+				}))}
+			/>
+
+			<section className="min-w-0">
+				<div className="mb-3 flex items-center justify-between gap-4">
+					<h2 className="text-xl font-semibold text-gray-100">
+						Today&apos;s Top Stocks
+					</h2>
+					<span className="text-xs font-medium text-gray-500">
+						US market movers
+					</span>
+				</div>
+				<div className="overflow-y-auto rounded-xl border border-gray-700 bg-gray-800">
+					<TradingViewWidget
+						scriptUrl={`${TRADING_VIEW_EMBED_URL}hotlists.js`}
+						config={TOP_STOCKS_WIDGET_CONFIG}
+						height={TOP_STOCKS_HEIGHT}
+						className="!border-0"
+					/>
+				</div>
+			</section>
+
+			<DashboardNews news={news} />
 		</div>
 	);
 }

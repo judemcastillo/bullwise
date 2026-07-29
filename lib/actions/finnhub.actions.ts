@@ -5,7 +5,7 @@ import { cache } from "react";
 import { POPULAR_STOCK_SYMBOLS } from "../constants";
 import { auth } from "../better-auth/auth";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { getWatchlistSymbolsByUserId } from "./watchlist.actions";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
@@ -161,6 +161,7 @@ export async function getNews(
 			.sort((first, second) => second.datetime - first.datetime)
 			.slice(0, MAX_NEWS_ARTICLES);
 	} catch (error: unknown) {
+		unstable_rethrow(error);
 		console.error("Error fetching Finnhub news:", error);
 		throw new Error("Failed to fetch news");
 	}
@@ -257,6 +258,7 @@ export const searchStocks = cache(
 
 			return mapped;
 		} catch (err) {
+			unstable_rethrow(err);
 			console.error("Error in stock search:", err);
 			return [];
 		}

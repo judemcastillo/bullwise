@@ -142,6 +142,8 @@ declare global {
 		company: string;
 		addedAt: Date;
 		currentPrice?: number;
+		currency?: string | null;
+		logo?: string | null;
 		changePercent?: number;
 		priceFormatted?: string;
 		changeFormatted?: string;
