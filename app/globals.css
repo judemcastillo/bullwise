@@ -616,7 +616,7 @@
 		@apply size-3.5;
 	}
 	.stock-analysis-widget.tradingview-widget-container {
-		`@apply` border-0;
+		@apply` border-0;
 
 		border-radius: 0.5rem !important;
 	}

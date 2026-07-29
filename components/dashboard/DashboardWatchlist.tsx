@@ -35,10 +35,11 @@ export default function DashboardWatchlist({
 
 			<div className="min-h-[450px] rounded-xl border border-gray-700 bg-gray-800 p-5 flex">
 				{watchlist.length > 0 ? (
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 h-full w-full">
-						{watchlist.map((stock) => {
-							const hasChange = stock.changePercent !== undefined;
-							const isPositive = hasChange && stock.changePercent >= 0;
+						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 h-full w-full">
+							{watchlist.map((stock) => {
+								const changePercent = stock.changePercent;
+								const hasChange = changePercent !== undefined;
+								const isPositive = changePercent !== undefined && changePercent >= 0;
 
 							return (
 								<Link
