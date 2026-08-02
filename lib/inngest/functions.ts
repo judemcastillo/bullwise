@@ -8,6 +8,40 @@ import { getWatchlistSymbolsByUserId } from "../actions/watchlist.actions";
 import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailer";
 import { getAllUsersForNewsEmail } from "../actions/user.actions";
 import { getFormattedTodayDate } from "../utils";
+import { monitorDuePriceAlerts } from "@/lib/alerts/monitoring";
+import { ALERT_MONITORING_FUNCTION_CONFIG } from "@/lib/inngest/alert-monitoring.config";
+import { deliverAlertEmailOutbox } from "@/lib/alerts/email-delivery-worker";
+import { ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG } from "@/lib/inngest/alert-email-delivery.config";
+
+export const deliverAlertEmails = inngest.createFunction(
+	ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG,
+	async ({ step }) => {
+		const summary = await step.run("deliver-alert-email-outbox", () =>
+			deliverAlertEmailOutbox(),
+		);
+
+		return {
+			success: true,
+			message: "Alert email delivery completed",
+			summary,
+		};
+	},
+);
+
+export const monitorPriceAlerts = inngest.createFunction(
+	ALERT_MONITORING_FUNCTION_CONFIG,
+	async ({ step }) => {
+		const summary = await step.run("monitor-due-price-alerts", () =>
+			monitorDuePriceAlerts(),
+		);
+
+		return {
+			success: true,
+			message: "Price alert monitoring completed",
+			summary,
+		};
+	},
+);
 
 export const sendSignUpEmail = inngest.createFunction(
 	{

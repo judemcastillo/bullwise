@@ -25,12 +25,20 @@ export default function SignInPage() {
 	const onSubmit = async (data: SignInFormData) => {
 		try {
 			const result = await signInWithEmail(data);
-			if (result.success) router.push("/");
+
+			if (!result.success) {
+				toast.error("Unable to sign in", {
+					description: result.error,
+				});
+				return;
+			}
+
+			router.push("/");
 		} catch (e) {
 			console.error(e);
-			toast.error("Sign-up failed", {
+			toast.error("Unable to sign in", {
 				description:
-					e instanceof Error ? e.message : "Failed to create an account",
+					e instanceof Error ? e.message : "Failed to sign in.",
 			});
 		}
 	};
@@ -67,9 +75,10 @@ export default function SignInPage() {
 				<Button
 					type="submit"
 					disabled={isSubmitting}
+					aria-busy={isSubmitting}
 					className="yellow-btn w-full mt-5"
 				>
-					{isSubmitting ? "Signing In" : "Sign In"}
+					{isSubmitting ? "Signing In..." : "Sign In"}
 				</Button>
 
 				<FooterLink

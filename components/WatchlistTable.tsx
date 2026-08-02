@@ -16,10 +16,14 @@ import { cn, getChangeColorClass } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
 import { useState, type MouseEvent } from "react";
 import { BellPlus } from "lucide-react";
+import { CreateAlertDialog } from "@/components/alerts/AlertDialogs";
+import type { AlertInstrumentOption } from "@/types/alerts";
 
 export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	const router = useRouter();
 	const [items, setItems] = useState(watchlist);
+	const [selectedInstrument, setSelectedInstrument] =
+		useState<AlertInstrumentOption | null>(null);
 
 	const handleWatchlistChange = (symbol: string, isAdded: boolean) => {
 		if (!isAdded) {
@@ -30,13 +34,27 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 		}
 	};
 
-	const preventRowNavigation = (event: MouseEvent<HTMLButtonElement>) => {
+	const openAlertDialog = (
+		event: MouseEvent<HTMLButtonElement>,
+		item: StockWithData,
+	) => {
 		event.stopPropagation();
+		event.preventDefault();
+		setSelectedInstrument({
+			assetClass: "equity",
+			provider: "finnhub",
+			providerSymbol: item.symbol,
+			displaySymbol: item.symbol,
+			name: item.company,
+			currency: item.currency,
+			currentPrice: item.currentPrice,
+		});
 	};
 
 	return (
-		<div className="watchlist-table-shell">
-			<Table className="scrollbar-hide-default watchlist-table">
+		<>
+			<div className="watchlist-table-shell">
+				<Table className="scrollbar-hide-default watchlist-table">
 				<TableHeader>
 					<TableRow className="table-header-row">
 						{WATCHLIST_TABLE_HEADER.map((label, index) => (
@@ -92,7 +110,7 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 								<Button
 									type="button"
 									className="add-alert"
-									onClick={preventRowNavigation}
+									onClick={(event) => openAlertDialog(event, item)}
 								>
 									<BellPlus aria-hidden="true" />
 									Add Alert
@@ -101,7 +119,16 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 						</TableRow>
 					))}
 				</TableBody>
-			</Table>
-		</div>
+				</Table>
+			</div>
+			<CreateAlertDialog
+				open={Boolean(selectedInstrument)}
+				onOpenChange={(open) => {
+					if (!open) setSelectedInstrument(null);
+				}}
+				instruments={selectedInstrument ? [selectedInstrument] : []}
+				initialInstrument={selectedInstrument}
+			/>
+		</>
 	);
 }

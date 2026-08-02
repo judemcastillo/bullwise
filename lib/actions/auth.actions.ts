@@ -1,8 +1,35 @@
 "use server";
 
+import { after } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "../better-auth/auth";
 import { inngest } from "../inngest/client";
+
+type AuthActionResult =
+	| { success: true }
+	| { success: false; error: string };
+
+const getAuthErrorMessage = (error: unknown, fallback: string) => {
+	if (!error || typeof error !== "object" || !("body" in error)) {
+		return fallback;
+	}
+
+	const body = error.body;
+
+	if (!body || typeof body !== "object") return fallback;
+
+	if (
+		"code" in body &&
+		(body.code === "USER_ALREADY_EXISTS" ||
+			body.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL")
+	) {
+		return "An account with this email already exists.";
+	}
+
+	return "message" in body && typeof body.message === "string"
+		? body.message
+		: fallback;
+};
 
 export const signUpWithEmail = async ({
 	email,
@@ -12,34 +39,43 @@ export const signUpWithEmail = async ({
 	riskTolerance,
 	country,
 	preferredIndustry,
-}: SignUpFormData) => {
+}: SignUpFormData): Promise<AuthActionResult> => {
 	try {
 		const response = await auth.api.signUpEmail({
 			body: {
-				email: email,
-				password: password,
+				email,
+				password,
 				name: fullName,
 			},
 		});
 
 		if (response) {
-			await inngest.send({
-				name: "app/user.created",
-				data: {
-					email: email,
-					name: fullName,
-					country,
-					investmentGoals,
-					preferredIndustry,
-					riskTolerance,
-				},
+			after(async () => {
+				try {
+					await inngest.send({
+						name: "app/user.created",
+						data: {
+							email,
+							name: fullName,
+							country,
+							investmentGoals,
+							preferredIndustry,
+							riskTolerance,
+						},
+					});
+				} catch (error) {
+					console.error("Failed to queue sign-up email", error);
+				}
 			});
 		}
 
-		return { success: true, data: response };
+		return { success: true };
 	} catch (e) {
-		console.log("Sign up failed", e);
-		return { success: false, error: "Sign up failed" };
+		console.error("Sign up failed", e);
+		return {
+			success: false,
+			error: getAuthErrorMessage(e, "Failed to create an account."),
+		};
 	}
 };
 
@@ -53,18 +89,24 @@ export const signOut = async () => {
 		return { success: false, error: "Sign out failed" };
 	}
 };
-export const signInWithEmail = async ({ email, password }: SignInFormData) => {
+export const signInWithEmail = async ({
+	email,
+	password,
+}: SignInFormData): Promise<AuthActionResult> => {
 	try {
-		const response = await auth.api.signInEmail({
+		await auth.api.signInEmail({
 			body: {
 				email,
 				password,
 			},
 		});
 
-		return { success: true, data: response };
+		return { success: true };
 	} catch (e) {
-		console.log("Sign in failed", e);
-		return { success: false, error: "Sign in failed" };
+		console.error("Sign in failed", e);
+		return {
+			success: false,
+			error: getAuthErrorMessage(e, "Invalid email or password."),
+		};
 	}
 };

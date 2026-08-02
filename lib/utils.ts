@@ -100,13 +100,12 @@ export const formatArticle = (
 	article: ValidNewsArticle,
 	isCompanyNews: boolean,
 	symbol?: string,
-	index: number = 0,
 ): MarketNewsArticle => {
 	const summary = article.summary.trim();
 	const summaryLimit = isCompanyNews ? 200 : 150;
 
 	return {
-		id: article.id + index,
+		id: article.id,
 		headline: article.headline.trim(),
 		summary:
 			summary.length > summaryLimit

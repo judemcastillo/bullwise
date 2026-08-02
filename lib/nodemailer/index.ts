@@ -1,3 +1,5 @@
+import "server-only";
+
 import nodemailer from "nodemailer";
 import {
 	NEWS_SUMMARY_EMAIL_TEMPLATE,

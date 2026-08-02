@@ -38,12 +38,20 @@ export default function SignUpPage() {
 	const onSubmit = async (data: SignUpFormData) => {
 		try {
 			const result = await signUpWithEmail(data);
-			if (result.success) return router.push("/");
+
+			if (!result.success) {
+				toast.error("Unable to create account", {
+					description: result.error,
+				});
+				return;
+			}
+
+			router.push("/");
 		} catch (e) {
 			console.error(e);
-			toast.error("Sign-up failed", {
+			toast.error("Unable to create account", {
 				description:
-					e instanceof Error ? e.message : "Failed to create an account",
+					e instanceof Error ? e.message : "Failed to create an account.",
 			});
 		}
 	};
@@ -57,7 +65,13 @@ export default function SignUpPage() {
 					placeholder="John Doe"
 					register={register}
 					error={errors.fullName}
-					validation={{ required: "Full name is required", minLength: 2 }}
+					validation={{
+						required: "Full name is required",
+						minLength: {
+							value: 2,
+							message: "Full name must be at least 2 characters",
+						},
+					}}
 				/>
 				<InputField
 					name="email"
@@ -66,9 +80,11 @@ export default function SignUpPage() {
 					register={register}
 					error={errors.email}
 					validation={{
-						required: "Email name is required",
-						pattern: /^\w+@\w+\.\w+$/,
-						message: "Email address is required",
+						required: "Email is required",
+						pattern: {
+							value: /^\S+@\S+\.\S+$/,
+							message: "Enter a valid email address",
+						},
 					}}
 				/>
 
@@ -79,7 +95,13 @@ export default function SignUpPage() {
 					type="password"
 					register={register}
 					error={errors.password}
-					validation={{ required: "Password is required", minLength: 8 }}
+					validation={{
+						required: "Password is required",
+						minLength: {
+							value: 8,
+							message: "Password must be at least 8 characters",
+						},
+					}}
 				/>
 				<CountrySelectField
 					name="country"
@@ -120,9 +142,12 @@ export default function SignUpPage() {
 				<Button
 					type="submit"
 					disabled={isSubmitting}
+					aria-busy={isSubmitting}
 					className="yellow-btn w-full mt-5"
 				>
-					{isSubmitting ? "Creating Account" : "Start Your Investing Journey"}
+					{isSubmitting
+						? "Creating Account..."
+						: "Start Your Investing Journey"}
 				</Button>
 				<FooterLink
 					text="Already have an account?"
