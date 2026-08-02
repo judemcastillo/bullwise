@@ -102,7 +102,7 @@ async function getGeneralNews(): Promise<MarketNewsArticle[]> {
 		})
 		.sort((first, second) => second.datetime - first.datetime)
 		.slice(0, MAX_NEWS_ARTICLES)
-		.map((article, index) => formatArticle(article, false, undefined, index));
+		.map((article) => formatArticle(article, false));
 }
 
 export async function getNews(
@@ -152,7 +152,7 @@ export async function getNews(
 			if (!article) continue;
 
 			usedArticles.add(articleKey(article));
-			companyNews.push(formatArticle(article, true, symbol, round));
+			companyNews.push(formatArticle(article, true, symbol));
 		}
 
 		if (companyNews.length === 0) return await getGeneralNews();

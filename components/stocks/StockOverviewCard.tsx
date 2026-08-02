@@ -2,9 +2,9 @@ import {
 	formatCompactCurrencyValue,
 	formatCurrencyValue,
 } from "@/lib/utils";
-import { BellPlus } from "lucide-react";
 import StockDataRow from "./StockDataRow";
 import type { StockDashboardData } from "./types";
+import StockAlertButton from "@/components/alerts/StockAlertButton";
 
 export default function StockOverviewCard({
 	stock,
@@ -15,15 +15,22 @@ export default function StockOverviewCard({
 		<aside className="stock-card h-full" aria-labelledby="overview-heading">
 			<div className="stock-card-heading">
 				<h2 id="overview-heading">Overview</h2>
-				<button
-					type="button"
-					className="stock-alert-btn"
-					disabled
-					title="Price alert creation will be connected to the monitoring service next"
-				>
-					<BellPlus aria-hidden="true" />
-					Create alert
-				</button>
+				<StockAlertButton
+					instrument={
+						stock
+							? {
+									assetClass: "equity",
+									provider: "finnhub",
+									providerSymbol: stock.symbol,
+									displaySymbol: stock.symbol,
+									name: stock.company,
+									venue: stock.exchange,
+									currency: stock.currency,
+									currentPrice: stock.currentPrice,
+								}
+							: null
+					}
+				/>
 			</div>
 
 			<div className="stock-card-section">

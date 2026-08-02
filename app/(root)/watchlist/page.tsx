@@ -4,12 +4,14 @@ import WatchlistSearch from "@/components/WatchlistSearch";
 import { WatchlistTable } from "@/components/WatchlistTable";
 import { getNews, searchStocks } from "@/lib/actions/finnhub.actions";
 import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
+import { getUserAlerts } from "@/lib/data/user-alerts";
 import { Star } from "lucide-react";
 
 const Watchlist = async () => {
-	const [watchlist, initialStocks] = await Promise.all([
+	const [watchlist, initialStocks, alerts] = await Promise.all([
 		getWatchlistWithData(),
 		searchStocks(),
+		getUserAlerts(),
 	]);
 	const stockMembershipKey = initialStocks
 		.map((stock) => `${stock.symbol}:${stock.isInWatchlist}`)
@@ -59,7 +61,18 @@ const Watchlist = async () => {
 					)}
 				</section>
 
-				<WatchlistAlerts />
+				<WatchlistAlerts
+					alerts={alerts}
+					instruments={watchlist.map((item) => ({
+						assetClass: "equity",
+						provider: "finnhub",
+						providerSymbol: item.symbol,
+						displaySymbol: item.symbol,
+						name: item.company,
+						currency: item.currency,
+						currentPrice: item.currentPrice,
+					}))}
+				/>
 			</div>
 
 			<WatchlistNews news={news} />

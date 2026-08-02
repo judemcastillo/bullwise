@@ -1,11 +1,8 @@
 import { formatTimeAgo } from "@/lib/utils";
 import { ArrowUpRight, Newspaper } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
 
-export default function DashboardNews({
-	news,
-}: {
-	news: MarketNewsArticle[];
-}) {
+export default function DashboardNews({ news }: { news: MarketNewsArticle[] }) {
 	return (
 		<section className="min-w-0">
 			<div className="mb-3 flex items-center justify-between gap-4">
@@ -29,61 +26,66 @@ export default function DashboardNews({
 				</div>
 
 				{news.length > 0 ? (
-					<div className="divide-y divide-gray-700 overflow-y-auto h-[370px] px-3">
-						{news.map((article) => {
-							const tag =
-								article.related?.split(",")[0]?.trim() ||
-								article.category ||
-								"Market";
+					<ScrollArea className="h-93">
+						<div className="divide-y divide-gray-700 px-5">
+							{news.map((article) => {
+								const tag =
+									article.related?.split(",")[0]?.trim() ||
+									article.category ||
+									"Market";
 
-							return (
-								<a
-									href={article.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="group flex min-h-28 gap-4 py-3"
-									key={article.id}
-								>
-									<div className="min-w-0 flex-1">
-										<p className="mb-2 flex flex-wrap items-center gap-1.5 text-[10px] text-gray-500">
-											<span>{article.source}</span>
-											<span aria-hidden="true">•</span>
-											<time
-												dateTime={new Date(
-													article.datetime * 1000,
-												).toISOString()}
-											>
-												{formatTimeAgo(article.datetime)}
-											</time>
-										</p>
-										<h3 className="line-clamp-2 text-sm font-medium leading-relaxed text-gray-100 transition-colors group-hover:text-yellow-500">
-											{article.headline}
-										</h3>
-										<span className="mt-2 inline-flex items-center gap-1 rounded bg-gray-700 px-2 py-1 font-mono text-[9px] text-gray-400">
-											{tag.toUpperCase()}
-											<ArrowUpRight className="size-2.5" aria-hidden="true" />
-										</span>
-									</div>
-
-									{article.image ? (
-										<div
-											className="h-20 w-28 shrink-0 self-center rounded-lg bg-gray-700 bg-cover bg-center"
-											role="img"
-											aria-label=""
-											style={{ backgroundImage: `url("${article.image}")` }}
-										/>
-									) : (
-										<div className="flex h-20 w-28 shrink-0 items-center justify-center self-center rounded-lg bg-gray-700 text-gray-500">
-											<Newspaper className="size-5" aria-hidden="true" />
+								return (
+									<a
+										href={article.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="group flex min-h-28 gap-4 py-3"
+										key={article.id}
+									>
+										<div className="min-w-0 flex-1">
+											<p className="mb-2 flex flex-wrap items-center gap-1.5 text-[10px] text-gray-500">
+												<span>{article.source}</span>
+												<span aria-hidden="true">•</span>
+												<time
+													dateTime={new Date(
+														article.datetime * 1000,
+													).toISOString()}
+												>
+													{formatTimeAgo(article.datetime)}
+												</time>
+											</p>
+											<h3 className="line-clamp-2 text-sm font-medium leading-relaxed text-gray-100 transition-colors group-hover:text-yellow-500">
+												{article.headline}
+											</h3>
+											<span className="mt-2 inline-flex items-center gap-1 rounded bg-gray-700 px-2 py-1  text-[9px] text-gray-400">
+												{tag.toUpperCase()}
+												<ArrowUpRight className="size-2.5" aria-hidden="true" />
+											</span>
 										</div>
-									)}
-								</a>
-							);
-						})}
-					</div>
+
+										{article.image ? (
+											<div
+												className="h-20 w-28 shrink-0 self-center rounded-lg bg-gray-700 bg-cover bg-center"
+												role="img"
+												aria-label=""
+												style={{ backgroundImage: `url("${article.image}")` }}
+											/>
+										) : (
+											<div className="flex h-20 w-28 shrink-0 items-center justify-center self-center rounded-lg bg-gray-700 text-gray-500">
+												<Newspaper className="size-5" aria-hidden="true" />
+											</div>
+										)}
+									</a>
+								);
+							})}
+						</div>
+					</ScrollArea>
 				) : (
 					<div className="flex min-h-80 flex-col items-center justify-center text-center">
-						<Newspaper className="mb-3 size-7 text-gray-600" aria-hidden="true" />
+						<Newspaper
+							className="mb-3 size-7 text-gray-600"
+							aria-hidden="true"
+						/>
 						<p className="text-sm font-medium text-gray-400">
 							No market stories available
 						</p>

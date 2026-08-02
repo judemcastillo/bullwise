@@ -12,6 +12,7 @@ import Link from "next/link";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 import { useDebounce } from "@/hooks/useDebounce";
 import WatchlistButton from "./WatchlistButton";
+import { ScrollArea } from "./ui/scroll-area";
 
 export default function SearchCommand({
 	open,
@@ -87,7 +88,7 @@ export default function SearchCommand({
 				</div>
 				<div>{loading && <Loader2 className="search-loader" />}</div>
 			</div>
-			<CommandList className="search-list">
+			<CommandList className="search-list max-h-[400px] overflow-hidden">
 				{loading ? (
 					<CommandEmpty className="search-list-empty">
 						Loading stocks...
@@ -97,39 +98,43 @@ export default function SearchCommand({
 						{isSearchMode ? "No results found" : "No stocks available"}
 					</div>
 				) : (
-					<ul>
+					<>
 						<div className="search-count">
 							{isSearchMode ? "Search results" : "Popular stocks"}
 							{` `}({displayStocks?.length || 0})
 						</div>
-						{displayStocks?.map((stock) => (
-							<li
-								key={stock.symbol}
-								className="search-item flex items-center px-2 hover:bg-accent"
-							>
-								<Link
-									href={`/stocks/${stock.symbol}`}
-									onClick={handleSelectStock}
-									className="search-item-link grow px-0"
-								>
-									<TrendingUp className="h-4 w-4 text-gray-500" />
-									<div className="flex-1">
-										<div className="search-item-name">{stock.name}</div>
-										<div className="text-sm text-gray-500">
-											{stock.symbol} | {stock.exchange} | {stock.type}
-										</div>
-									</div>
-								</Link>
-								<WatchlistButton
-									symbol={stock.symbol}
-									company={stock.name}
-									isInWatchlist={stock.isInWatchlist}
-									onWatchlistChange={handleWatchlistChange}
-									type="icon"
-								/>
-							</li>
-						))}
-					</ul>
+						<ScrollArea className="h-90 w-full" type="always">
+							<ul>
+								{displayStocks?.map((stock) => (
+									<li
+										key={stock.symbol}
+										className="search-item flex items-center px-3 hover:bg-accent pr-6"
+									>
+										<Link
+											href={`/stocks/${stock.symbol}`}
+											onClick={handleSelectStock}
+											className="search-item-link grow px-0"
+										>
+											<TrendingUp className="h-4 w-4 text-gray-500" />
+											<div className="flex-1">
+												<div className="search-item-name hover:underline">{stock.name}</div>
+												<div className="text-sm text-gray-500">
+													{stock.symbol} | {stock.exchange} | {stock.type}
+												</div>
+											</div>
+										</Link>
+										<WatchlistButton
+											symbol={stock.symbol}
+											company={stock.name}
+											isInWatchlist={stock.isInWatchlist}
+											onWatchlistChange={handleWatchlistChange}
+											type="icon"
+										/>
+									</li>
+								))}
+							</ul>
+						</ScrollArea>
+					</>
 				)}
 			</CommandList>
 		</CommandDialog>
