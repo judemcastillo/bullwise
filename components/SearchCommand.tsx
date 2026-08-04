@@ -42,7 +42,10 @@ export default function SearchCommand({
 	}, [setOpen]);
 
 	useEffect(() => {
-		if (!open || (!isSearchMode && hasLoadedPopularStocks)) return;
+		if (!open || (!isSearchMode && hasLoadedPopularStocks)) {
+			const loadingTimeoutId = window.setTimeout(() => setLoading(false), 0);
+			return () => window.clearTimeout(loadingTimeoutId);
+		}
 
 		const currentRequestId = ++requestId.current;
 		const timeoutId = window.setTimeout(
