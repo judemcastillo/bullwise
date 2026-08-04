@@ -163,7 +163,7 @@ export const getRelatedStockDetails = cache(async (symbol: string) => {
 		currency: profileData.currency || null,
 		logo: profileData.logo || null,
 		changePercent,
-		changeFormatted: formatChangePercent(changePercent),
+		changeFormatted: formatChangePercent(changePercent) || "0.00%",
 	};
 });
 
