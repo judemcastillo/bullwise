@@ -8,14 +8,14 @@ import { Star, Trash2 } from "lucide-react";
 import { useState, type MouseEvent } from "react";
 import { toast } from "sonner";
 
-const WatchlistButton = ({
+export default function WatchlistButton({
 	symbol,
 	company,
 	isInWatchlist,
 	showTrashIcon = false,
 	type = "button",
 	onWatchlistChange,
-}: WatchlistButtonProps) => {
+}: WatchlistButtonProps) {
 	const [isAdded, setIsAdded] = useState<boolean>(!!isInWatchlist);
 	const [isPending, setIsPending] = useState(false);
 
@@ -94,6 +94,4 @@ const WatchlistButton = ({
 			<span>{label}</span>
 		</button>
 	);
-};
-
-export default WatchlistButton;
+}

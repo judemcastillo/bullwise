@@ -1,32 +1,27 @@
-import WatchlistAlerts from "@/components/WatchlistAlerts";
-import WatchlistNews from "@/components/WatchlistNews";
-import WatchlistSearch from "@/components/WatchlistSearch";
-import { WatchlistTable } from "@/components/WatchlistTable";
-import { getNews, searchStocks } from "@/lib/actions/finnhub.actions";
+import WatchlistAlerts from "@/components/watchlist/WatchlistAlerts";
+import WatchlistNewsSection, {
+	WatchlistNewsLoading,
+} from "@/components/watchlist/WatchlistNewsSection";
+import WatchlistPageLoading from "@/components/watchlist/WatchlistPageLoading";
+import WatchlistSearch from "@/components/watchlist/WatchlistSearch";
+import { WatchlistTable } from "@/components/watchlist/WatchlistTable";
 import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
 import { getUserAlerts } from "@/lib/data/user-alerts";
 import { Star } from "lucide-react";
+import { Suspense } from "react";
 
-const Watchlist = async () => {
-	const [watchlist, initialStocks, alerts] = await Promise.all([
+async function WatchlistContent() {
+	const [watchlist, alerts] = await Promise.all([
 		getWatchlistWithData(),
-		searchStocks(),
 		getUserAlerts(),
 	]);
-	const stockMembershipKey = initialStocks
-		.map((stock) => `${stock.symbol}:${stock.isInWatchlist}`)
+	const stockMembershipKey = watchlist
+		.map((stock) => stock.symbol)
+		.sort()
 		.join("|");
 
-	let news: MarketNewsArticle[] = [];
-
-	try {
-		news = await getNews(watchlist.map((item) => item.symbol));
-	} catch (error) {
-		console.error("Unable to load watchlist news:", error);
-	}
-
 	return (
-		<div className="watchlist-page  gap-10">
+		<div className="watchlist-page gap-10">
 			<div className="watchlist-container">
 				<section className="watchlist" aria-labelledby="watchlist-heading">
 					<div className="watchlist-section-heading">
@@ -36,10 +31,7 @@ const Watchlist = async () => {
 								Watchlist
 							</h1>
 						</div>
-						<WatchlistSearch
-							initialStocks={initialStocks}
-							stockMembershipKey={stockMembershipKey}
-						/>
+						<WatchlistSearch stockMembershipKey={stockMembershipKey} />
 					</div>
 
 					{watchlist.length > 0 ? (
@@ -75,9 +67,19 @@ const Watchlist = async () => {
 				/>
 			</div>
 
-			<WatchlistNews news={news} />
+			<Suspense fallback={<WatchlistNewsLoading />}>
+				<WatchlistNewsSection
+					symbols={watchlist.map((item) => item.symbol)}
+				/>
+			</Suspense>
 		</div>
 	);
-};
+}
 
-export default Watchlist;
+const WatchlistPage = () => (
+	<Suspense fallback={<WatchlistPageLoading />}>
+		<WatchlistContent />
+	</Suspense>
+);
+
+export default WatchlistPage;

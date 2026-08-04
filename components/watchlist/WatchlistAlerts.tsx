@@ -1,13 +1,13 @@
 "use client";
 
-import { BellRing, Mail, Radio } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { AlertDto, AlertInstrumentOption } from "@/types/alerts";
-import { useState } from "react";
 import {
 	AlertDetailsDialog,
 	CreateAlertDialog,
 } from "@/components/alerts/AlertDialogs";
+import { Button } from "@/components/ui/button";
+import type { AlertDto, AlertInstrumentOption } from "@/types/alerts";
+import { BellRing, Mail, Radio } from "lucide-react";
+import { useState } from "react";
 
 export default function WatchlistAlerts({
 	alerts,

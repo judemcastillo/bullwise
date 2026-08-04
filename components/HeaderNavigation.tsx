@@ -7,10 +7,8 @@ import UserDropdown from "./UserDropdown";
 
 export default function HeaderNavigation({
 	user,
-	initialStocks,
 }: {
 	user: User;
-	initialStocks: StockWithWatchlistStatus[];
 }) {
 	const [searchOpen, setSearchOpen] = useState(false);
 	const openSearch = () => setSearchOpen(true);
@@ -27,7 +25,6 @@ export default function HeaderNavigation({
 			<SearchCommand
 				open={searchOpen}
 				setOpen={setSearchOpen}
-				initialStocks={initialStocks}
 			/>
 		</>
 	);

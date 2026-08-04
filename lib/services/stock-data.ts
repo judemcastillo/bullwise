@@ -5,11 +5,12 @@ import {
 	formatMarketCapValue,
 	formatPrice,
 } from "@/lib/utils";
+import { getFinnhubApiKey } from "@/lib/market-data/finnhub-config";
 import { cache } from "react";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
-const FINNHUB_API_KEY =
-	process.env.FINNHUB_API_KEY ?? process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? "";
+const DEFAULT_FINNHUB_TIMEOUT_MS = 5000;
+const PEERS_TIMEOUT_MS = 1500;
 
 type DashboardQuoteData = QuoteData & {
 	d?: number;
@@ -34,15 +35,16 @@ type DashboardProfileData = ProfileData & {
 async function fetchStockData<T>(
 	path: string,
 	revalidateSeconds?: number,
+	timeoutMs = DEFAULT_FINNHUB_TIMEOUT_MS,
 ): Promise<T> {
 	const response = await fetch(
-		`${FINNHUB_BASE_URL}/${path}${path.includes("?") ? "&" : "?"}token=${FINNHUB_API_KEY}`,
+		`${FINNHUB_BASE_URL}/${path}${path.includes("?") ? "&" : "?"}token=${getFinnhubApiKey()}`,
 		revalidateSeconds === undefined
-			? { cache: "no-store", signal: AbortSignal.timeout(8000) }
+			? { cache: "no-store", signal: AbortSignal.timeout(timeoutMs) }
 			: {
 					cache: "force-cache",
 					next: { revalidate: revalidateSeconds },
-					signal: AbortSignal.timeout(8000),
+					signal: AbortSignal.timeout(timeoutMs),
 				},
 	);
 
@@ -110,10 +112,20 @@ export const getStockDashboardData = cache(async (symbol: string) => {
 export const getCompanyPeers = cache(async (symbol: string) => {
 	const cleanSymbol = symbol.trim().toUpperCase();
 	const encodedSymbol = encodeURIComponent(cleanSymbol);
-	const payload = await fetchStockData<unknown>(
-		`stock/peers?symbol=${encodedSymbol}&grouping=sector`,
-		3600,
-	);
+	let payload: unknown;
+
+	try {
+		payload = await fetchStockData<unknown>(
+			`stock/peers?symbol=${encodedSymbol}&grouping=sector`,
+			3600,
+			PEERS_TIMEOUT_MS,
+		);
+	} catch (error) {
+		const reason =
+			error instanceof Error ? `${error.name}: ${error.message}` : "unknown error";
+		console.warn(`Unable to load peers for ${cleanSymbol} (${reason})`);
+		return [];
+	}
 
 	if (!Array.isArray(payload)) return [];
 
@@ -125,6 +137,34 @@ export const getCompanyPeers = cache(async (symbol: string) => {
 				.filter((peer) => peer.length > 0 && peer !== cleanSymbol),
 		),
 	);
+});
+
+export const getRelatedStockDetails = cache(async (symbol: string) => {
+	const cleanSymbol = symbol.trim().toUpperCase();
+	const encodedSymbol = encodeURIComponent(cleanSymbol);
+	const [quoteData, profileData] = await Promise.all([
+		fetchStockData<QuoteData>(`quote?symbol=${encodedSymbol}`),
+		fetchStockData<DashboardProfileData>(
+			`stock/profile2?symbol=${encodedSymbol}`,
+			3600,
+		),
+	]);
+
+	if (!quoteData.c || !profileData.name) {
+		throw new Error("Invalid stock data received from API");
+	}
+
+	const changePercent = quoteData.dp || 0;
+
+	return {
+		symbol: cleanSymbol,
+		company: profileData.name,
+		currentPrice: quoteData.c,
+		currency: profileData.currency || null,
+		logo: profileData.logo || null,
+		changePercent,
+		changeFormatted: formatChangePercent(changePercent) || "0.00%",
+	};
 });
 
 export const getStocksDetails = cache(async (symbol: string) => {
@@ -166,7 +206,9 @@ export const getStocksDetails = cache(async (symbol: string) => {
 			),
 		};
 	} catch (error) {
-		console.error(`Error fetching details for ${cleanSymbol}:`, error);
+		const reason =
+			error instanceof Error ? `${error.name}: ${error.message}` : "unknown error";
+		console.warn(`Unable to load stock details for ${cleanSymbol} (${reason})`);
 		throw new Error("Failed to fetch stock details");
 	}
 });

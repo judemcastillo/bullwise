@@ -4,17 +4,58 @@ import StockChartCard from "@/components/stocks/StockChartCard";
 import StockCompanyInfoCard from "@/components/stocks/StockCompanyInfoCard";
 import StockNewsCard from "@/components/stocks/StockNewsCard";
 import StockOverviewCard from "@/components/stocks/StockOverviewCard";
-import { getNews, searchStocks } from "@/lib/actions/finnhub.actions";
+import { getNews } from "@/lib/actions/finnhub.actions";
 import { getWatchlistSymbolsByUserId } from "@/lib/actions/watchlist.actions";
 import { auth } from "@/lib/better-auth/auth";
 import { STOCK_DETAILS_RELATED_LIMIT } from "@/lib/constants";
 import {
 	getCompanyPeers,
+	getRelatedStockDetails,
 	getStockDashboardData,
-	getStocksDetails,
 } from "@/lib/services/stock-data";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+async function StockNewsSection({ symbol }: { symbol: string }) {
+	const news = await getNews([symbol]).catch((error) => {
+		const reason = error instanceof Error ? error.message : "unknown error";
+		console.warn(`Unable to load news for ${symbol} (${reason})`);
+		return [] as MarketNewsArticle[];
+	});
+
+	return <StockNewsCard news={news} />;
+}
+
+async function RelatedStocksSection({ symbol }: { symbol: string }) {
+	const companyPeers = await getCompanyPeers(symbol);
+	const peerSymbols = companyPeers.slice(0, STOCK_DETAILS_RELATED_LIMIT);
+	const relatedResults = await Promise.allSettled(
+		peerSymbols.map((peerSymbol) => getRelatedStockDetails(peerSymbol)),
+	);
+	const relatedStocks = relatedResults.flatMap((result) =>
+		result.status === "fulfilled" ? [result.value] : [],
+	);
+
+	return (
+		<RelatedStocksCard stocks={relatedStocks} peerSymbols={peerSymbols} />
+	);
+}
+
+function StockCardLoading({ title }: { title: string }) {
+	return (
+		<section className="stock-card h-full" aria-label={`Loading ${title}`}>
+			<div className="stock-card-heading">
+				<h2>{title}</h2>
+			</div>
+			<div className="min-h-56 animate-pulse space-y-4 p-5">
+				<div className="h-4 w-3/4 rounded bg-gray-700" />
+				<div className="h-4 w-1/2 rounded bg-gray-700" />
+				<div className="h-4 w-2/3 rounded bg-gray-700" />
+			</div>
+		</section>
+	);
+}
 
 const StockDetails = async ({ params }: StockDetailsPageProps) => {
 	const { symbol } = await params;
@@ -25,47 +66,25 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 
 	if (!session?.user) redirect("/sign-in");
 
-	const [watchlistSymbols, matchingStocks, stock, news, companyPeers] =
-		await Promise.all([
-			getWatchlistSymbolsByUserId(session.user.id).catch((error) => {
-				console.error(
-					`Unable to load watchlist for ${session.user.id}:`,
-					error,
-				);
-				return [] as string[];
-			}),
-			searchStocks(normalizedSymbol).catch((error) => {
-				console.error(`Unable to search stocks for ${normalizedSymbol}:`, error);
-				return [];
-			}),
-			getStockDashboardData(normalizedSymbol).catch((error) => {
-				console.error(
-					`Unable to load dashboard data for ${normalizedSymbol}:`,
-					error,
-				);
-				return null;
-			}),
-			getNews([normalizedSymbol]).catch((error) => {
-				console.error(`Unable to load news for ${normalizedSymbol}:`, error);
-				return [] as MarketNewsArticle[];
-			}),
-			getCompanyPeers(normalizedSymbol).catch((error) => {
-				console.error(`Unable to load peers for ${normalizedSymbol}:`, error);
-				return [] as string[];
-			}),
-		]);
+	const [watchlistSymbols, stock] = await Promise.all([
+		getWatchlistSymbolsByUserId(session.user.id).catch((error) => {
+			console.error(
+				`Unable to load watchlist for ${session.user.id}:`,
+				error,
+			);
+			return [] as string[];
+		}),
+		getStockDashboardData(normalizedSymbol).catch((error) => {
+			const reason =
+				error instanceof Error ? error.message : "unknown error";
+			console.warn(
+				`Unable to load dashboard data for ${normalizedSymbol} (${reason})`,
+			);
+			return null;
+		}),
+	]);
 
-	const company =
-		stock?.company ??
-		matchingStocks.find((item) => item.symbol === normalizedSymbol)?.name ??
-		normalizedSymbol;
-	const peerSymbols = companyPeers.slice(0, STOCK_DETAILS_RELATED_LIMIT);
-	const relatedResults = await Promise.allSettled(
-		peerSymbols.map((peerSymbol) => getStocksDetails(peerSymbol)),
-	);
-	const relatedStocks = relatedResults.flatMap((result) =>
-		result.status === "fulfilled" ? [result.value] : [],
-	);
+	const company = stock?.company ?? normalizedSymbol;
 
 	return (
 		<div className="stock-dashboard">
@@ -84,11 +103,12 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 					<StockAnalysisCard symbol={normalizedSymbol} />
 					<StockCompanyInfoCard stock={stock} />
 				</div>
-				<StockNewsCard news={news} />
-				<RelatedStocksCard
-					stocks={relatedStocks}
-					peerSymbols={peerSymbols}
-				/>
+				<Suspense fallback={<StockCardLoading title="Latest news" />}>
+					<StockNewsSection symbol={normalizedSymbol} />
+				</Suspense>
+				<Suspense fallback={<StockCardLoading title="Related stocks" />}>
+					<RelatedStocksSection symbol={normalizedSymbol} />
+				</Suspense>
 			</div>
 		</div>
 	);

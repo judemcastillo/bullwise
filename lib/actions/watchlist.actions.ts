@@ -140,7 +140,11 @@ export const getWatchlistWithData = async (
 						peRatio: stockData.peRatio,
 					};
 				} catch (error) {
-					console.warn(`Failed to fetch data for ${item.symbol}:`, error);
+					const reason =
+						error instanceof Error ? error.message : "unknown error";
+					console.warn(
+						`Unable to load watchlist data for ${item.symbol} (${reason})`,
+					);
 					return item;
 				}
 			}),

@@ -1,5 +1,5 @@
 import TradingViewWidget from "@/components/TradingViewWidget";
-import WatchlistButton from "@/components/WatchlistButton";
+import WatchlistButton from "@/components/watchlist/WatchlistButton";
 import {
 	CANDLE_CHART_WIDGET_CONFIG,
 	TRADING_VIEW_EMBED_URL,
