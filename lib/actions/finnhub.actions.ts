@@ -1,6 +1,12 @@
 "use server";
 
-import { formatArticle, getDateRange, validateArticle } from "@/lib/utils";
+import {
+	formatArticle,
+	getDateRange,
+	type ValidNewsArticle,
+	validateArticle,
+} from "@/lib/utils";
+import { getFinnhubApiKey } from "@/lib/market-data/finnhub-config";
 import { cache } from "react";
 import { POPULAR_STOCK_SYMBOLS } from "../constants";
 import { auth } from "../better-auth/auth";
@@ -9,9 +15,9 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { getWatchlistSymbolsByUserId } from "./watchlist.actions";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
-const NEXT_PUBLIC_FINNHUB_API_KEY =
-	process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? "";
 const MAX_NEWS_ARTICLES = 6;
+const NEWS_REQUEST_CONCURRENCY = 3;
+const FINNHUB_REQUEST_TIMEOUT_MS = 6000;
 
 type FinnhubCompanyProfile = {
 	name?: string;
@@ -40,8 +46,12 @@ export async function fetchJSON<T>(
 			? {
 					cache: "force-cache",
 					next: { revalidate: revalidateSeconds },
+					signal: AbortSignal.timeout(FINNHUB_REQUEST_TIMEOUT_MS),
 				}
-			: { cache: "no-store" },
+			: {
+					cache: "no-store",
+					signal: AbortSignal.timeout(FINNHUB_REQUEST_TIMEOUT_MS),
+				},
 	);
 
 	if (!response.ok) {
@@ -59,7 +69,7 @@ function buildFinnhubUrl(
 ): string {
 	const searchParams = new URLSearchParams({
 		...params,
-		token: NEXT_PUBLIC_FINNHUB_API_KEY,
+		token: getFinnhubApiKey(),
 	});
 
 	return `${FINNHUB_BASE_URL}/${path}?${searchParams.toString()}`;
@@ -120,39 +130,69 @@ export async function getNews(
 		if (cleanedSymbols.length === 0) return await getGeneralNews();
 
 		const { from, to } = getDateRange(5);
-		const articlesBySymbol = new Map<string, RawNewsArticle[]>();
+		const symbolsToFetch = cleanedSymbols.slice(0, MAX_NEWS_ARTICLES);
+		const articlesBySymbol = new Map<string, ValidNewsArticle[]>();
 		const usedArticles = new Set<string>();
 		const companyNews: MarketNewsArticle[] = [];
 
-		const maxRounds = Math.max(MAX_NEWS_ARTICLES, cleanedSymbols.length);
 		for (
-			let round = 0;
-			round < maxRounds && companyNews.length < MAX_NEWS_ARTICLES;
-			round += 1
+			let offset = 0;
+			offset < symbolsToFetch.length;
+			offset += NEWS_REQUEST_CONCURRENCY
 		) {
-			const symbol = cleanedSymbols[round % cleanedSymbols.length];
-			let articles = articlesBySymbol.get(symbol);
+			const batch = symbolsToFetch.slice(
+				offset,
+				offset + NEWS_REQUEST_CONCURRENCY,
+			);
+			const results = await Promise.all(
+				batch.map(async (symbol) => {
+					try {
+						const articles = await fetchArticleList(
+							buildFinnhubUrl("company-news", { symbol, from, to }),
+						);
+						return [symbol, articles.filter(validateArticle)] as const;
+					} catch (error: unknown) {
+						const reason =
+							error instanceof Error ? error.message : "unknown error";
+						console.warn(`Unable to load news for ${symbol} (${reason})`);
+						return [symbol, [] as ValidNewsArticle[]] as const;
+					}
+				}),
+			);
 
-			if (!articles) {
-				try {
-					articles = await fetchArticleList(
-						buildFinnhubUrl("company-news", { symbol, from, to }),
-					);
-				} catch (error: unknown) {
-					console.error(`Error fetching news for ${symbol}:`, error);
-					articles = [];
-				}
+			for (const [symbol, articles] of results) {
 				articlesBySymbol.set(symbol, articles);
 			}
+		}
 
-			const article = articles
-				.filter(validateArticle)
-				.find((candidate) => !usedArticles.has(articleKey(candidate)));
+		const nextArticleIndex = new Map(
+			symbolsToFetch.map((symbol) => [symbol, 0]),
+		);
+		while (companyNews.length < MAX_NEWS_ARTICLES) {
+			let addedArticle = false;
 
-			if (!article) continue;
+			for (const symbol of symbolsToFetch) {
+				const articles = articlesBySymbol.get(symbol) ?? [];
+				let index = nextArticleIndex.get(symbol) ?? 0;
 
-			usedArticles.add(articleKey(article));
-			companyNews.push(formatArticle(article, true, symbol));
+				while (
+					index < articles.length &&
+					usedArticles.has(articleKey(articles[index]))
+				) {
+					index += 1;
+				}
+
+				const article = articles[index];
+				nextArticleIndex.set(symbol, index + 1);
+				if (!article) continue;
+
+				usedArticles.add(articleKey(article));
+				companyNews.push(formatArticle(article, true, symbol));
+				addedArticle = true;
+				if (companyNews.length === MAX_NEWS_ARTICLES) break;
+			}
+
+			if (!addedArticle) break;
 		}
 
 		if (companyNews.length === 0) return await getGeneralNews();
@@ -162,7 +202,8 @@ export async function getNews(
 			.slice(0, MAX_NEWS_ARTICLES);
 	} catch (error: unknown) {
 		unstable_rethrow(error);
-		console.error("Error fetching Finnhub news:", error);
+		const reason = error instanceof Error ? error.message : "unknown error";
+		console.warn(`Finnhub news unavailable (${reason})`);
 		throw new Error("Failed to fetch news");
 	}
 }
@@ -178,15 +219,7 @@ export const searchStocks = cache(
 			const userWatchlistSymbols = await getWatchlistSymbolsByUserId(
 				session.user.id,
 			);
-			const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
-			if (!token) {
-				// If no token, log and return empty to avoid throwing per requirements
-				console.error(
-					"Error in stock search:",
-					new Error("FINNHUB API key is not configured"),
-				);
-				return [];
-			}
+			const token = getFinnhubApiKey();
 
 			const trimmed = typeof query === "string" ? query.trim() : "";
 

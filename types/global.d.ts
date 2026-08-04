@@ -58,7 +58,6 @@ declare global {
 	type SearchCommandProps = {
 		open: boolean;
 		setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-		initialStocks: StockWithWatchlistStatus[];
 		onWatchlistChange?: (symbol: string, isAdded: boolean) => void;
 	};
 

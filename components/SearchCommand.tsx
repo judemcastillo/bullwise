@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	CommandDialog,
 	CommandEmpty,
@@ -10,23 +10,25 @@ import {
 import { Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
-import { useDebounce } from "@/hooks/useDebounce";
-import WatchlistButton from "./WatchlistButton";
+import WatchlistButton from "@/components/watchlist/WatchlistButton";
 import { ScrollArea } from "./ui/scroll-area";
 
 export default function SearchCommand({
 	open,
 	setOpen,
-	initialStocks,
 	onWatchlistChange,
 }: SearchCommandProps) {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [loading, setLoading] = useState(false);
-	const [stocks, setStocks] =
-		useState<StockWithWatchlistStatus[]>(initialStocks);
+	const [popularStocks, setPopularStocks] = useState<
+		StockWithWatchlistStatus[]
+	>([]);
+	const [stocks, setStocks] = useState<StockWithWatchlistStatus[]>([]);
+	const [hasLoadedPopularStocks, setHasLoadedPopularStocks] = useState(false);
+	const requestId = useRef(0);
 
 	const isSearchMode = !!searchTerm.trim();
-	const displayStocks = isSearchMode ? stocks : stocks?.slice(0, 10);
+	const displayStocks = isSearchMode ? stocks : popularStocks.slice(0, 10);
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
@@ -39,35 +41,59 @@ export default function SearchCommand({
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [setOpen]);
 
-	const handleSearch = useCallback(async () => {
-		if (!isSearchMode) return setStocks(initialStocks);
-
-		setLoading(true);
-		try {
-			const results = await searchStocks(searchTerm.trim());
-			setStocks(results);
-		} catch (e) {
-			console.error(e);
-			setStocks([]);
-		} finally {
-			setLoading(false);
-		}
-	}, [initialStocks, isSearchMode, searchTerm]);
-
-	const debouncedSearch = useDebounce(handleSearch, 300);
-
 	useEffect(() => {
-		debouncedSearch();
-	}, [debouncedSearch]);
+		if (!open || (!isSearchMode && hasLoadedPopularStocks)) return;
+
+		const currentRequestId = ++requestId.current;
+		const timeoutId = window.setTimeout(
+			async () => {
+				setLoading(true);
+				try {
+					const results = await searchStocks(
+						isSearchMode ? searchTerm.trim() : undefined,
+					);
+					if (requestId.current !== currentRequestId) return;
+
+					if (isSearchMode) {
+						setStocks(results);
+					} else {
+						setPopularStocks(results);
+						setHasLoadedPopularStocks(true);
+					}
+				} catch (error) {
+					if (requestId.current !== currentRequestId) return;
+					console.error("Unable to search stocks:", error);
+					if (isSearchMode) setStocks([]);
+				} finally {
+					if (requestId.current === currentRequestId) setLoading(false);
+				}
+			},
+			isSearchMode ? 300 : 0,
+		);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+			requestId.current += 1;
+		};
+	}, [
+		hasLoadedPopularStocks,
+		isSearchMode,
+		open,
+		searchTerm,
+	]);
 
 	const handleSelectStock = () => {
 		setOpen(false);
 		setSearchTerm("");
-		setStocks(initialStocks);
 	};
 
 	const handleWatchlistChange = (symbol: string, isAdded: boolean) => {
 		setStocks((currentStocks) =>
+			currentStocks.map((stock) =>
+				stock.symbol === symbol ? { ...stock, isInWatchlist: isAdded } : stock,
+			),
+		);
+		setPopularStocks((currentStocks) =>
 			currentStocks.map((stock) =>
 				stock.symbol === symbol ? { ...stock, isInWatchlist: isAdded } : stock,
 			),

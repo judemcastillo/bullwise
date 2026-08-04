@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Create a local `.env` file with the server-only credentials required by the app:
+
+```bash
+FINNHUB_API_KEY=your_finnhub_api_key
+```
+
+Never prefix the Finnhub key with `NEXT_PUBLIC_`; Next.js includes public
+environment variables in browser bundles. Configure `FINNHUB_API_KEY` in each
+deployment environment as a server-side secret.
+
 First, run the development server:
 
 ```bash

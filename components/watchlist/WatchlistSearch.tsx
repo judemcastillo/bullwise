@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import SearchCommand from "@/components/SearchCommand";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function WatchlistSearch({
-	initialStocks,
 	stockMembershipKey,
 }: {
-	initialStocks: StockWithWatchlistStatus[];
 	stockMembershipKey: string;
 }) {
 	const [open, setOpen] = useState(false);
@@ -24,7 +22,6 @@ export default function WatchlistSearch({
 				key={stockMembershipKey}
 				open={open}
 				setOpen={setOpen}
-				initialStocks={initialStocks}
 				onWatchlistChange={() => router.refresh()}
 			/>
 		</>

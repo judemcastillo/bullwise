@@ -1,10 +1,10 @@
 import type {
+	getRelatedStockDetails,
 	getStockDashboardData,
-	getStocksDetails,
 } from "@/lib/services/stock-data";
 
 export type StockDashboardData = Awaited<
 	ReturnType<typeof getStockDashboardData>
 >;
 
-export type RelatedStockData = Awaited<ReturnType<typeof getStocksDetails>>;
+export type RelatedStockData = Awaited<ReturnType<typeof getRelatedStockDetails>>;

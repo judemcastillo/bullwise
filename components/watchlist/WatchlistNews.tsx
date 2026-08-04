@@ -1,5 +1,5 @@
-import { ArrowUpRight, Newspaper } from "lucide-react";
 import { formatTimeAgo } from "@/lib/utils";
+import { ArrowUpRight, Newspaper } from "lucide-react";
 
 export default function WatchlistNews({
 	news,
