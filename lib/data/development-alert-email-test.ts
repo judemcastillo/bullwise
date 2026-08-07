@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import Alert from "@/database/models/alert.model";
 import AlertEvent from "@/database/models/alert-event.model";
 import type { InstrumentItem } from "@/database/models/instrument.model";
-import { requireUser } from "@/lib/auth/require-user";
+import { requireCompletedUser } from "@/lib/auth/require-user";
 import { connectToDatabase } from "@/database/mongoose";
 
 type TestableAlert = {
@@ -24,7 +24,7 @@ export class DevelopmentEmailTestError extends Error {
 }
 
 export async function createDevelopmentAlertEmailTestEvent(alertId: string) {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	if (process.env.NODE_ENV !== "development") {
 		throw new DevelopmentEmailTestError(
 			"Test alert emails are only available in development",

@@ -8,10 +8,15 @@ declare global {
 		fullName: string;
 		email: string;
 		password: string;
+	};
+
+	type OnboardingFormData = {
 		country: string;
+		investmentExperience: string;
 		investmentGoals: string;
 		riskTolerance: string;
-		preferredIndustry: string;
+		preferredMarkets: string[];
+		preferredIndustries: string[];
 	};
 
 	type CountrySelectProps = {

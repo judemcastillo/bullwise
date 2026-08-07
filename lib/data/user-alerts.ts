@@ -4,7 +4,7 @@ import Alert from "@/database/models/alert.model";
 import Instrument, {
 	type InstrumentItem,
 } from "@/database/models/instrument.model";
-import { requireUser } from "@/lib/auth/require-user";
+import { requireCompletedUser } from "@/lib/auth/require-user";
 import { getStockDashboardData } from "@/lib/services/stock-data";
 import type {
 	AlertDto,
@@ -138,7 +138,7 @@ async function resolveInstrument(input: AlertInstrumentInput) {
 				],
 			},
 		},
-		{ upsert: true, new: true, runValidators: true },
+		{ upsert: true, returnDocument: "after", runValidators: true },
 	);
 
 	if (!instrument) throw new Error("Unable to resolve this instrument");
@@ -182,7 +182,7 @@ async function populateAlert(alertId: Types.ObjectId, userId: string) {
 }
 
 export async function getUserAlerts(): Promise<AlertDto[]> {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	const alerts = await Alert.find({ userId: user.id })
 		.sort({ createdAt: -1 })
 		.populate("instrumentId")
@@ -198,7 +198,7 @@ export async function getUserAlerts(): Promise<AlertDto[]> {
 export async function createUserAlert(
 	input: CreateAlertInput,
 ): Promise<AlertDto> {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	const fields = validateAlertFields(input);
 	const { instrument, currentPrice } = await resolveInstrument(input.instrument);
 	const targetPrice = Number(fields.threshold);
@@ -237,7 +237,7 @@ export async function updateUserAlert(
 	alertId: string,
 	input: UpdateAlertInput,
 ): Promise<AlertDto | null> {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	if (!Types.ObjectId.isValid(alertId)) return null;
 
 	const fields = validateAlertFields(input);
@@ -263,7 +263,7 @@ export async function setUserAlertStatus(
 	alertId: string,
 	status: Exclude<AlertStatus, "triggered">,
 ): Promise<AlertDto | null> {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	if (!Types.ObjectId.isValid(alertId)) return null;
 	if (status !== "active" && status !== "paused") return null;
 
@@ -279,7 +279,7 @@ export async function setUserAlertStatus(
 }
 
 export async function deleteUserAlert(alertId: string): Promise<boolean> {
-	const user = await requireUser();
+	const user = await requireCompletedUser();
 	if (!Types.ObjectId.isValid(alertId)) return false;
 
 	const result = await Alert.deleteOne({

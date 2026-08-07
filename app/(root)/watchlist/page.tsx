@@ -5,7 +5,7 @@ import WatchlistNewsSection, {
 import WatchlistPageLoading from "@/components/watchlist/WatchlistPageLoading";
 import WatchlistSearch from "@/components/watchlist/WatchlistSearch";
 import { WatchlistTable } from "@/components/watchlist/WatchlistTable";
-import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
+import { getWatchlistWithData } from "@/lib/data/watchlist";
 import { getUserAlerts } from "@/lib/data/user-alerts";
 import { Star } from "lucide-react";
 import { Suspense } from "react";

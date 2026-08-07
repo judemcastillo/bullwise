@@ -3,10 +3,10 @@ import {
 	NEWS_SUMMARY_EMAIL_PROMPT,
 	PERSONALIZED_WELCOME_EMAIL_PROMPT,
 } from "@/lib/inngest/prompts";
-import { getNews } from "../actions/finnhub.actions";
-import { getWatchlistSymbolsByUserId } from "../actions/watchlist.actions";
+import { getNews } from "../market-data/finnhub";
+import { getWatchlistSymbolsForUser } from "../data/watchlist";
 import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailer";
-import { getAllUsersForNewsEmail } from "../actions/user.actions";
+import { getAllUsersForNewsEmail } from "../data/news-email-users";
 import { getFormattedTodayDate } from "../utils";
 import { monitorDuePriceAlerts } from "@/lib/alerts/monitoring";
 import { ALERT_MONITORING_FUNCTION_CONFIG } from "@/lib/inngest/alert-monitoring.config";
@@ -49,11 +49,20 @@ export const sendSignUpEmail = inngest.createFunction(
 		triggers: [{ event: "app/user.created" }],
 	},
 	async ({ event, step }) => {
+		const experience = event.data.investmentExperience ?? "Beginner";
+		const preferredMarkets = Array.isArray(event.data.preferredMarkets)
+			? event.data.preferredMarkets.join(", ")
+			: "US Stocks";
+		const preferredIndustries = Array.isArray(event.data.preferredIndustries)
+			? event.data.preferredIndustries.join(", ")
+			: (event.data.preferredIndustry ?? "Technology");
 		const userProfile = `
             - Country: ${event.data.country}
+            - Investment experience: ${experience}
             - Investment goals: ${event.data.investmentGoals}
             - Risk tolerance: ${event.data.riskTolerance}
-            - Preferred industry: ${event.data.preferredIndustry}
+            - Preferred markets: ${preferredMarkets}
+            - Preferred industries: ${preferredIndustries}
         `;
 
 		const prompt = PERSONALIZED_WELCOME_EMAIL_PROMPT.replace(
@@ -109,7 +118,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 		const newsByUser = await step.run("fetch-news-for-users", async () =>
 			Promise.all(
 				users.map(async (user) => {
-					const symbols = await getWatchlistSymbolsByUserId(user.id);
+					const symbols = await getWatchlistSymbolsForUser(user.id);
 					let news: MarketNewsArticle[] = [];
 
 					try {

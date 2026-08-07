@@ -143,7 +143,7 @@ export class MongoAlertMonitoringStore implements AlertMonitoringStore {
 							nextEvaluationAt: nextEvaluationAt(triggeredAt),
 						},
 					},
-					{ new: true, session },
+					{ returnDocument: "after", session },
 				);
 
 				if (!claimed) {

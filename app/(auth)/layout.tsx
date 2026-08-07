@@ -1,4 +1,3 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import Image from "next/image";
@@ -13,8 +12,6 @@ export default async function Layout({
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (session?.user) redirect("/");
-
-	
 	return (
 		<main className="auth-layout">
 			<section className="auth-left-section scroll-hide-default">
@@ -22,8 +19,8 @@ export default async function Layout({
 					<Image
 						src="/assets/icons/logo.svg"
 						alt="Bull Wise Logo"
-						width={140}
-						height={32}
+						width={260}
+						height={60}
 						className="h-8 w-auto"
 					/>
 				</Link>

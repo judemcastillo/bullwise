@@ -1,64 +1,67 @@
 "use client";
-import { CountrySelectField } from "@/components/forms/CountrySelectField";
+import AuthDivider from "@/components/forms/AuthDivider";
+import AuthFormError from "@/components/forms/AuthFormError";
 import FooterLink from "@/components/forms/FooterLink";
+import GoogleAuthButton from "@/components/forms/GoogleAuthButton";
 import InputField from "@/components/forms/InputField";
-import SelectField from "@/components/forms/SelectField";
 import { Button } from "@/components/ui/button";
 import { signUpWithEmail } from "@/lib/actions/auth.actions";
-import {
-	INVESTMENT_GOALS,
-	PREFERRED_INDUSTRIES,
-	RISK_TOLERANCE_OPTIONS,
-} from "@/lib/constants";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function SignUpPage() {
 	const router = useRouter();
+	const [formError, setFormError] = useState<string | null>(null);
 	const {
 		register,
 		handleSubmit,
-		control,
 		formState: { errors, isSubmitting },
 	} = useForm<SignUpFormData>({
 		defaultValues: {
 			fullName: "",
 			email: "",
 			password: "",
-			country: "US",
-			investmentGoals: "Growth",
-			riskTolerance: "Medium",
-			preferredIndustry: "Technology",
 		},
 
 		mode: "onBlur",
 	});
 
 	const onSubmit = async (data: SignUpFormData) => {
+		setFormError(null);
+
 		try {
 			const result = await signUpWithEmail(data);
 
 			if (!result.success) {
-				toast.error("Unable to create account", {
-					description: result.error,
-				});
+				setFormError(result.error);
 				return;
 			}
 
-			router.push("/");
+			router.push(
+				`/verify-email?email=${encodeURIComponent(data.email)}&sent=1`,
+			);
 		} catch (e) {
 			console.error(e);
-			toast.error("Unable to create account", {
-				description:
-					e instanceof Error ? e.message : "Failed to create an account.",
-			});
+			setFormError(
+				e instanceof Error ? e.message : "Failed to create an account.",
+			);
 		}
 	};
 	return (
-		<div>
-			<h1 className="form-title">Sign Up & Personalize</h1>
-			<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+		<div className="mx-auto w-full max-w-md">
+			<div className="mb-6">
+				<h1 className="text-3xl font-bold text-gray-400">Create account</h1>
+				<p className="mt-2 text-sm text-gray-500">
+					Build a smarter watchlist with personalized market insights.
+				</p>
+			</div>
+
+			<GoogleAuthButton />
+			<AuthDivider label="or" />
+
+			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 				<InputField
 					name="fullName"
 					label="Full Name"
@@ -103,51 +106,14 @@ export default function SignUpPage() {
 						},
 					}}
 				/>
-				<CountrySelectField
-					name="country"
-					label="Country"
-					control={control}
-					error={errors.country}
-					required
-				/>
-				<SelectField
-					name="investmentGoals"
-					label="Investment Goals"
-					placeholder="Select your investment goal"
-					options={INVESTMENT_GOALS}
-					control={control}
-					error={errors.investmentGoals}
-					required
-				/>
-
-				<SelectField
-					name="riskTolerance"
-					label="Risk Tolerance"
-					placeholder="Select your risk level"
-					options={RISK_TOLERANCE_OPTIONS}
-					control={control}
-					error={errors.riskTolerance}
-					required
-				/>
-
-				<SelectField
-					name="preferredIndustry"
-					label="Preferred Industry"
-					placeholder="Select your preferred industry"
-					options={PREFERRED_INDUSTRIES}
-					control={control}
-					error={errors.preferredIndustry}
-					required
-				/>
+				<AuthFormError message={formError} />
 				<Button
 					type="submit"
 					disabled={isSubmitting}
 					aria-busy={isSubmitting}
-					className="yellow-btn w-full mt-5"
+					className="yellow-btn mt-2 w-full"
 				>
-					{isSubmitting
-						? "Creating Account..."
-						: "Start Your Investing Journey"}
+					{isSubmitting ? "Creating account..." : "Create account"}
 				</Button>
 				<FooterLink
 					text="Already have an account?"
@@ -155,6 +121,28 @@ export default function SignUpPage() {
 					href="/sign-in"
 				/>
 			</form>
+
+			<p className="mt-10 text-center text-xs leading-5 text-gray-500">
+				By creating an account, you agree to our{" "}
+				<Link
+					href="/terms#terms-of-use"
+					target="_blank"
+					rel="noreferrer"
+					className="underline underline-offset-2 hover:text-yellow-400"
+				>
+					Terms of Use
+				</Link>{" "}
+				and{" "}
+				<Link
+					href="/terms#privacy-policy"
+					target="_blank"
+					rel="noreferrer"
+					className="underline underline-offset-2 hover:text-yellow-400"
+				>
+					Privacy Policy
+				</Link>
+				.
+			</p>
 		</div>
 	);
 }

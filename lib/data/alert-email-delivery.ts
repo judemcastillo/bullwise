@@ -99,7 +99,7 @@ export class MongoAlertEmailDeliveryStore
 					"delivery.email.error": 1,
 				},
 			},
-			{ new: true, sort: { triggeredAt: 1, _id: 1 } },
+			{ returnDocument: "after", sort: { triggeredAt: 1, _id: 1 } },
 		).lean();
 
 		return event ? asJob(event as never) : null;

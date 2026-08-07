@@ -15,8 +15,15 @@ export interface WatchlistItem extends Document {
 
 const watchlistSchema = new Schema<WatchlistItem>({
 	userId: { type: String, required: true, index: true },
-	symbol: { type: String, required: true, uppercase: true, trim: true },
-	company: { type: String, required: true, trim: true },
+	symbol: {
+		type: String,
+		required: true,
+		uppercase: true,
+		trim: true,
+		maxlength: 40,
+		match: /^[A-Z0-9._:/-]+$/,
+	},
+	company: { type: String, required: true, trim: true, maxlength: 160 },
 	addedAt: { type: Date, default: Date.now },
 });
 
