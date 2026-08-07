@@ -22,7 +22,7 @@ export default async function VerifyEmailPage({
 		? params.complete[0]
 		: params.complete;
 
-	if (session?.user.emailVerified) {
+	if (session?.user?.emailVerified) {
 		redirect(complete === "1" ? "/onboarding" : "/");
 	}
 
