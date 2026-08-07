@@ -68,10 +68,14 @@ export async function removeFromCurrentUserWatchlist(symbol: string) {
 	}
 
 	try {
-		await Watchlist.deleteOne({
+		const result = await Watchlist.deleteOne({
 			userId,
 			symbol: normalizedSymbol,
 		});
+
+		if (result.deletedCount === 0) {
+			return { success: false, error: "Stock is not in watchlist" };
+		}
 
 		return { success: true, message: "Stock removed from watchlist" };
 	} catch (error) {
