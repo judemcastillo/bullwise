@@ -134,7 +134,7 @@ export default function SignUpPage() {
 				</Link>{" "}
 				and{" "}
 				<Link
-					href="/terms#privacy-policy"
+					href="/privacy"
 					target="_blank"
 					rel="noreferrer"
 					className="underline underline-offset-2 hover:text-yellow-400"
