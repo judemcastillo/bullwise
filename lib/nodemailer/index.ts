@@ -39,8 +39,8 @@ export const sendAccountVerificationEmail = async ({
 }) => {
 	const html = VERIFICATION_EMAIL_TEMPLATE.replace(
 		"{{name}}",
-		escapeHtml(name),
-	).replace("{{verificationUrl}}", escapeHtml(verificationUrl));
+		() => escapeHtml(name),
+	).replace("{{verificationUrl}}", () => escapeHtml(verificationUrl));
 
 	await transporter.sendMail({
 		from: `"Bull Wise" <${process.env.NODEMAILER_EMAIL}>`,
@@ -56,10 +56,9 @@ export const sendWelcomeEmail = async ({
 	name,
 	intro,
 }: WelcomeEmailData) => {
-	const htmlTemplate = WELCOME_EMAIL_TEMPLATE.replace("{{name}}", name).replace(
-		"{{intro}}",
-		intro,
-	);
+	const htmlTemplate = WELCOME_EMAIL_TEMPLATE.replace("{{name}}", () =>
+		escapeHtml(name),
+	).replace("{{intro}}", () => escapeHtml(intro));
 
 	const mailOptions = {
 		from: `"Bull Wise" <${process.env.NODEMAILER_EMAIL}>`,
