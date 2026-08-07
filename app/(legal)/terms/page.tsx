@@ -105,7 +105,8 @@ const sections = [
 	{
 		title: "Your choices",
 		paragraphs: [
-			"You can update supported profile and preference data from your account settings. Depending on where you live, you may also have rights to request access, correction, deletion, or restriction of certain personal information, subject to applicable exceptions.",
+			"Bull Wise, the service operator, is the data controller responsible for personal information processed through the service. For privacy questions or requests, contact bullwise.business@gmail.com.",
+			"You can update supported profile and preference data from your account settings. Depending on where you live, you may also have rights to request access, correction, deletion, or restriction of certain personal information, subject to applicable exceptions. To submit one of these requests outside your account settings, email bullwise.business@gmail.com with the subject “Privacy Rights Request,” state which right you want to exercise, and include the email address associated with your account. Bull Wise may ask for additional information to verify your identity before acting on the request.",
 		],
 	},
 	{
