@@ -25,16 +25,21 @@ export const saveOnboardingProgress = async ({
 		if (!validated.success) return validated;
 
 		await connectToDatabase();
-		const profile =
-			(await UserProfile.findOne({ userId: user.id })) ??
-			new UserProfile({ userId: user.id });
+		const profile = await UserProfile.findOneAndUpdate(
+			{ userId: user.id },
+			{ $setOnInsert: { userId: user.id } },
+			{ upsert: true, returnDocument: "after" },
+		);
 		if (profile.onboardingCompletedAt) {
 			return { success: false, error: "Onboarding is already complete." };
 		}
 
 		profile.set({
 			...validated.data,
-			onboardingStep: Math.min(step + 1, ONBOARDING_TOTAL_STEPS),
+			onboardingStep: Math.max(
+				profile.onboardingStep,
+				Math.min(step + 1, ONBOARDING_TOTAL_STEPS),
+			),
 		});
 		await profile.save();
 
@@ -81,9 +86,11 @@ export const completeOnboarding = async (formData: unknown) => {
 					completedAt: profileCompletedAt,
 					version,
 				}) => {
-					const profile =
-						(await UserProfile.findOne({ userId })) ??
-						new UserProfile({ userId });
+					const profile = await UserProfile.findOneAndUpdate(
+						{ userId },
+						{ $setOnInsert: { userId } },
+						{ upsert: true, returnDocument: "after" },
+					);
 					profile.set({
 						...data,
 						// Keep a compatibility mirror while older app instances or
