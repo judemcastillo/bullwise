@@ -27,7 +27,9 @@ export default async function VerifyEmailPage({
 	}
 
 	const emailParam = params.email;
-	const email = Array.isArray(emailParam) ? emailParam[0] : emailParam;
+	const email =
+		session?.user.email ??
+		(Array.isArray(emailParam) ? emailParam[0] : emailParam);
 	const errorParam = params.error;
 	const error = Array.isArray(errorParam) ? errorParam[0] : errorParam;
 	const sentParam = Array.isArray(params.sent) ? params.sent[0] : params.sent;

@@ -16,7 +16,7 @@ export default async function Layout({
 
 	if (!session?.user) redirect("/sign-in");
 	if (!session.user.emailVerified) {
-		redirect(`/verify-email?email=${encodeURIComponent(session.user.email)}`);
+		redirect("/verify-email");
 	}
 	if (!(await hasCompletedOnboarding(session.user.id))) redirect("/onboarding");
 

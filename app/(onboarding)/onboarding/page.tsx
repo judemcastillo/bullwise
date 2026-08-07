@@ -10,7 +10,7 @@ export default async function OnboardingPage() {
 
 	if (!session?.user) redirect("/sign-in");
 	if (!session.user.emailVerified) {
-		redirect(`/verify-email?email=${encodeURIComponent(session.user.email)}`);
+		redirect("/verify-email");
 	}
 	const profile = await getOnboardingProfile(session.user.id);
 	if (profile.completed) redirect("/");
