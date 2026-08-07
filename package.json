@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "npm run test:alerts && npm run test:auth",
     "test:alerts": "node --import tsx lib/alerts/run-tests.ts",
+    "test:auth": "node --import tsx lib/auth/run-tests.ts",
     "test:db": "tsx database/test-db.ts"
   },
   "dependencies": {

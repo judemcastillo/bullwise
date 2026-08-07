@@ -4,8 +4,8 @@ import StockChartCard from "@/components/stocks/StockChartCard";
 import StockCompanyInfoCard from "@/components/stocks/StockCompanyInfoCard";
 import StockNewsCard from "@/components/stocks/StockNewsCard";
 import StockOverviewCard from "@/components/stocks/StockOverviewCard";
-import { getNews } from "@/lib/actions/finnhub.actions";
-import { getWatchlistSymbolsByUserId } from "@/lib/actions/watchlist.actions";
+import { getWatchlistSymbolsForUser } from "@/lib/data/watchlist";
+import { getNews } from "@/lib/market-data/finnhub";
 import { auth } from "@/lib/better-auth/auth";
 import { STOCK_DETAILS_RELATED_LIMIT } from "@/lib/constants";
 import {
@@ -67,7 +67,7 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 	if (!session?.user) redirect("/sign-in");
 
 	const [watchlistSymbols, stock] = await Promise.all([
-		getWatchlistSymbolsByUserId(session.user.id).catch((error) => {
+		getWatchlistSymbolsForUser(session.user.id).catch((error) => {
 			console.error(
 				`Unable to load watchlist for ${session.user.id}:`,
 				error,

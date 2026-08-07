@@ -10,8 +10,8 @@ export default function Header({ user }: { user: User }) {
 					<Image
 						src="/assets/icons/logo.svg"
 						alt="Bull Wise Logo"
-						width={140}
-						height={32}
+						width={260}
+						height={60}
 						className="h-8 w-auto cursor-pointer"
 					/>
 				</Link>

@@ -12,6 +12,12 @@ export const INVESTMENT_GOALS = [
     { value: 'Conservative', label: 'Conservative' },
 ];
 
+export const INVESTMENT_EXPERIENCE_OPTIONS = [
+    { value: 'Beginner', label: 'Beginner — less than 1 year' },
+    { value: 'Intermediate', label: 'Intermediate — 1 to 5 years' },
+    { value: 'Advanced', label: 'Advanced — more than 5 years' },
+];
+
 export const RISK_TOLERANCE_OPTIONS = [
     { value: 'Low', label: 'Low' },
     { value: 'Medium', label: 'Medium' },
@@ -24,6 +30,13 @@ export const PREFERRED_INDUSTRIES = [
     { value: 'Finance', label: 'Finance' },
     { value: 'Energy', label: 'Energy' },
     { value: 'Consumer Goods', label: 'Consumer Goods' },
+];
+
+export const PREFERRED_MARKETS = [
+    { value: 'US Stocks', label: 'US Stocks' },
+    { value: 'International Stocks', label: 'International Stocks' },
+    { value: 'ETFs', label: 'ETFs' },
+    { value: 'Crypto', label: 'Crypto' },
 ];
 
 export const ALERT_TYPE_OPTIONS = [

@@ -1,3 +1,56 @@
+export const VERIFICATION_EMAIL_TEMPLATE = `<!DOCTYPE html>
+<html lang="en" style="background-color:#050505;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
+    <title>Verify your Bull Wise email</title>
+    <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+        @media only screen and (max-width: 600px) {
+            .mobile-outer-padding { padding: 20px 10px !important; }
+            .mobile-padding { padding: 24px !important; }
+        }
+    </style>
+</head>
+<body class="email-body" bgcolor="#050505" style="margin:0;padding:0;background-color:#050505;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#ccdadc;">
+    <div style="background-color:#000000;">
+    <div style="background-color:#050505;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-background" bgcolor="#050505" style="background-color:#050505;">
+        <tr>
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding:40px 16px;background-color:#050505;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-container" bgcolor="#141414" style="max-width:560px;background-color:#141414;border:1px solid #30333a;border-radius:12px;">
+                    <tr>
+                        <td class="mobile-padding" bgcolor="#141414" style="padding:40px;background-color:#141414;color:#ccdadc;">
+                            <p style="margin:0 0 24px;color:#fdd458;font-size:24px;font-weight:700;">Bull Wise</p>
+                            <h1 style="margin:0 0 16px;color:#ffffff;font-size:26px;line-height:1.25;">Verify your email</h1>
+                            <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hi {{name}},</p>
+                            <p style="margin:0 0 28px;font-size:16px;line-height:1.6;">Confirm your email address to finish creating your Bull Wise account. This link expires in one hour.</p>
+                            <a href="{{verificationUrl}}" style="display:inline-block;background:#fdd458;color:#050505;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:700;">Verify email address</a>
+                            <p style="margin:28px 0 0;color:#9095a1;font-size:13px;line-height:1.6;">If you did not create this account, you can safely ignore this email.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    </div>
+    </div>
+</body>
+</html>`;
+
 export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +58,8 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>Welcome to Bull Wise</title>
     <!--[if mso]>
     <noscript>
@@ -17,6 +72,17 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -88,11 +154,13 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
@@ -141,7 +209,7 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 40px 0; width: 100%;">
                                 <tr>
                                     <td align="center">
-                                        <a href="https://stock-market-dev.vercel.app/" style="display: block; width: 100%; background: linear-gradient(135deg, #FDD458 0%, #E8BA40 100%); color: #000000; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center; box-sizing: border-box;">
+                                        <a href="https://stock-market-dev.vercel.app/" style="display: block; width: 100%; background-color: #FDD458; color: #000000; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center; box-sizing: border-box;">
                                             Go to Dashboard
                                         </a>
                                     </td>
@@ -162,6 +230,8 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;
 
@@ -172,6 +242,8 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>Market News Summary Today</title>
     <!--[if mso]>
     <noscript>
@@ -184,6 +256,17 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -251,16 +334,18 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/logo.png?updatedAt=1756378431634" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -301,6 +386,8 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;
 
@@ -311,6 +398,8 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>Price Alert: {{symbol}} Hit Upper Target</title>
     <!--[if mso]>
     <noscript>
@@ -323,6 +412,17 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -401,16 +501,18 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/logo.png?updatedAt=1756378431634" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -510,6 +612,8 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;
 
@@ -520,6 +624,8 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>Price Alert: {{symbol}} Hit Lower Target</title>
     <!--[if mso]>
     <noscript>
@@ -532,6 +638,17 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -610,16 +727,18 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/logo.png?updatedAt=1756378431634" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -719,6 +838,8 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;
 
@@ -729,6 +850,8 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>Volume Alert: {{symbol}}</title>
     <!--[if mso]>
     <noscript>
@@ -741,6 +864,17 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -810,16 +944,18 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/logo.png?updatedAt=1756378431634" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -939,6 +1075,8 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;
 
@@ -949,6 +1087,8 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
     <title>We Miss You! Your Market Insights Await</title>
     <!--[if mso]>
     <noscript>
@@ -961,6 +1101,17 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style type="text/css">
+        :root {
+            color-scheme: dark only;
+            supported-color-schemes: dark only;
+        }
+        html, body, .email-body, .email-background {
+            background-color: #050505 !important;
+        }
+        .email-container {
+            background-color: #141414 !important;
+        }
+
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .email-container {
@@ -1033,16 +1184,18 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #050505;">
+<body class="email-body" bgcolor="#050505" style="margin: 0; padding: 0; background-color: #050505; color: #CCDADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="background-color: #000000;">
+    <div style="background-color: #050505;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-background" bgcolor="#050505" style="background-color: #050505;">
         <tr>
-            <td align="center" class="mobile-outer-padding" style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
+            <td align="center" class="mobile-outer-padding" bgcolor="#050505" style="padding: 40px 20px; background-color: #050505;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" bgcolor="#141414" style="max-width: 600px; background-color: #141414; border-radius: 8px; border: 1px solid #30333A;">
                     
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/logo.png?updatedAt=1756378431634" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -1051,7 +1204,7 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                         <td class="mobile-padding" style="padding: 40px 40px 40px 40px;">
                             
                             <!-- Welcome Back Heading -->
-                            <h1 class="mobile-title dark-text" style="margin: 0 0 15px 0; font-size: 28px; font-weight: 600; background: linear-gradient(135deg, #FDD458 0%, #E8BA40 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: #FDD458; line-height: 1.2;">
+                            <h1 class="mobile-title dark-text" style="margin: 0 0 15px 0; font-size: 28px; font-weight: 600; color: #FDD458; line-height: 1.2;">
                                 We Miss You, {{name}}!
                             </h1>
                             
@@ -1106,5 +1259,7 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
             </td>
         </tr>
     </table>
+    </div>
+    </div>
 </body>
 </html>`;

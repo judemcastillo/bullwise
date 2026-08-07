@@ -1,6 +1,9 @@
 "use server";
 
-import { AuthenticationError } from "@/lib/auth/require-user";
+import {
+	AccessControlError,
+	AuthenticationError,
+} from "@/lib/auth/access-policy";
 import {
 	createUserAlert,
 	deleteUserAlert,
@@ -24,6 +27,9 @@ import { deliverSpecificAlertEmail } from "@/lib/alerts/email-delivery-worker";
 function actionError(error: unknown): AlertActionResult {
 	if (error instanceof AuthenticationError) {
 		return { success: false, error: "Please sign in to manage alerts" };
+	}
+	if (error instanceof AccessControlError) {
+		return { success: false, error: error.message };
 	}
 
 	console.error("Alert action failed:", error);
@@ -117,6 +123,9 @@ export async function sendTestAlertEmailAction(
 	} catch (error) {
 		if (error instanceof AuthenticationError) {
 			return { success: false, error: "Please sign in to test alerts" };
+		}
+		if (error instanceof AccessControlError) {
+			return { success: false, error: error.message };
 		}
 		if (error instanceof DevelopmentEmailTestError) {
 			return { success: false, error: error.message };

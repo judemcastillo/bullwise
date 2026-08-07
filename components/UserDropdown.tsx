@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useRouter } from "next/navigation";
 import NavItems from "./NavItems";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { signOut } from "@/lib/actions/auth.actions";
 
 export default function UserDropdown({
@@ -67,6 +67,14 @@ export default function UserDropdown({
 						</div>
 					</div>
 				</DropdownMenuLabel>
+				<DropdownMenuSeparator className="bg-gray-600" />
+				<DropdownMenuItem
+					onClick={() => router.push("/settings/preferences")}
+					className="cursor-pointer text-md font-medium text-gray-100 transition-colors focus:bg-transparent focus:text-yellow-500"
+				>
+					<Settings className="mr-2 hidden h-4 w-4 sm:block" />
+					Settings
+				</DropdownMenuItem>
 				<DropdownMenuSeparator className="bg-gray-600" />
 				<DropdownMenuItem
 					onClick={handleSignOut}

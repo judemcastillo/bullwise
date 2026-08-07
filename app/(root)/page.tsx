@@ -1,8 +1,8 @@
 import DashboardNews from "@/components/dashboard/DashboardNews";
 import DashboardWatchlist from "@/components/dashboard/DashboardWatchlist";
 import TradingViewWidget from "@/components/TradingViewWidget";
-import { getNews } from "@/lib/actions/finnhub.actions";
-import { getWatchlistWithData } from "@/lib/actions/watchlist.actions";
+import { getWatchlistWithData } from "@/lib/data/watchlist";
+import { getNews } from "@/lib/market-data/finnhub";
 import {
 	MARKET_OVERVIEW_WIDGET_CONFIG,
 	TOP_STOCKS_WIDGET_CONFIG,

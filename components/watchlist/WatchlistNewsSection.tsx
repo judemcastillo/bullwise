@@ -1,4 +1,4 @@
-import { getNews } from "@/lib/actions/finnhub.actions";
+import { getNews } from "@/lib/market-data/finnhub";
 import WatchlistNews from "./WatchlistNews";
 
 export function WatchlistNewsLoading() {

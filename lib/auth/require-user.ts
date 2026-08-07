@@ -1,14 +1,15 @@
 import "server-only";
 
+import {
+	assertCompletedUser,
+	assertVerifiedUser,
+	AuthenticationError,
+} from "@/lib/auth/access-policy";
 import { auth } from "@/lib/better-auth/auth";
+import { hasCompletedOnboarding } from "@/lib/data/user-profile";
 import { headers } from "next/headers";
 
-export class AuthenticationError extends Error {
-	constructor() {
-		super("Authentication required");
-		this.name = "AuthenticationError";
-	}
-}
+export { AuthenticationError } from "@/lib/auth/access-policy";
 
 export async function requireUser() {
 	const session = await auth.api.getSession({
@@ -21,5 +22,14 @@ export async function requireUser() {
 		id: session.user.id,
 		name: session.user.name,
 		email: session.user.email,
+		emailVerified: session.user.emailVerified,
 	};
+}
+
+export async function requireVerifiedUser() {
+	return assertVerifiedUser(await requireUser());
+}
+
+export async function requireCompletedUser() {
+	return assertCompletedUser(await requireUser(), hasCompletedOnboarding);
 }
