@@ -62,12 +62,18 @@ export const completeOnboarding = async (formData: unknown) => {
 				onboardingCompletedAt: { $ne: null },
 			}),
 		);
+		const welcomeEmailQueued = Boolean(
+			await UserProfile.exists({
+				userId: user.id,
+				welcomeEmailQueuedAt: { $exists: true },
+			}),
+		);
 
 		return await completeOnboardingWorkflow({
 			user,
 			formData,
 			completedAt,
-			queueWelcomeEmail: !wasCompleted,
+			queueWelcomeEmail: !welcomeEmailQueued,
 			repository: {
 				saveCompletedProfile: async ({
 					userId,
