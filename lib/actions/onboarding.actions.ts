@@ -25,24 +25,18 @@ export const saveOnboardingProgress = async ({
 		if (!validated.success) return validated;
 
 		await connectToDatabase();
-		const completedProfile = await UserProfile.exists({
-			userId: user.id,
-			onboardingCompletedAt: { $ne: null },
-		});
-		if (completedProfile) {
+		const profile =
+			(await UserProfile.findOne({ userId: user.id })) ??
+			new UserProfile({ userId: user.id });
+		if (profile.onboardingCompletedAt) {
 			return { success: false, error: "Onboarding is already complete." };
 		}
 
-		await UserProfile.findOneAndUpdate(
-			{ userId: user.id },
-			{
-				$set: {
-					...validated.data,
-					onboardingStep: Math.min(step + 1, ONBOARDING_TOTAL_STEPS),
-				},
-			},
-			{ upsert: true, runValidators: true },
-		);
+		profile.set({
+			...validated.data,
+			onboardingStep: Math.min(step + 1, ONBOARDING_TOTAL_STEPS),
+		});
+		await profile.save();
 
 		return { success: true };
 	} catch (error) {
@@ -81,23 +75,21 @@ export const completeOnboarding = async (formData: unknown) => {
 					completedAt: profileCompletedAt,
 					version,
 				}) => {
-					await UserProfile.findOneAndUpdate(
-						{ userId },
-						{
-							$set: {
-								...data,
-								// Keep a compatibility mirror while older app instances or
-								// development hot reloads may still use the version-1 schema.
-								preferredIndustry: data.preferredIndustries[0],
-								...(wasCompleted
-									? {}
-									: { onboardingCompletedAt: profileCompletedAt }),
-								onboardingStep: ONBOARDING_TOTAL_STEPS,
-								onboardingVersion: version,
-							},
-						},
-						{ upsert: true, runValidators: true },
-					);
+					const profile =
+						(await UserProfile.findOne({ userId })) ??
+						new UserProfile({ userId });
+					profile.set({
+						...data,
+						// Keep a compatibility mirror while older app instances or
+						// development hot reloads may still use the version-1 schema.
+						preferredIndustry: data.preferredIndustries[0],
+						...(wasCompleted
+							? {}
+							: { onboardingCompletedAt: profileCompletedAt }),
+						onboardingStep: ONBOARDING_TOTAL_STEPS,
+						onboardingVersion: version,
+					});
+					await profile.save();
 				},
 				claimWelcomeEmail: async ({ userId, claimedAt }) => {
 					const claimedProfile = await UserProfile.findOneAndUpdate(
