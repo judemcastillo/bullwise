@@ -5,16 +5,24 @@ import {
 	assertVerifiedUser,
 	AuthenticationError,
 } from "@/lib/auth/access-policy";
-import { auth } from "@/lib/better-auth/auth";
+import { getAuth } from "@/lib/better-auth/auth";
 import { hasCompletedOnboarding } from "@/lib/data/user-profile";
 import { headers } from "next/headers";
+import { cache } from "react";
 
 export { AuthenticationError } from "@/lib/auth/access-policy";
 
-export async function requireUser() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
+export const getRequestSession = cache(async () => {
+	const requestHeaders = await headers();
+	const auth = await getAuth();
+
+	return auth.api.getSession({
+		headers: requestHeaders,
 	});
+});
+
+export async function requireUser() {
+	const session = await getRequestSession();
 
 	if (!session?.user) throw new AuthenticationError();
 

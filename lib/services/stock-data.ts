@@ -32,6 +32,26 @@ type DashboardProfileData = ProfileData & {
 	weburl?: string;
 };
 
+type StockQuote = {
+	symbol: string;
+	currentPrice?: number;
+	change?: number;
+	changePercent?: number;
+	dayHigh?: number;
+	dayLow?: number;
+	openPrice?: number;
+	previousClose?: number;
+};
+
+type StockProfile = DashboardProfileData & {
+	symbol: string;
+};
+
+type StockMetrics = {
+	symbol: string;
+	values: NonNullable<FinancialsData["metric"]>;
+};
+
 async function fetchStockData<T>(
 	path: string,
 	revalidateSeconds?: number,
@@ -57,39 +77,82 @@ async function fetchStockData<T>(
 	return (await response.json()) as T;
 }
 
-export const getStockDashboardData = cache(async (symbol: string) => {
-	const cleanSymbol = symbol.trim().toUpperCase();
-	const encodedSymbol = encodeURIComponent(cleanSymbol);
+function normalizeSymbol(symbol: string) {
+	return symbol.trim().toUpperCase();
+}
 
-	const [quoteData, profileData, financialsData] = await Promise.all([
-		fetchStockData<DashboardQuoteData>(`quote?symbol=${encodedSymbol}`),
-		fetchStockData<DashboardProfileData>(
-			`stock/profile2?symbol=${encodedSymbol}`,
+export const getStockQuote = cache(
+	async (symbol: string): Promise<StockQuote> => {
+		const cleanSymbol = normalizeSymbol(symbol);
+		const quote = await fetchStockData<DashboardQuoteData>(
+			`quote?symbol=${encodeURIComponent(cleanSymbol)}`,
+		);
+
+		return {
+			symbol: cleanSymbol,
+			currentPrice: quote.c,
+			change: quote.d,
+			changePercent: quote.dp,
+			dayHigh: quote.h,
+			dayLow: quote.l,
+			openPrice: quote.o,
+			previousClose: quote.pc,
+		};
+	},
+);
+
+export const getStockProfile = cache(
+	async (symbol: string): Promise<StockProfile> => {
+		const cleanSymbol = normalizeSymbol(symbol);
+		const profile = await fetchStockData<DashboardProfileData>(
+			`stock/profile2?symbol=${encodeURIComponent(cleanSymbol)}`,
 			3600,
-		),
-		fetchStockData<FinancialsData>(
-			`stock/metric?symbol=${encodedSymbol}&metric=all`,
+		);
+
+		return { ...profile, symbol: cleanSymbol };
+	},
+);
+
+export const getStockMetrics = cache(
+	async (symbol: string): Promise<StockMetrics> => {
+		const cleanSymbol = normalizeSymbol(symbol);
+		const financials = await fetchStockData<FinancialsData>(
+			`stock/metric?symbol=${encodeURIComponent(cleanSymbol)}&metric=all`,
 			1800,
-		),
+		);
+
+		return {
+			symbol: cleanSymbol,
+			values: financials.metric ?? {},
+		};
+	},
+);
+
+export const getStockDashboardData = cache(async (symbol: string) => {
+	const cleanSymbol = normalizeSymbol(symbol);
+	const [quote, profile, financials] = await Promise.all([
+		getStockQuote(cleanSymbol),
+		getStockProfile(cleanSymbol),
+		getStockMetrics(cleanSymbol),
 	]);
 
-	const metrics = financialsData.metric ?? {};
-	const currentPrice = quoteData.c ?? 0;
-	const changePercent = quoteData.dp ?? 0;
-	const marketCapInUsd = (profileData.marketCapitalization ?? 0) * 1_000_000;
+	const metrics = financials.values;
+	const currentPrice = quote.currentPrice ?? 0;
+	const changePercent = quote.changePercent ?? 0;
+	const marketCapInUsd = (profile.marketCapitalization ?? 0) * 1_000_000;
 
 	return {
 		symbol: cleanSymbol,
-		company: profileData.name || profileData.ticker || cleanSymbol,
+		company: profile.name || profile.ticker || cleanSymbol,
 		currentPrice,
 		priceFormatted: currentPrice ? formatPrice(currentPrice) : "—",
-		change: quoteData.d ?? 0,
+		change: quote.change ?? 0,
 		changePercent,
 		changeFormatted: formatChangePercent(changePercent) || "0.00%",
-		dayHigh: quoteData.h ?? 0,
-		dayLow: quoteData.l ?? 0,
-		openPrice: quoteData.o ?? 0,
-		previousClose: quoteData.pc ?? 0,
+		dayHigh: quote.dayHigh ?? 0,
+		dayLow: quote.dayLow ?? 0,
+		openPrice: quote.openPrice ?? 0,
+		previousClose: quote.previousClose ?? 0,
 		marketCapitalization: marketCapInUsd,
 		peRatio: metrics.peNormalizedAnnual?.toFixed(1) || "—",
 		eps:
@@ -98,14 +161,14 @@ export const getStockDashboardData = cache(async (symbol: string) => {
 			null,
 		week52High: metrics["52WeekHigh"] ?? null,
 		week52Low: metrics["52WeekLow"] ?? null,
-		country: profileData.country || "—",
-		currency: profileData.currency || null,
-		exchange: profileData.exchange || "—",
-		industry: profileData.finnhubIndustry || "—",
-		ipo: profileData.ipo || "—",
-		logo: profileData.logo || "",
-		shareOutstanding: profileData.shareOutstanding ?? null,
-		webUrl: profileData.weburl || "",
+		country: profile.country || "—",
+		currency: profile.currency || null,
+		exchange: profile.exchange || "—",
+		industry: profile.finnhubIndustry || "—",
+		ipo: profile.ipo || "—",
+		logo: profile.logo || "",
+		shareOutstanding: profile.shareOutstanding ?? null,
+		webUrl: profile.weburl || "",
 	};
 });
 
@@ -140,69 +203,58 @@ export const getCompanyPeers = cache(async (symbol: string) => {
 });
 
 export const getRelatedStockDetails = cache(async (symbol: string) => {
-	const cleanSymbol = symbol.trim().toUpperCase();
-	const encodedSymbol = encodeURIComponent(cleanSymbol);
-	const [quoteData, profileData] = await Promise.all([
-		fetchStockData<QuoteData>(`quote?symbol=${encodedSymbol}`),
-		fetchStockData<DashboardProfileData>(
-			`stock/profile2?symbol=${encodedSymbol}`,
-			3600,
-		),
+	const cleanSymbol = normalizeSymbol(symbol);
+	const [quote, profile] = await Promise.all([
+		getStockQuote(cleanSymbol),
+		getStockProfile(cleanSymbol),
 	]);
 
-	if (!quoteData.c || !profileData.name) {
+	if (!quote.currentPrice || !profile.name) {
 		throw new Error("Invalid stock data received from API");
 	}
 
-	const changePercent = quoteData.dp || 0;
+	const changePercent = quote.changePercent || 0;
 
 	return {
 		symbol: cleanSymbol,
-		company: profileData.name,
-		currentPrice: quoteData.c,
-		currency: profileData.currency || null,
-		logo: profileData.logo || null,
+		company: profile.name,
+		currentPrice: quote.currentPrice,
+		currency: profile.currency || null,
+		logo: profile.logo || null,
 		changePercent,
 		changeFormatted: formatChangePercent(changePercent) || "0.00%",
 	};
 });
 
 export const getStocksDetails = cache(async (symbol: string) => {
-	const cleanSymbol = symbol.trim().toUpperCase();
-	const encodedSymbol = encodeURIComponent(cleanSymbol);
+	const cleanSymbol = normalizeSymbol(symbol);
 
 	try {
-		const [quoteData, profileData, financialsData] = await Promise.all([
-			fetchStockData<QuoteData>(`quote?symbol=${encodedSymbol}`),
-			fetchStockData<DashboardProfileData>(
-				`stock/profile2?symbol=${encodedSymbol}`,
-				3600,
-			),
-			fetchStockData<FinancialsData>(
-				`stock/metric?symbol=${encodedSymbol}&metric=all`,
-				1800,
-			),
+		const [quote, profile, financials] = await Promise.all([
+			getStockQuote(cleanSymbol),
+			getStockProfile(cleanSymbol),
+			getStockMetrics(cleanSymbol),
 		]);
 
-		if (!quoteData.c || !profileData.name) {
+		if (!quote.currentPrice || !profile.name) {
 			throw new Error("Invalid stock data received from API");
 		}
 
-		const changePercent = quoteData.dp || 0;
-		const peRatio = financialsData.metric?.peNormalizedAnnual || null;
+		const changePercent = quote.changePercent || 0;
+		const peRatio = financials.values.peNormalizedAnnual || null;
 
 		return {
 			symbol: cleanSymbol,
-			company: profileData.name,
-			currentPrice: quoteData.c,
-			currency: profileData.currency || null,
-			logo: profileData.logo || null,
+			company: profile.name,
+			currentPrice: quote.currentPrice,
+			currency: profile.currency || null,
+			logo: profile.logo || null,
 			changePercent,
-			priceFormatted: formatPrice(quoteData.c),
+			priceFormatted: formatPrice(quote.currentPrice),
 			changeFormatted: formatChangePercent(changePercent),
 			peRatio: peRatio?.toFixed(1) || "—",
 			marketCapFormatted: formatMarketCapValue(
-				profileData.marketCapitalization || 0,
+				profile.marketCapitalization || 0,
 			),
 		};
 	} catch (error) {

@@ -3,22 +3,49 @@ import WatchlistNewsSection, {
 	WatchlistNewsLoading,
 } from "@/components/watchlist/WatchlistNewsSection";
 import WatchlistPageLoading from "@/components/watchlist/WatchlistPageLoading";
+import WatchlistPagination from "@/components/watchlist/WatchlistPagination";
 import WatchlistSearch from "@/components/watchlist/WatchlistSearch";
 import { WatchlistTable } from "@/components/watchlist/WatchlistTable";
-import { getWatchlistWithData } from "@/lib/data/watchlist";
+import { getPaginatedWatchlistWithData } from "@/lib/data/watchlist";
 import { getUserAlerts } from "@/lib/data/user-alerts";
 import { Star } from "lucide-react";
 import { Suspense } from "react";
 
-async function WatchlistContent() {
-	const [watchlist, alerts] = await Promise.all([
-		getWatchlistWithData(),
+type WatchlistSearchParams = Promise<{
+	page?: string | string[];
+}>;
+
+async function WatchlistContent({
+	searchParams,
+}: {
+	searchParams: WatchlistSearchParams;
+}) {
+	const { page } = await searchParams;
+	const [watchlistPage, alerts] = await Promise.all([
+		getPaginatedWatchlistWithData(page),
 		getUserAlerts(),
 	]);
-	const stockMembershipKey = watchlist
-		.map((stock) => stock.symbol)
+	const stockMembershipKey = watchlistPage.allItems
+		.map((item) => item.symbol)
 		.sort()
 		.join("|");
+	const currentPageStocks = new Map(
+		watchlistPage.items.map((item) => [item.symbol, item]),
+	);
+	const allSymbols = watchlistPage.allItems.map((item) => item.symbol);
+	const alertInstruments = watchlistPage.allItems.map((item) => {
+		const stock = currentPageStocks.get(item.symbol);
+
+		return {
+			assetClass: "equity" as const,
+			provider: "finnhub",
+			providerSymbol: item.symbol,
+			displaySymbol: item.symbol,
+			name: stock?.company ?? item.company,
+			currency: stock?.currency,
+			currentPrice: stock?.currentPrice,
+		};
+	});
 
 	return (
 		<div className="watchlist-page gap-10">
@@ -34,11 +61,21 @@ async function WatchlistContent() {
 						<WatchlistSearch stockMembershipKey={stockMembershipKey} />
 					</div>
 
-					{watchlist.length > 0 ? (
-						<WatchlistTable
-							key={watchlist.map((item) => item.symbol).join("|")}
-							watchlist={watchlist}
-						/>
+					{watchlistPage.items.length > 0 ? (
+						<>
+							<WatchlistTable
+								key={watchlistPage.items
+									.map((item) => item.symbol)
+									.join("|")}
+								watchlist={watchlistPage.items}
+							/>
+							<WatchlistPagination
+								currentPage={watchlistPage.currentPage}
+								pageSize={watchlistPage.pageSize}
+								totalItems={watchlistPage.totalItems}
+								totalPages={watchlistPage.totalPages}
+							/>
+						</>
 					) : (
 						<div className="watchlist-empty-container">
 							<div className="watchlist-empty">
@@ -55,30 +92,24 @@ async function WatchlistContent() {
 
 				<WatchlistAlerts
 					alerts={alerts}
-					instruments={watchlist.map((item) => ({
-						assetClass: "equity",
-						provider: "finnhub",
-						providerSymbol: item.symbol,
-						displaySymbol: item.symbol,
-						name: item.company,
-						currency: item.currency,
-						currentPrice: item.currentPrice,
-					}))}
+					instruments={alertInstruments}
 				/>
 			</div>
 
 			<Suspense fallback={<WatchlistNewsLoading />}>
-				<WatchlistNewsSection
-					symbols={watchlist.map((item) => item.symbol)}
-				/>
+				<WatchlistNewsSection symbols={allSymbols} />
 			</Suspense>
 		</div>
 	);
 }
 
-const WatchlistPage = () => (
+const WatchlistPage = ({
+	searchParams,
+}: {
+	searchParams: WatchlistSearchParams;
+}) => (
 	<Suspense fallback={<WatchlistPageLoading />}>
-		<WatchlistContent />
+		<WatchlistContent searchParams={searchParams} />
 	</Suspense>
 );
 

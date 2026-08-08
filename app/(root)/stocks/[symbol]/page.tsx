@@ -4,17 +4,15 @@ import StockChartCard from "@/components/stocks/StockChartCard";
 import StockCompanyInfoCard from "@/components/stocks/StockCompanyInfoCard";
 import StockNewsCard from "@/components/stocks/StockNewsCard";
 import StockOverviewCard from "@/components/stocks/StockOverviewCard";
+import { requireUser } from "@/lib/auth/require-user";
 import { getWatchlistSymbolsForUser } from "@/lib/data/watchlist";
 import { getNews } from "@/lib/market-data/finnhub";
-import { auth } from "@/lib/better-auth/auth";
 import { STOCK_DETAILS_RELATED_LIMIT } from "@/lib/constants";
 import {
 	getCompanyPeers,
 	getRelatedStockDetails,
 	getStockDashboardData,
 } from "@/lib/services/stock-data";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 async function StockNewsSection({ symbol }: { symbol: string }) {
@@ -60,16 +58,12 @@ function StockCardLoading({ title }: { title: string }) {
 const StockDetails = async ({ params }: StockDetailsPageProps) => {
 	const { symbol } = await params;
 	const normalizedSymbol = symbol.trim().toUpperCase();
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
-	if (!session?.user) redirect("/sign-in");
+	const user = await requireUser();
 
 	const [watchlistSymbols, stock] = await Promise.all([
-		getWatchlistSymbolsForUser(session.user.id).catch((error) => {
+		getWatchlistSymbolsForUser(user.id).catch((error) => {
 			console.error(
-				`Unable to load watchlist for ${session.user.id}:`,
+				`Unable to load watchlist for ${user.id}:`,
 				error,
 			);
 			return [] as string[];

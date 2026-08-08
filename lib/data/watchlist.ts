@@ -2,14 +2,41 @@ import "server-only";
 
 import Watchlist from "@/database/models/watchlist.model";
 import { requireCompletedUser } from "@/lib/auth/require-user";
+import { mapWithConcurrency } from "@/lib/concurrency";
 import { getStocksDetails } from "@/lib/services/stock-data";
+import {
+	hasWatchlistCapacity,
+	paginateWatchlist,
+	WATCHLIST_MAX_ITEMS,
+} from "@/lib/watchlist-policy";
 
 interface WatchlistSymbol {
 	symbol: string;
 }
 
+interface WatchlistRecord extends WatchlistSymbol {
+	userId: string;
+	company: string;
+	addedAt: Date;
+}
+
 const WATCHLIST_SYMBOL_PATTERN = /^[A-Z0-9._:/-]{1,40}$/;
 const MAX_COMPANY_LENGTH = 160;
+const WATCHLIST_STOCK_DATA_CONCURRENCY = 4;
+
+const watchlistLimitResult = () => ({
+	success: false as const,
+	error: `Your watchlist can contain up to ${WATCHLIST_MAX_ITEMS} stocks`,
+});
+
+function isDuplicateKeyError(error: unknown) {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"code" in error &&
+		(error as { code?: unknown }).code === 11000
+	);
+}
 
 async function getCurrentUserId(): Promise<string> {
 	return (await requireCompletedUser()).id;
@@ -36,24 +63,34 @@ export async function addToCurrentUserWatchlist(
 	}
 
 	try {
-		const result = await Watchlist.updateOne(
-			{ userId, symbol: normalizedSymbol },
-			{
-				$setOnInsert: {
-					userId,
-					symbol: normalizedSymbol,
-					company: normalizedCompany,
-				},
-			},
-			{ upsert: true, runValidators: true },
-		);
+		const itemCount = await Watchlist.countDocuments({ userId });
+		if (!hasWatchlistCapacity(itemCount)) {
+			const existingItem = await Watchlist.exists({
+				userId,
+				symbol: normalizedSymbol,
+			});
+			return existingItem
+				? { success: false, error: "Stock already exists" }
+				: watchlistLimitResult();
+		}
 
-		if (result.upsertedCount === 0) {
-			return { success: false, error: "Stock already exists" };
+		const createdItem = await Watchlist.create({
+			userId,
+			symbol: normalizedSymbol,
+			company: normalizedCompany,
+		});
+		const updatedItemCount = await Watchlist.countDocuments({ userId });
+
+		if (updatedItemCount > WATCHLIST_MAX_ITEMS) {
+			await Watchlist.deleteOne({ _id: createdItem._id, userId });
+			return watchlistLimitResult();
 		}
 
 		return { success: true, message: "Stock added to watchlist" };
 	} catch (e) {
+		if (isDuplicateKeyError(e)) {
+			return { success: false, error: "Stock already exists" };
+		}
 		console.error("Error adding to watchlist", e);
 		throw new Error("Failed to add stock to watchlist");
 	}
@@ -99,6 +136,45 @@ export async function getWatchlistSymbolsForUser(
 	}
 }
 
+async function enrichWatchlistItems(watchlist: readonly WatchlistRecord[]) {
+	return mapWithConcurrency(
+		watchlist,
+		WATCHLIST_STOCK_DATA_CONCURRENCY,
+		async (item): Promise<StockWithData> => {
+			try {
+				const stockData = await getStocksDetails(item.symbol);
+
+				if (!stockData) {
+					console.warn(`Failed to fetch data for ${item.symbol}`);
+					return item;
+				}
+
+				return {
+					userId: item.userId,
+					company: stockData.company,
+					symbol: stockData.symbol,
+					addedAt: item.addedAt,
+					currentPrice: stockData.currentPrice,
+					currency: stockData.currency,
+					logo: stockData.logo,
+					priceFormatted: stockData.priceFormatted,
+					changeFormatted: stockData.changeFormatted,
+					changePercent: stockData.changePercent,
+					marketCap: stockData.marketCapFormatted,
+					peRatio: stockData.peRatio,
+				};
+			} catch (error) {
+				const reason =
+					error instanceof Error ? error.message : "unknown error";
+				console.warn(
+					`Unable to load watchlist data for ${item.symbol} (${reason})`,
+				);
+				return item;
+			}
+		},
+	);
+}
+
 // Get user's watchlist with stock data
 export const getWatchlistWithData = async (
 	limit?: number,
@@ -108,48 +184,34 @@ export const getWatchlistWithData = async (
 	try {
 		const query = Watchlist.find({ userId }).sort({ addedAt: -1 });
 		if (limit && limit > 0) query.limit(limit);
-		const watchlist = await query.lean();
+		const watchlist = await query.lean<WatchlistRecord[]>();
 
 		if (watchlist.length === 0) return [];
-
-		const stocksWithData: StockWithData[] = await Promise.all(
-			watchlist.map(async (item): Promise<StockWithData> => {
-				try {
-					const stockData = await getStocksDetails(item.symbol);
-
-					if (!stockData) {
-						console.warn(`Failed to fetch data for ${item.symbol}`);
-						return item;
-					}
-
-					return {
-						userId: item.userId,
-						company: stockData.company,
-						symbol: stockData.symbol,
-						addedAt: item.addedAt,
-						currentPrice: stockData.currentPrice,
-						currency: stockData.currency,
-						logo: stockData.logo,
-						priceFormatted: stockData.priceFormatted,
-						changeFormatted: stockData.changeFormatted,
-						changePercent: stockData.changePercent,
-						marketCap: stockData.marketCapFormatted,
-						peRatio: stockData.peRatio,
-					};
-				} catch (error) {
-					const reason =
-						error instanceof Error ? error.message : "unknown error";
-					console.warn(
-						`Unable to load watchlist data for ${item.symbol} (${reason})`,
-					);
-					return item;
-				}
-			}),
-		);
-
-		return stocksWithData;
+		return enrichWatchlistItems(watchlist);
 	} catch (error) {
 		console.error("Error loading watchlist:", error);
 		throw new Error("Failed to fetch watchlist");
 	}
 };
+
+export async function getPaginatedWatchlistWithData(
+	requestedPage?: string | string[],
+) {
+	const userId = await getCurrentUserId();
+
+	try {
+		const watchlist = await Watchlist.find({ userId })
+			.sort({ addedAt: -1 })
+			.lean<WatchlistRecord[]>();
+		const pagination = paginateWatchlist(watchlist, requestedPage);
+
+		return {
+			...pagination,
+			items: await enrichWatchlistItems(pagination.items),
+			allItems: watchlist.map(({ company, symbol }) => ({ company, symbol })),
+		};
+	} catch (error) {
+		console.error("Error loading paginated watchlist:", error);
+		throw new Error("Failed to fetch watchlist");
+	}
+}
