@@ -21,6 +21,7 @@ export interface UserProfileDocument {
 	onboardingCompletedAt?: Date;
 	onboardingVersion: number;
 	welcomeEmailQueuedAt?: Date;
+	watchlistItemCount: number;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -99,6 +100,7 @@ const userProfileSchema = new Schema<UserProfileDocument>(
 		onboardingCompletedAt: { type: Date },
 		onboardingVersion: { type: Number, required: true, default: 1 },
 		welcomeEmailQueuedAt: { type: Date },
+		watchlistItemCount: { type: Number, required: true, default: 0, min: 0 },
 	},
 	{ timestamps: true },
 );
@@ -108,7 +110,8 @@ const cachedUserProfile = models?.UserProfile as
 	| undefined;
 const cachedSchemaIsCurrent = Boolean(
 	cachedUserProfile?.schema.path("preferredIndustries") &&
-		cachedUserProfile.schema.path("investmentExperience"),
+		cachedUserProfile.schema.path("investmentExperience") &&
+		cachedUserProfile.schema.path("watchlistItemCount"),
 );
 
 if (

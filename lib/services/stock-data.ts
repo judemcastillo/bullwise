@@ -254,7 +254,7 @@ export const getStocksDetails = cache(async (symbol: string) => {
 			changeFormatted: formatChangePercent(changePercent),
 			peRatio: peRatio?.toFixed(1) || "—",
 			marketCapFormatted: formatMarketCapValue(
-				profile.marketCapitalization || 0,
+				(profile.marketCapitalization || 0) * 1_000_000,
 			),
 		};
 	} catch (error) {

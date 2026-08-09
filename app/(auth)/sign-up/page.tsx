@@ -79,7 +79,7 @@ export default function SignUpPage() {
 				<InputField
 					name="email"
 					label="Email"
-					placeholder="contact@jsmastery.com"
+					placeholder="johndoe@example.com"
 					register={register}
 					error={errors.email}
 					validation={{

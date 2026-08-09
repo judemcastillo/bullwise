@@ -62,7 +62,7 @@ export default function SignInPage({
 	};
 
 	return (
-		<div>
+		<div className="max-w-md flex flex-col gap-6 mx-auto">
 			<h1 className="form-title">Welcome Back</h1>
 			{hasAccountLinkingConflict ? (
 				<div

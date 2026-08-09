@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { formatMarketCapValue } from "@/lib/utils";
 
 const source = readFileSync(new URL("./stock-data.ts", import.meta.url), "utf8");
 
@@ -50,5 +51,17 @@ describe("stock data loader boundaries", () => {
 
 		assert.match(composedLoaders[0], /getStockMetrics\(cleanSymbol\)/);
 		assert.match(composedLoaders[2], /getStockMetrics\(cleanSymbol\)/);
+	});
+
+	it("formats the watchlist market cap from Finnhub millions into USD", () => {
+		const watchlistLoader = source.slice(
+			source.indexOf("export const getStocksDetails"),
+		);
+
+		assert.match(
+			watchlistLoader,
+			/formatMarketCapValue\(\s*\(profile\.marketCapitalization \|\| 0\) \* 1_000_000/,
+		);
+		assert.equal(formatMarketCapValue(2_500 * 1_000_000), "$2.50B");
 	});
 });

@@ -1,11 +1,11 @@
 import "server-only";
 
+import UserProfile from "@/database/models/user-profile.model";
 import Watchlist from "@/database/models/watchlist.model";
 import { requireCompletedUser } from "@/lib/auth/require-user";
 import { mapWithConcurrency } from "@/lib/concurrency";
 import { getStocksDetails } from "@/lib/services/stock-data";
 import {
-	hasWatchlistCapacity,
 	paginateWatchlist,
 	WATCHLIST_MAX_ITEMS,
 } from "@/lib/watchlist-policy";
@@ -28,6 +28,13 @@ const watchlistLimitResult = () => ({
 	success: false as const,
 	error: `Your watchlist can contain up to ${WATCHLIST_MAX_ITEMS} stocks`,
 });
+
+async function releaseWatchlistSlot(userId: string) {
+	await UserProfile.updateOne(
+		{ userId, watchlistItemCount: { $gt: 0 } },
+		{ $inc: { watchlistItemCount: -1 } },
+	);
+}
 
 function isDuplicateKeyError(error: unknown) {
 	return (
@@ -63,8 +70,13 @@ export async function addToCurrentUserWatchlist(
 	}
 
 	try {
-		const itemCount = await Watchlist.countDocuments({ userId });
-		if (!hasWatchlistCapacity(itemCount)) {
+		const reservation = await UserProfile.findOneAndUpdate(
+			{ userId, watchlistItemCount: { $lt: WATCHLIST_MAX_ITEMS } },
+			{ $inc: { watchlistItemCount: 1 } },
+			{ returnDocument: "after" },
+		);
+
+		if (!reservation) {
 			const existingItem = await Watchlist.exists({
 				userId,
 				symbol: normalizedSymbol,
@@ -74,16 +86,15 @@ export async function addToCurrentUserWatchlist(
 				: watchlistLimitResult();
 		}
 
-		const createdItem = await Watchlist.create({
-			userId,
-			symbol: normalizedSymbol,
-			company: normalizedCompany,
-		});
-		const updatedItemCount = await Watchlist.countDocuments({ userId });
-
-		if (updatedItemCount > WATCHLIST_MAX_ITEMS) {
-			await Watchlist.deleteOne({ _id: createdItem._id, userId });
-			return watchlistLimitResult();
+		try {
+			await Watchlist.create({
+				userId,
+				symbol: normalizedSymbol,
+				company: normalizedCompany,
+			});
+		} catch (error) {
+			await releaseWatchlistSlot(userId);
+			throw error;
 		}
 
 		return { success: true, message: "Stock added to watchlist" };
@@ -113,6 +124,7 @@ export async function removeFromCurrentUserWatchlist(symbol: string) {
 		if (result.deletedCount === 0) {
 			return { success: false, error: "Stock is not in watchlist" };
 		}
+		await releaseWatchlistSlot(userId);
 
 		return { success: true, message: "Stock removed from watchlist" };
 	} catch (error) {
