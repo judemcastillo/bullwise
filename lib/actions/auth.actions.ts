@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { auth } from "../better-auth/auth";
+import { getAuth } from "../better-auth/auth";
 import { validateSignUpData } from "@/lib/auth/sign-up-policy";
 import {
 	normalizeVerificationEmail,
@@ -60,6 +60,7 @@ export const signUpWithEmail = async (
 	const { email, password, fullName } = validation.data;
 
 	try {
+		const auth = await getAuth();
 		await auth.api.signUpEmail({
 			body: {
 				email,
@@ -81,6 +82,7 @@ export const signUpWithEmail = async (
 
 export const signOut = async () => {
 	try {
+		const auth = await getAuth();
 		await auth.api.signOut({
 			headers: await headers(),
 		});
@@ -105,6 +107,7 @@ export const resendVerificationEmail = async (emailInput: unknown) => {
 	if (!isValidEmail(email)) return genericResult;
 
 	try {
+		const auth = await getAuth();
 		await auth.api.sendVerificationEmail({
 			headers: await headers(),
 			body: {
@@ -126,6 +129,7 @@ export const signInWithEmail = async ({
 	password,
 }: SignInFormData): Promise<AuthActionResult> => {
 	try {
+		const auth = await getAuth();
 		await auth.api.signInEmail({
 			body: {
 				email,

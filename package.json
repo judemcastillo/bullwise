@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npm run test:alerts && npm run test:auth",
+    "test": "npm run test:concurrency && npm run test:stock-data && npm run test:stock-search && npm run test:watchlist-policy && npm run test:alerts && npm run test:auth",
+    "test:concurrency": "node --import tsx lib/concurrency.test.ts",
+    "test:stock-data": "node --import tsx lib/services/stock-data.test.ts",
+    "test:stock-search": "node --import tsx lib/market-data/stock-search.test.ts",
+    "test:watchlist-policy": "node --import tsx lib/watchlist-policy.test.ts",
     "test:alerts": "node --import tsx lib/alerts/run-tests.ts",
     "test:auth": "node --import tsx lib/auth/run-tests.ts",
     "test:db": "tsx database/test-db.ts"
@@ -50,9 +54,9 @@
     "typescript": "^5"
   },
   "overrides": {
-    "brace-expansion@1.1.16": "1.1.17",
+    "brace-expansion@1.1.16": "1.1.18",
     "brace-expansion@2.1.2": "2.1.4",
-    "brace-expansion@5.0.7": "5.0.8",
+    "brace-expansion@5.0.7": "5.0.9",
     "postcss": "8.5.25",
     "sharp": "0.35.3"
   }

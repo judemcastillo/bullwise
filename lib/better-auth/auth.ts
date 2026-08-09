@@ -53,13 +53,15 @@ const createAuth = async () => {
 	});
 };
 
-let authInstance: Awaited<ReturnType<typeof createAuth>> | null = null;
+let authPromise: ReturnType<typeof createAuth> | null = null;
 
-export const getAuth = async () => {
-	if (authInstance) return authInstance;
+export const getAuth = () => {
+	if (!authPromise) {
+		authPromise = createAuth().catch((error) => {
+			authPromise = null;
+			throw error;
+		});
+	}
 
-	authInstance = await createAuth();
-	return authInstance;
+	return authPromise;
 };
-
-export const auth = await getAuth();

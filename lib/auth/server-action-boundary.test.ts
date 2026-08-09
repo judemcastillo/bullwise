@@ -46,6 +46,42 @@ describe("Server Action security boundary", () => {
 		);
 	});
 
+	it("deduplicates authentication and onboarding reads within a request", () => {
+		const requireUser = source("./require-user.ts");
+		const userProfile = source("../data/user-profile.ts");
+		const protectedLayout = source("../../app/(root)/layout.tsx");
+		const stockPage = source("../../app/(root)/stocks/[symbol]/page.tsx");
+		const preferencesPage = source(
+			"../../app/(root)/settings/preferences/page.tsx",
+		);
+
+		assert.match(requireUser, /getRequestSession\s*=\s*cache\(/);
+		assert.match(requireUser, /await getRequestSession\(\)/);
+		assert.match(userProfile, /hasCompletedOnboarding\s*=\s*cache\(/);
+		assert.match(protectedLayout, /await getRequestSession\(\)/);
+		assert.match(stockPage, /await requireUser\(\)/);
+		assert.match(preferencesPage, /await requireUser\(\)/);
+
+		for (const page of [protectedLayout, stockPage, preferencesPage]) {
+			assert.doesNotMatch(page, /auth\.api\.getSession/);
+		}
+	});
+
+	it("initializes Better Auth lazily inside requests", () => {
+		const authServer = source("../better-auth/auth.ts");
+		const authRoute = source("../../app/api/auth/[...all]/route.ts");
+		const authActions = source("../actions/auth.actions.ts");
+
+		assert.match(authServer, /authPromise\s*=\s*createAuth\(\)\.catch/);
+		assert.doesNotMatch(authServer, /export const auth\s*=\s*await getAuth\(\)/);
+		assert.match(
+			source("./require-user.ts"),
+			/const requestHeaders = await headers\(\);[\s\S]*const auth = await getAuth\(\)/,
+		);
+		assert.match(authRoute, /await getAuth\(\)/);
+		assert.match(authActions, /await getAuth\(\)/);
+	});
+
 	it("removes the legacy preferences route", () => {
 		assert.equal(
 			existsSync(

@@ -79,7 +79,7 @@ export default function SignUpPage() {
 				<InputField
 					name="email"
 					label="Email"
-					placeholder="contact@jsmastery.com"
+					placeholder="johndoe@example.com"
 					register={register}
 					error={errors.email}
 					validation={{
@@ -134,7 +134,7 @@ export default function SignUpPage() {
 				</Link>{" "}
 				and{" "}
 				<Link
-					href="/privacy"
+					href="/terms#privacy-policy"
 					target="_blank"
 					rel="noreferrer"
 					className="underline underline-offset-2 hover:text-yellow-400"

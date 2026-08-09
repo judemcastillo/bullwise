@@ -1,12 +1,11 @@
 import OnboardingForm from "@/components/forms/OnboardingForm";
-import { auth } from "@/lib/better-auth/auth";
+import { getRequestSession } from "@/lib/auth/require-user";
 import { getOnboardingProfile } from "@/lib/data/user-profile";
-import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function OnboardingPage() {
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getRequestSession();
 
 	if (!session?.user) redirect("/sign-in");
 	if (!session.user.emailVerified) {

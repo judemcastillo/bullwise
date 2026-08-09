@@ -3,8 +3,9 @@ import "server-only";
 import { connectToDatabase } from "@/database/mongoose";
 import UserProfile from "@/database/models/user-profile.model";
 import { createOnboardingDefaults } from "@/lib/onboarding/service";
+import { cache } from "react";
 
-export const hasCompletedOnboarding = async (userId: string) => {
+export const hasCompletedOnboarding = cache(async (userId: string) => {
 	await connectToDatabase();
 
 	const profile = await UserProfile.exists({
@@ -13,7 +14,7 @@ export const hasCompletedOnboarding = async (userId: string) => {
 	});
 
 	return Boolean(profile);
-};
+});
 
 export const getOnboardingProfile = async (userId: string) => {
 	await connectToDatabase();

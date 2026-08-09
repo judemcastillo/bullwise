@@ -1,7 +1,6 @@
 import VerifyEmailCard from "@/components/forms/VerifyEmailCard";
+import { getRequestSession } from "@/lib/auth/require-user";
 import { VERIFICATION_EMAIL_COOLDOWN_SECONDS } from "@/lib/auth/verification-email-policy";
-import { auth } from "@/lib/better-auth/auth";
-import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -16,7 +15,7 @@ export default async function VerifyEmailPage({
 		sent?: string | string[];
 	}>;
 }) {
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getRequestSession();
 	const params = await searchParams;
 	const complete = Array.isArray(params.complete)
 		? params.complete[0]
