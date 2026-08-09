@@ -2,6 +2,7 @@ import "server-only";
 
 import UserProfile from "@/database/models/user-profile.model";
 import Watchlist from "@/database/models/watchlist.model";
+import { connectToDatabase } from "@/database/mongoose";
 import { requireCompletedUser } from "@/lib/auth/require-user";
 import { mapWithConcurrency } from "@/lib/concurrency";
 import { getStocksDetails } from "@/lib/services/stock-data";
@@ -28,13 +29,6 @@ const watchlistLimitResult = () => ({
 	success: false as const,
 	error: `Your watchlist can contain up to ${WATCHLIST_MAX_ITEMS} stocks`,
 });
-
-async function releaseWatchlistSlot(userId: string) {
-	await UserProfile.updateOne(
-		{ userId, watchlistItemCount: { $gt: 0 } },
-		{ $inc: { watchlistItemCount: -1 } },
-	);
-}
 
 function isDuplicateKeyError(error: unknown) {
 	return (
@@ -70,34 +64,37 @@ export async function addToCurrentUserWatchlist(
 	}
 
 	try {
-		const reservation = await UserProfile.findOneAndUpdate(
-			{ userId, watchlistItemCount: { $lt: WATCHLIST_MAX_ITEMS } },
-			{ $inc: { watchlistItemCount: 1 } },
-			{ returnDocument: "after" },
-		);
+		const mongoose = await connectToDatabase();
+		return await mongoose.connection.transaction(async (session) => {
+			const reservation = await UserProfile.findOneAndUpdate(
+				{ userId, watchlistItemCount: { $lt: WATCHLIST_MAX_ITEMS } },
+				{ $inc: { watchlistItemCount: 1 } },
+				{ returnDocument: "after", session },
+			);
 
-		if (!reservation) {
-			const existingItem = await Watchlist.exists({
-				userId,
-				symbol: normalizedSymbol,
-			});
-			return existingItem
-				? { success: false, error: "Stock already exists" }
-				: watchlistLimitResult();
-		}
+			if (!reservation) {
+				const existingItem = await Watchlist.exists({
+					userId,
+					symbol: normalizedSymbol,
+				}).session(session);
+				return existingItem
+					? { success: false, error: "Stock already exists" }
+					: watchlistLimitResult();
+			}
 
-		try {
-			await Watchlist.create({
-				userId,
-				symbol: normalizedSymbol,
-				company: normalizedCompany,
-			});
-		} catch (error) {
-			await releaseWatchlistSlot(userId);
-			throw error;
-		}
+			await Watchlist.create(
+				[
+					{
+						userId,
+						symbol: normalizedSymbol,
+						company: normalizedCompany,
+					},
+				],
+				{ session },
+			);
 
-		return { success: true, message: "Stock added to watchlist" };
+			return { success: true, message: "Stock added to watchlist" };
+		});
 	} catch (e) {
 		if (isDuplicateKeyError(e)) {
 			return { success: false, error: "Stock already exists" };
@@ -116,17 +113,28 @@ export async function removeFromCurrentUserWatchlist(symbol: string) {
 	}
 
 	try {
-		const result = await Watchlist.deleteOne({
-			userId,
-			symbol: normalizedSymbol,
+		const mongoose = await connectToDatabase();
+		return await mongoose.connection.transaction(async (session) => {
+			const result = await Watchlist.deleteOne(
+				{ userId, symbol: normalizedSymbol },
+				{ session },
+			);
+
+			if (result.deletedCount === 0) {
+				return { success: false, error: "Stock is not in watchlist" };
+			}
+
+			const counterUpdate = await UserProfile.updateOne(
+				{ userId, watchlistItemCount: { $gt: 0 } },
+				{ $inc: { watchlistItemCount: -1 } },
+				{ session },
+			);
+			if (counterUpdate.modifiedCount !== 1) {
+				throw new Error("Watchlist counter is inconsistent");
+			}
+
+			return { success: true, message: "Stock removed from watchlist" };
 		});
-
-		if (result.deletedCount === 0) {
-			return { success: false, error: "Stock is not in watchlist" };
-		}
-		await releaseWatchlistSlot(userId);
-
-		return { success: true, message: "Stock removed from watchlist" };
 	} catch (error) {
 		console.error("Error removing from watchlist:", error);
 		throw new Error("Failed to remove stock from watchlist");
