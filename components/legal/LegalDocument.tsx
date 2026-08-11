@@ -32,8 +32,8 @@ export default function LegalDocument({
 						alt="Bull Wise"
 						width={260}
 						height={60}
+						loading="eager"
 						className="h-9 w-auto"
-						priority
 					/>
 				</Link>
 

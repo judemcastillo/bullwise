@@ -1,13 +1,11 @@
 import type { AlertEmailJob } from "@/lib/alerts/email-delivery";
+import {
+	escapeHtml,
+	requireSafeEmailUrl,
+	sanitizeEmailHeader,
+} from "@/lib/email/content-safety";
 
-export function escapeHtml(value: string) {
-	return value
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;")
-		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#39;");
-}
+export { escapeHtml } from "@/lib/email/content-safety";
 
 function formatPrice(value: string, currency: string) {
 	const amount = Number(value);
@@ -52,11 +50,14 @@ export function renderAlertEmail(job: AlertEmailJob) {
 	);
 	const formattedTimestamp = formatTimestamp(job.triggeredAt);
 	const timestamp = escapeHtml(formattedTimestamp);
-	const url = escapeHtml(dashboardUrl());
+	const safeDashboardUrl = requireSafeEmailUrl(dashboardUrl());
+	const url = escapeHtml(safeDashboardUrl);
 	const accent = isAbove ? "#10b981" : "#ef4444";
 	const testPrefix = job.source === "development_test" ? "[Test] " : "";
-	const subject = `${testPrefix}Price alert: ${job.instrument.displaySymbol} crossed ${direction} ${formatPrice(job.threshold, job.instrument.quoteCurrency)}`;
-	const text = `${job.instrument.displaySymbol} (${job.instrument.name}) crossed ${direction} your ${formatPrice(job.threshold, job.instrument.quoteCurrency)} target. Observed price: ${formatPrice(job.observedValue, job.instrument.quoteCurrency)} at ${formattedTimestamp}. View Bull Wise: ${dashboardUrl()}`;
+	const subject = sanitizeEmailHeader(
+		`${testPrefix}Price alert: ${job.instrument.displaySymbol} crossed ${direction} ${formatPrice(job.threshold, job.instrument.quoteCurrency)}`,
+	);
+	const text = `${job.instrument.displaySymbol} (${job.instrument.name}) crossed ${direction} your ${formatPrice(job.threshold, job.instrument.quoteCurrency)} target. Observed price: ${formatPrice(job.observedValue, job.instrument.quoteCurrency)} at ${formattedTimestamp}. View Bull Wise: ${safeDashboardUrl}`;
 	const testBanner =
 		job.source === "development_test"
 			? '<p style="margin:0 0 20px;padding:10px;background-color:#1f2937;border-radius:6px;color:#fdd458;font-weight:700">Development test email — no market alert was triggered.</p>'
@@ -70,9 +71,21 @@ export function renderAlertEmail(job: AlertEmailJob) {
 >
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="x-apple-disable-message-reformatting" />
 		<meta name="color-scheme" content="dark" />
 		<meta name="supported-color-schemes" content="dark" />
+		<!--[if mso]>
+		<noscript>
+			<xml>
+				<o:OfficeDocumentSettings>
+					<o:AllowPNG/>
+					<o:PixelsPerInch>96</o:PixelsPerInch>
+				</o:OfficeDocumentSettings>
+			</xml>
+		</noscript>
+		<![endif]-->
 		<style>
 			:root {
 				color-scheme: dark only;
@@ -87,6 +100,14 @@ export function renderAlertEmail(job: AlertEmailJob) {
 			.email-container {
 				background-color: #141414 !important;
 			}
+			@media only screen and (max-width: 600px) {
+				.mobile-outer-padding {
+					padding: 20px 10px !important;
+				}
+				.mobile-padding {
+					padding: 24px !important;
+				}
+			}
 		</style>
 		<title>${escapeHtml(subject)}</title>
 	</head>
@@ -95,6 +116,7 @@ export function renderAlertEmail(job: AlertEmailJob) {
 		bgcolor="#050505"
 		style="
 			margin: 0;
+			padding: 0;
 			background-color: #050505;
 			color: #fff;
 			font-family: Arial, sans-serif;
@@ -117,6 +139,7 @@ export function renderAlertEmail(job: AlertEmailJob) {
 			<tr>
 				<td
 					align="center"
+					class="mobile-outer-padding"
 					bgcolor="#050505"
 					style="
 						padding: 32px 16px;
@@ -140,6 +163,7 @@ export function renderAlertEmail(job: AlertEmailJob) {
 					>
 						<tr>
 							<td
+								class="mobile-padding"
 								bgcolor="#141414"
 								style="
 									padding: 32px;
@@ -176,20 +200,26 @@ export function renderAlertEmail(job: AlertEmailJob) {
 								<p style="color: #9ca3af; font-size: 14px">
 									Triggered at ${timestamp}
 								</p>
-								<a
-									href="${url}"
-									style="
-										display: inline-block;
-										margin-top: 16px;
-										padding: 14px 22px;
-										background-color: #fdd458;
-										color: #050505;
-										text-decoration: none;
-										border-radius: 8px;
-										font-weight: 700;
-									"
-									>View Bull Wise</a
+								<table
+									role="presentation"
+									cellpadding="0"
+									cellspacing="0"
+									border="0"
+									style="margin-top: 16px"
 								>
+									<tr>
+										<td
+											bgcolor="#FDD458"
+											style="background-color:#fdd458;border-radius:8px;padding:14px 22px"
+										>
+											<a
+												href="${url}"
+												style="display:inline-block;color:#050505;text-decoration:none;font-weight:700"
+												>View Bull Wise</a
+											>
+										</td>
+									</tr>
+								</table>
 								<p
 									style="
 										margin: 32px 0 0;

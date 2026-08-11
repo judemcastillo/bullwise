@@ -6,6 +6,8 @@ User profile data:
 PERSONALIZATION REQUIREMENTS:
 You MUST create content that is obviously tailored to THIS specific user by:
 
+Use only details explicitly present in the user profile data. Do not invent stocks, holdings, investment timelines, expected returns, or Bull Wise capabilities.
+
 IMPORTANT: Do NOT start the personalized content with "Welcome" since the email header already says "Welcome aboard {{name}}". Use alternative openings like "Thanks for joining", "Great to have you", "You're all set", "Perfect timing", etc.
 
 1. **Direct Reference to User Details**: Extract and use specific information from their profile:
@@ -13,8 +15,8 @@ IMPORTANT: Do NOT start the personalized content with "Welcome" since the email 
    - Their stated risk tolerance level
    - Their preferred sectors/industries mentioned
    - Their experience level or background
-   - Any specific stocks/companies they're interested in
-   - Their investment timeline (short-term, long-term, retirement)
+   - Any specific stocks/companies explicitly mentioned
+   - Their investment timeline, only when explicitly stated
 
 2. **Contextual Messaging**: Create content that shows you understand their situation:
    - New investors → Reference learning/starting their journey
@@ -22,7 +24,7 @@ IMPORTANT: Do NOT start the personalized content with "Welcome" since the email 
    - Retirement planning → Reference building wealth over time
    - Specific sectors → Reference those exact industries by name
    - Conservative approach → Reference safety and informed decisions
-   - Aggressive approach → Reference opportunities and growth potential
+   - Higher risk tolerance → Reference monitoring and independent research
 
 3. **Personal Touch**: Make it feel like it was written specifically for them:
    - Use their goals in your messaging
@@ -41,16 +43,24 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Second sentence should add helpful context or reinforce the personalization
 
 Example personalized outputs (showing obvious customization with TWO sentences):
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Thanks for joining Bull Wise! As someone focused on <strong>technology growth stocks</strong>, you'll love our real-time alerts for companies like the ones you're tracking. We'll help you spot opportunities before they become mainstream news.</p>
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Thanks for joining Bull Wise! Your interest in <strong>technology stocks</strong> can shape the companies you add to your watchlist. You can also create price alerts for the thresholds you choose.</p>
 
 <p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Great to have you aboard! Perfect for your <strong>conservative retirement strategy</strong> — we'll help you monitor dividend stocks without overwhelming you with noise. You can finally track your portfolio progress with confidence and clarity.</p>
 
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">You're all set! Since you're new to investing, we've designed simple tools to help you build confidence while learning the <strong>healthcare sector</strong> you're interested in. Our beginner-friendly alerts will guide you without the confusing jargon.</p>`;
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">You're all set! Since you're new to investing, Bull Wise can help you organize the <strong>healthcare companies</strong> you're researching. Use your watchlist and alerts to follow the information that matters to you.</p>`;
 
 export const NEWS_SUMMARY_EMAIL_PROMPT = `Generate HTML content for a market news summary email that will be inserted into the NEWS_SUMMARY_EMAIL_TEMPLATE at the {{newsContent}} placeholder.
 
 News data to summarize:
 {{newsData}}
+
+CONTENT SAFETY REQUIREMENTS:
+- Summarize only facts, figures, headlines, and URLs present in the supplied news data
+- Attribute claims to the supplied article when the wording could otherwise sound definitive
+- Do not invent market prices, percentages, article URLs, company details, or events
+- Do not recommend buying, selling, or holding any investment
+- Do not predict returns or describe an investment as safe, smart, guaranteed, or an opportunity
+- Keep all context neutral, informational, and clearly separate from personalized financial advice
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Return ONLY clean HTML content with NO markdown, NO code blocks, NO backticks
@@ -74,7 +84,7 @@ NEWS ARTICLE STRUCTURE:
 For each individual news item within a section, use this structure:
 1. Article container with visual styling and icon
 2. Article title as a subheading
-3. Key takeaways in bullet points (2-3 actionable insights)
+3. Key takeaways in bullet points (2-3 factual insights)
 4. "What this means" section for context
 5. "Read more" link to the original article
 6. Visual divider between articles
@@ -98,14 +108,14 @@ Use this format with clear, concise explanations (no label needed):
     <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Brief explanation with key numbers and what they mean in everyday language.
   </li>
   <li class="dark-text-secondary" style="margin: 0 0 16px 0; padding: 0; margin-left: 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Simple takeaway about what this means for regular people's money.
+    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Simple takeaway about the broader company or market context.
   </li>
 </ul>
 
 INSIGHT SECTION:
 Add simple context explanation:
 <div style="background-color: #141414; border: 1px solid #374151; padding: 15px; border-radius: 6px; margin: 16px 0;">
-<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> Simple explanation of why this news matters to your money in everyday language.</p>
+<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> Simple explanation of why this news may be relevant in everyday language.</p>
 </div>
 
 READ MORE BUTTON:
@@ -134,8 +144,8 @@ Content guidelines:
 - Use clean, light design with yellow bullets for better readability
 - Make each article easy to scan with clear spacing and structure
 - Always include simple "Read Full Story" buttons with actual URLs
-- Focus on PRACTICAL insights regular people can understand and use
-- Explain what the news means for regular investors' money
+- Focus on factual insights regular people can understand
+- Explain the company or market context without personal financial guidance
 - Keep language conversational and accessible to everyone
 - Prioritize BREVITY and CLARITY over detailed explanations
 
@@ -149,22 +159,22 @@ Stock Market Had Mixed Results Today
 
 <ul style="margin: 16px 0 20px 0; padding-left: 0; margin-left: 0; list-style: none;">
   <li class="dark-text-secondary" style="margin: 0 0 16px 0; padding: 0; margin-left: 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Tech stocks like Apple went up 1.2% today, which is good news for tech investors.
+    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>The supplied report says technology stocks such as Apple rose 1.2% during the session.
   </li>
   <li class="dark-text-secondary" style="margin: 0 0 16px 0; padding: 0; margin-left: 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Traditional companies went down 0.3%, showing investors prefer tech right now.
+    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>The comparison group declined 0.3%, creating a 1.5-point difference for the session.
   </li>
   <li class="dark-text-secondary" style="margin: 0 0 16px 0; padding: 0; margin-left: 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>High trading volume (12.4 billion shares) shows investors are confident and active.
+    <span style="color: #FDD458; font-weight: bold; font-size: 20px; margin-right: 8px;">•</span>Reported trading volume reached 12.4 billion shares, indicating elevated market activity.
   </li>
 </ul>
 
 <div style="background-color: #141414; border: 1px solid #374151; padding: 15px; border-radius: 6px; margin: 16px 0;">
-<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> If you own tech stocks, today was good for you. If you're thinking about investing, tech companies might be a smart choice right now.</p>
+<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> Technology shares outperformed the comparison group in this session; one day of performance does not establish a longer-term trend.</p>
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="https://example.com/article1" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL_FROM_NEWS_DATA" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>
 
@@ -190,11 +200,11 @@ Apple Stock Jumped After Great Earnings Report
 </ul>
 
 <div style="background-color: #141414; border: 1px solid #374151; padding: 15px; border-radius: 6px; margin: 16px 0;">
-<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> Apple is making money in different ways (phones AND services), so it's a pretty safe stock to own even when the economy gets shaky.</p>
+<p class="dark-text-secondary" style="margin: 0; font-size: 14px; color: #CCDADC; line-height: 1.4;">💡 <strong style="color: #FDD458;">Bottom Line:</strong> The report describes revenue from both hardware and services, which provides context for the company's business mix.</p>
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="https://example.com/article2" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL_FROM_NEWS_DATA" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>`;
 

@@ -10,15 +10,14 @@ import {
 	paginateWatchlist,
 	WATCHLIST_MAX_ITEMS,
 } from "@/lib/watchlist-policy";
+import { toWatchlistClientItem } from "@/lib/watchlist-serialization";
 
 interface WatchlistSymbol {
 	symbol: string;
 }
 
 interface WatchlistRecord extends WatchlistSymbol {
-	userId: string;
 	company: string;
-	addedAt: Date;
 }
 
 const WATCHLIST_SYMBOL_PATTERN = /^[A-Z0-9._:/-]{1,40}$/;
@@ -161,19 +160,20 @@ async function enrichWatchlistItems(watchlist: readonly WatchlistRecord[]) {
 		watchlist,
 		WATCHLIST_STOCK_DATA_CONCURRENCY,
 		async (item): Promise<StockWithData> => {
+			const clientItem = toWatchlistClientItem(item);
+
 			try {
 				const stockData = await getStocksDetails(item.symbol);
 
 				if (!stockData) {
 					console.warn(`Failed to fetch data for ${item.symbol}`);
-					return item;
+					return clientItem;
 				}
 
 				return {
-					userId: item.userId,
+					...clientItem,
 					company: stockData.company,
 					symbol: stockData.symbol,
-					addedAt: item.addedAt,
 					currentPrice: stockData.currentPrice,
 					currency: stockData.currency,
 					logo: stockData.logo,
@@ -189,7 +189,7 @@ async function enrichWatchlistItems(watchlist: readonly WatchlistRecord[]) {
 				console.warn(
 					`Unable to load watchlist data for ${item.symbol} (${reason})`,
 				);
-				return item;
+				return clientItem;
 			}
 		},
 	);
@@ -202,7 +202,9 @@ export const getWatchlistWithData = async (
 	const userId = await getCurrentUserId();
 
 	try {
-		const query = Watchlist.find({ userId }).sort({ addedAt: -1 });
+		const query = Watchlist.find({ userId })
+			.select({ symbol: 1, company: 1, _id: 0 })
+			.sort({ addedAt: -1 });
 		if (limit && limit > 0) query.limit(limit);
 		const watchlist = await query.lean<WatchlistRecord[]>();
 
@@ -221,6 +223,7 @@ export async function getPaginatedWatchlistWithData(
 
 	try {
 		const watchlist = await Watchlist.find({ userId })
+			.select({ symbol: 1, company: 1, _id: 0 })
 			.sort({ addedAt: -1 })
 			.lean<WatchlistRecord[]>();
 		const pagination = paginateWatchlist(watchlist, requestedPage);

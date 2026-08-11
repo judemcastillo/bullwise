@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { normalizeFinnhubSearchResults } from "./stock-search";
 
 describe("Finnhub stock search normalization", () => {
-	it("normalizes explicit US exchange data and watchlist state", () => {
+	it("normalizes search data and watchlist state", () => {
 		const results = normalizeFinnhubSearchResults(
 			[
 				{
@@ -11,7 +11,6 @@ describe("Finnhub stock search normalization", () => {
 					description: " Apple Inc. ",
 					displaySymbol: "AAPL",
 					type: " Common Stock ",
-					exchange: " NASDAQ ",
 				},
 			],
 			["aapl"],
@@ -21,43 +20,10 @@ describe("Finnhub stock search normalization", () => {
 			{
 				symbol: "AAPL",
 				name: "Apple Inc.",
-				exchange: "NASDAQ",
 				type: "Common Stock",
 				isInWatchlist: true,
 			},
 		]);
-	});
-
-	it("preserves explicit international exchange data", () => {
-		const [result] = normalizeFinnhubSearchResults(
-			[
-				{
-					symbol: "7203.T",
-					description: "Toyota Motor Corp",
-					type: "Common Stock",
-					exchange: "Tokyo Stock Exchange",
-				},
-			],
-			[],
-		);
-
-		assert.equal(result.exchange, "Tokyo Stock Exchange");
-	});
-
-	it("does not mistake a display symbol for an exchange", () => {
-		const [result] = normalizeFinnhubSearchResults(
-			[
-				{
-					symbol: "MSFT",
-					description: "Microsoft Corp",
-					displaySymbol: "NASDAQ:MSFT",
-					type: "Common Stock",
-				},
-			],
-			[],
-		);
-
-		assert.equal(result.exchange, "—");
 	});
 
 	it("filters malformed symbols and deduplicates valid results", () => {
@@ -74,23 +40,20 @@ describe("Finnhub stock search normalization", () => {
 		);
 
 		assert.deepEqual(
-			results.map(({ symbol, name, exchange, type }) => ({
+			results.map(({ symbol, name, type }) => ({
 				symbol,
 				name,
-				exchange,
 				type,
 			})),
 			[
 				{
 					symbol: "AAPL",
 					name: "Apple Inc.",
-					exchange: "—",
 					type: "Stock",
 				},
 				{
 					symbol: "BARC.L",
 					name: "BARC.L",
-					exchange: "—",
 					type: "Stock",
 				},
 			],

@@ -13,6 +13,7 @@ export type EmailDeliveryStatus =
 	| "pending"
 	| "processing"
 	| "sent"
+	| "suppressed"
 	| "failed";
 
 export interface AlertEventItem extends Document {
@@ -39,6 +40,7 @@ export interface AlertEventItem extends Document {
 			lastAttemptAt?: Date;
 			nextAttemptAt?: Date;
 			deliveredAt?: Date;
+			suppressedAt?: Date;
 			error?: string;
 			leaseId?: string;
 			leaseExpiresAt?: Date;
@@ -135,6 +137,7 @@ const alertEventSchema = new Schema<AlertEventItem>(
 						"pending",
 						"processing",
 						"sent",
+						"suppressed",
 						"failed",
 					],
 					default: "not_requested",
@@ -143,6 +146,7 @@ const alertEventSchema = new Schema<AlertEventItem>(
 				lastAttemptAt: { type: Date },
 				nextAttemptAt: { type: Date },
 				deliveredAt: { type: Date },
+				suppressedAt: { type: Date },
 				error: { type: String },
 				leaseId: { type: String },
 				leaseExpiresAt: { type: Date },

@@ -6,7 +6,7 @@ import type {
 	AlertEmailSender,
 } from "@/lib/alerts/email-delivery";
 import { renderAlertEmail } from "@/lib/alerts/email-template";
-import { transporter } from "@/lib/nodemailer";
+import { sendMailWithSuppressionCapture } from "@/lib/nodemailer/transport";
 
 export class NodemailerAlertEmailSender implements AlertEmailSender {
 	async send(
@@ -19,13 +19,16 @@ export class NodemailerAlertEmailSender implements AlertEmailSender {
 		}
 
 		const content = renderAlertEmail(job);
-		await transporter.sendMail({
-			from: `"Bull Wise Alerts" <${from}>`,
-			to: recipient.email,
-			subject: content.subject,
-			text: content.text,
-			html: content.html,
-			messageId: `<price-alert-${job.id}@bullwise.local>`,
+		await sendMailWithSuppressionCapture({
+			recipientEmail: recipient.email,
+			message: {
+				from: `"Bull Wise Alerts" <${from}>`,
+				to: recipient.email,
+				subject: content.subject,
+				text: content.text,
+				html: content.html,
+				messageId: `<price-alert-${job.id}@bullwise.local>`,
+			},
 		});
 	}
 }

@@ -76,6 +76,18 @@ describe("AlertEvent model", () => {
 		await assert.doesNotReject(event.validate());
 	});
 
+	it("accepts a terminal suppressed delivery", async () => {
+		const event = validEvent();
+		event.set("delivery.email", {
+			status: "suppressed",
+			attempts: 1,
+			suppressedAt: new Date("2026-08-01T12:01:00.000Z"),
+			error: "Suppressed: complaint",
+		});
+
+		await assert.doesNotReject(event.validate());
+	});
+
 	it("defines a unique database index for the deduplication key", () => {
 		const indexes = AlertEvent.schema.indexes() as Array<
 			[Record<string, number>, { unique?: boolean }]

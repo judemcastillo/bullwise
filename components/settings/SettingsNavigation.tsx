@@ -7,7 +7,7 @@ const settingsTabs = [
 	{ label: "Account", href: null },
 	{ label: "Preferences", href: "/settings/preferences" },
 	{ label: "Security", href: null },
-	{ label: "Notifications", href: null },
+	{ label: "Notifications", href: "/settings/notifications" },
 ] as const;
 
 export default function SettingsNavigation() {

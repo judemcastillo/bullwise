@@ -9,9 +9,9 @@ import {
 	ALERT_EMAIL_MAX_ATTEMPTS,
 	type AlertEmailDeliveryStore,
 	type AlertEmailJob,
-	type AlertEmailRecipient,
 	type AlertEmailRecipientDirectory,
 } from "@/lib/alerts/email-delivery";
+import { getEmailEligibility } from "@/lib/email/communication-eligibility";
 
 const MAX_ERROR_LENGTH = 500;
 
@@ -157,6 +157,38 @@ export class MongoAlertEmailDeliveryStore
 
 		return result.modifiedCount === 1;
 	}
+
+	async markSuppressed(
+		job: AlertEmailJob,
+		reason: string,
+		suppressedAt: Date,
+	): Promise<boolean> {
+		const result = await AlertEvent.updateOne(
+			{
+				_id: new ObjectId(job.id),
+				userId: job.userId,
+				"delivery.email.status": "processing",
+				"delivery.email.leaseId": job.leaseId,
+			},
+			{
+				$set: {
+					"delivery.email.status": "suppressed",
+					"delivery.email.suppressedAt": suppressedAt,
+					"delivery.email.error": `Suppressed: ${reason}`.slice(
+						0,
+						MAX_ERROR_LENGTH,
+					),
+				},
+				$unset: {
+					"delivery.email.leaseId": 1,
+					"delivery.email.leaseExpiresAt": 1,
+					"delivery.email.nextAttemptAt": 1,
+				},
+			},
+		);
+
+		return result.modifiedCount === 1;
+	}
 }
 
 type BetterAuthUser = {
@@ -169,7 +201,15 @@ type BetterAuthUser = {
 export class BetterAuthAlertEmailRecipientDirectory
 	implements AlertEmailRecipientDirectory
 {
-	async findByUserId(userId: string): Promise<AlertEmailRecipient | null> {
+	async findByUserId(userId: string) {
+		const eligibility = await getEmailEligibility({
+			userId,
+			request: { messageType: "price_alert" },
+		});
+		if (!eligibility.eligible) {
+			return { status: "suppressed" as const, reason: eligibility.reason };
+		}
+
 		const mongoose = await connectToDatabase();
 		const db = mongoose.connection.db;
 		if (!db) throw new Error("Mongoose connection is not connected");
@@ -184,12 +224,15 @@ export class BetterAuthAlertEmailRecipientDirectory
 			{ projection: { email: 1, name: 1 } },
 		);
 		if (!user || typeof user.email !== "string" || !user.email.trim()) {
-			return null;
+			return { status: "unavailable" as const };
 		}
 
 		return {
-			email: user.email.trim(),
-			name: typeof user.name === "string" ? user.name : undefined,
+			status: "deliverable" as const,
+			recipient: {
+				email: user.email.trim(),
+				name: typeof user.name === "string" ? user.name : undefined,
+			},
 		};
 	}
 }

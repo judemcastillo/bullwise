@@ -92,4 +92,26 @@ describe("alert email template", () => {
 			"&lt;tag a=&quot;x&quot;&gt;Tom &amp; &#39;Sam&#39;&lt;/tag&gt;",
 		);
 	});
+
+	it("removes control characters from alert subjects", () => {
+		const rendered = renderAlertEmail({
+			id: "event-2",
+			userId: "user-1",
+			source: "market",
+			operator: "crosses_above",
+			threshold: "100",
+			observedValue: "101",
+			triggeredAt: new Date("2026-08-01T12:00:00.000Z"),
+			instrument: {
+				displaySymbol: "SAFE\r\nBcc: attacker@example.com",
+				name: "Safe Company",
+				quoteCurrency: "USD",
+			},
+			attempt: 1,
+			leaseId: "lease-2",
+		});
+
+		assert.doesNotMatch(rendered.subject, /[\r\n]/);
+		assert.match(rendered.subject, /SAFE Bcc: attacker@example\.com/);
+	});
 });

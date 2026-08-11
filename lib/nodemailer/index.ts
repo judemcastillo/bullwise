@@ -1,32 +1,19 @@
 import "server-only";
 
-import nodemailer from "nodemailer";
 import {
-	NEWS_SUMMARY_EMAIL_TEMPLATE,
-	VERIFICATION_EMAIL_TEMPLATE,
-	WELCOME_EMAIL_TEMPLATE,
-} from "./templates";
+	renderAccountVerificationEmail,
+	renderNewsSummaryEmail,
+	renderWelcomeEmail,
+} from "@/lib/email/email-rendering";
+import {
+	getEmailBranding,
+	getMarketingEmailBranding,
+} from "@/lib/email/email-branding";
+import { getEmailEligibilityByEmail } from "@/lib/email/communication-eligibility";
+import type { MarketNewsDeliveryFrequency } from "@/lib/email/market-news-delivery-policy";
+import { sendMailWithSuppressionCapture } from "@/lib/nodemailer/transport";
 
-export const transporter = nodemailer.createTransport({
-	service: "gmail",
-	auth: {
-		user: process.env.NODEMAILER_EMAIL!,
-		pass: process.env.NODEMAILER_PASSWORD!,
-	},
-});
-
-const escapeHtml = (value: string) =>
-	value.replace(
-		/[&<>'"]/g,
-		(character) =>
-			({
-				"&": "&amp;",
-				"<": "&lt;",
-				">": "&gt;",
-				"'": "&#39;",
-				'"': "&quot;",
-			})[character]!,
-	);
+export { transporter } from "@/lib/nodemailer/transport";
 
 export const sendAccountVerificationEmail = async ({
 	email,
@@ -37,17 +24,23 @@ export const sendAccountVerificationEmail = async ({
 	name: string;
 	verificationUrl: string;
 }) => {
-	const html = VERIFICATION_EMAIL_TEMPLATE.replace(
-		"{{name}}",
-		() => escapeHtml(name),
-	).replace("{{verificationUrl}}", () => escapeHtml(verificationUrl));
+	const eligibility = await getEmailEligibilityByEmail({
+		email,
+		request: { messageType: "email_verification" },
+	});
+	if (!eligibility.eligible) {
+		return;
+	}
 
-	await transporter.sendMail({
-		from: `"Bull Wise" <${process.env.NODEMAILER_EMAIL}>`,
-		to: email,
-		subject: "Verify your Bull Wise email",
-		text: `Verify your Bull Wise email by visiting this link: ${verificationUrl}`,
-		html,
+	const content = renderAccountVerificationEmail({ name, verificationUrl });
+
+	await sendMailWithSuppressionCapture({
+		recipientEmail: email,
+		message: {
+			from: `"Bull Wise" <${process.env.NODEMAILER_EMAIL}>`,
+			to: email,
+			...content,
+		},
 	});
 };
 
@@ -56,42 +49,60 @@ export const sendWelcomeEmail = async ({
 	name,
 	intro,
 }: WelcomeEmailData) => {
-	const htmlTemplate = WELCOME_EMAIL_TEMPLATE.replace("{{name}}", () =>
-		escapeHtml(name),
-	).replace("{{intro}}", () => escapeHtml(intro));
+	const eligibility = await getEmailEligibilityByEmail({
+		email,
+		request: { messageType: "account_welcome" },
+	});
+	if (!eligibility.eligible) {
+		return;
+	}
+
+	const content = renderWelcomeEmail({ name, intro, branding: getEmailBranding() });
 
 	const mailOptions = {
 		from: `"Bull Wise" <${process.env.NODEMAILER_EMAIL}>`,
 		to: email,
-		subject: `Welcome to Bull Wise - your stock market toolkit is ready`,
-		text: "Thanks for joining Bull Wise",
-		html: htmlTemplate,
+		...content,
 	};
 
-	await transporter.sendMail(mailOptions);
+	await sendMailWithSuppressionCapture({ recipientEmail: email, message: mailOptions });
 };
 
 export const sendNewsSummaryEmail = async ({
 	email,
+	frequency,
 	date,
 	newsContent,
+	unsubscribeUrl,
+	oneClickUnsubscribeUrl,
 }: {
 	email: string;
+	frequency: MarketNewsDeliveryFrequency;
 	date: string;
 	newsContent: string;
+	unsubscribeUrl: string;
+	oneClickUnsubscribeUrl: string;
 }): Promise<void> => {
-	const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE.replace(
-		"{{date}}",
+	const eligibility = await getEmailEligibilityByEmail({
+		email,
+		request: { messageType: "market_news" },
+	});
+	if (!eligibility.eligible) return;
+
+	const content = renderNewsSummaryEmail({
+		frequency,
 		date,
-	).replace("{{newsContent}}", newsContent);
+		newsContent,
+		unsubscribeUrl,
+		oneClickUnsubscribeUrl,
+		branding: getMarketingEmailBranding(),
+	});
 
 	const mailOptions = {
 		from: `"Bull Wise News" <${process.env.NODEMAILER_EMAIL}>`,
 		to: email,
-		subject: `📈 Market News Summary Today - ${date}`,
-		text: `Today's market news summary from Bull Wise`,
-		html: htmlTemplate,
+		...content,
 	};
 
-	await transporter.sendMail(mailOptions);
+	await sendMailWithSuppressionCapture({ recipientEmail: email, message: mailOptions });
 };
