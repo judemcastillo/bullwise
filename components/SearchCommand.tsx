@@ -71,19 +71,14 @@ export default function SearchCommand({
 					if (requestId.current === currentRequestId) setLoading(false);
 				}
 			},
-			isSearchMode ? 300 : 0,
+			isSearchMode ? 900 : 0,
 		);
 
 		return () => {
 			window.clearTimeout(timeoutId);
 			requestId.current += 1;
 		};
-	}, [
-		hasLoadedPopularStocks,
-		isSearchMode,
-		open,
-		searchTerm,
-	]);
+	}, [hasLoadedPopularStocks, isSearchMode, open, searchTerm]);
 
 	const handleSelectStock = () => {
 		setOpen(false);
@@ -146,9 +141,11 @@ export default function SearchCommand({
 										>
 											<TrendingUp className="h-4 w-4 text-gray-500" />
 											<div className="flex-1">
-												<div className="search-item-name hover:underline">{stock.name}</div>
+												<div className="search-item-name hover:underline">
+													{stock.name}
+												</div>
 												<div className="text-sm text-gray-500">
-													{stock.symbol} | {stock.exchange} | {stock.type}
+													{stock.symbol} | {stock.type}
 												</div>
 											</div>
 										</Link>

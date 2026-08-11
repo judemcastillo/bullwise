@@ -22,6 +22,7 @@ export default async function OnboardingPage() {
 					alt="Bull Wise Logo"
 					width={260}
 					height={60}
+					loading="eager"
 					className="mx-auto mb-8 h-8 w-auto"
 				/>
 				<section className="rounded-xl border border-gray-600 bg-gray-800 p-6 shadow-2xl sm:p-8">

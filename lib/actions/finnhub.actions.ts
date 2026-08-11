@@ -4,7 +4,7 @@ import { requireCompletedUser } from "@/lib/auth/require-user";
 import { getWatchlistSymbolsForUser } from "@/lib/data/watchlist";
 import { searchFinnhubStocks } from "@/lib/market-data/finnhub";
 
-const MAX_SEARCH_QUERY_LENGTH = 80;
+const MAX_SEARCH_QUERY_LENGTH = 20;
 
 export async function searchStocks(
 	query?: string,

@@ -24,6 +24,11 @@ export interface AlertEmailRecipient {
 	name?: string;
 }
 
+export type AlertEmailRecipientLookup =
+	| { status: "deliverable"; recipient: AlertEmailRecipient }
+	| { status: "suppressed"; reason: string }
+	| { status: "unavailable" };
+
 export interface AlertEmailDeliveryStore {
 	claimNext(now: Date): Promise<AlertEmailJob | null>;
 	markSent(job: AlertEmailJob, deliveredAt: Date): Promise<boolean>;
@@ -32,10 +37,15 @@ export interface AlertEmailDeliveryStore {
 		error: string,
 		failedAt: Date,
 	): Promise<boolean>;
+	markSuppressed(
+		job: AlertEmailJob,
+		reason: string,
+		suppressedAt: Date,
+	): Promise<boolean>;
 }
 
 export interface AlertEmailRecipientDirectory {
-	findByUserId(userId: string): Promise<AlertEmailRecipient | null>;
+	findByUserId(userId: string): Promise<AlertEmailRecipientLookup>;
 }
 
 export interface AlertEmailSender {
@@ -46,6 +56,7 @@ export interface AlertEmailDeliverySummary {
 	claimed: number;
 	sent: number;
 	failed: number;
+	suppressed: number;
 	conflicts: number;
 }
 
@@ -68,6 +79,7 @@ export async function deliverPendingAlertEmails(
 		claimed: 0,
 		sent: 0,
 		failed: 0,
+		suppressed: 0,
 		conflicts: 0,
 	};
 
@@ -77,12 +89,22 @@ export async function deliverPendingAlertEmails(
 		summary.claimed += 1;
 
 		try {
-			const recipient = await recipients.findByUserId(job.userId);
-			if (!recipient) {
+			const lookup = await recipients.findByUserId(job.userId);
+			if (lookup.status === "suppressed") {
+				const recorded = await store.markSuppressed(
+					job,
+					lookup.reason,
+					now(),
+				);
+				if (recorded) summary.suppressed += 1;
+				else summary.conflicts += 1;
+				continue;
+			}
+			if (lookup.status === "unavailable") {
 				throw new Error("Alert owner has no deliverable email address");
 			}
 
-			await sender.send(job, recipient);
+			await sender.send(job, lookup.recipient);
 			const recorded = await store.markSent(job, now());
 			if (recorded) summary.sent += 1;
 			else summary.conflicts += 1;

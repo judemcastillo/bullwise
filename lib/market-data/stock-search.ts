@@ -1,5 +1,4 @@
 const STOCK_SYMBOL_PATTERN = /^[A-Z0-9._:/-]{1,40}$/;
-const UNKNOWN_EXCHANGE = "—";
 const DEFAULT_RESULT_LIMIT = 15;
 
 function normalizeText(value: unknown): string {
@@ -40,7 +39,6 @@ export function normalizeFinnhubSearchResults(
 		results.push({
 			symbol,
 			name: normalizeText(record.description) || symbol,
-			exchange: normalizeText(record.exchange) || UNKNOWN_EXCHANGE,
 			type: normalizeText(record.type) || "Stock",
 			isInWatchlist: watchlistSymbols.has(symbol),
 		});

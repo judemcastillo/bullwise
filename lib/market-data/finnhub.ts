@@ -19,7 +19,6 @@ const FINNHUB_REQUEST_TIMEOUT_MS = 6000;
 type FinnhubCompanyProfile = {
 	name?: string;
 	ticker?: string;
-	exchange?: string;
 };
 
 function isRawNewsArticle(value: unknown): value is RawNewsArticle {
@@ -233,7 +232,6 @@ export async function searchFinnhubStocks(
 				description: profile?.name || profile?.ticker,
 				displaySymbol: symbol,
 				type: "Common Stock",
-				exchange: profile?.exchange,
 			}));
 		} else {
 			const url = `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(

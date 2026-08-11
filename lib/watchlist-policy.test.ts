@@ -6,6 +6,7 @@ import {
 	WATCHLIST_MAX_ITEMS,
 	WATCHLIST_PAGE_SIZE,
 } from "./watchlist-policy";
+import { toWatchlistClientItem } from "./watchlist-serialization";
 
 describe("watchlist policy", () => {
 	it("allows no more than 20 saved items", () => {
@@ -35,5 +36,21 @@ describe("watchlist policy", () => {
 		assert.equal(paginateWatchlist(items, "0").currentPage, 1);
 		assert.equal(paginateWatchlist(items, "999").currentPage, 2);
 		assert.equal(paginateWatchlist(items, ["2", "1"]).currentPage, 2);
+	});
+
+	it("removes database-only values before rendering client components", () => {
+		const databaseRecord = {
+			_id: { toJSON: () => "database-id" },
+			__v: 0,
+			userId: "user-1",
+			symbol: "AAPL",
+			company: "Apple Inc.",
+			addedAt: new Date("2026-08-10T00:00:00.000Z"),
+		};
+
+		assert.deepEqual(toWatchlistClientItem(databaseRecord), {
+			symbol: "AAPL",
+			company: "Apple Inc.",
+		});
 	});
 });

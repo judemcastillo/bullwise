@@ -41,6 +41,7 @@ export default async function VerifyEmailPage({
 				alt="Bull Wise Logo"
 				width={260}
 				height={60}
+				loading="eager"
 				className="h-8 w-auto"
 			/>
 		</Link>

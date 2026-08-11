@@ -25,7 +25,7 @@ describe("Server Action security boundary", () => {
 		for (const relativePath of [
 			"../market-data/finnhub.ts",
 			"../data/watchlist.ts",
-			"../data/news-email-users.ts",
+			"../data/market-news-recipients.ts",
 		]) {
 			assert.match(source(relativePath), /^import "server-only";/);
 		}

@@ -1,0 +1,13 @@
+import "./communication-policy.test";
+import "./communication-preference.model.test";
+import "./communication-preference-migration.test";
+import "./content-safety.test";
+import "./email-branding.test";
+import "./email-client-compatibility.test";
+import "./email-copy-policy.test";
+import "./email-rendering.test";
+import "./email-suppression-boundary.test";
+import "./market-news-preference-workflow.test";
+import "./market-news-delivery.test";
+import "./suppression-policy.test";
+import "./unsubscribe-token.test";

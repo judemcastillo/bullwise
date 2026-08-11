@@ -76,12 +76,12 @@ declare global {
 		id: string;
 		name: string;
 		email: string;
+		image?: string | null;
 	};
 
 	type Stock = {
 		symbol: string;
 		name: string;
-		exchange: string;
 		type: string;
 	};
 
@@ -141,10 +141,8 @@ declare global {
 	};
 
 	type StockWithData = {
-		userId: string;
 		symbol: string;
 		company: string;
-		addedAt: Date;
 		currentPrice?: number;
 		currency?: string | null;
 		logo?: string | null;

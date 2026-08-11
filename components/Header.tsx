@@ -12,6 +12,7 @@ export default function Header({ user }: { user: User }) {
 						alt="Bull Wise Logo"
 						width={260}
 						height={60}
+						loading="eager"
 						className="h-8 w-auto cursor-pointer"
 					/>
 				</Link>

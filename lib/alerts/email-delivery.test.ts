@@ -28,6 +28,7 @@ function job(id = "event-1"): AlertEmailJob {
 function storeFor(jobs: AlertEmailJob[]) {
 	const sent: string[] = [];
 	const failed: Array<{ id: string; error: string }> = [];
+	const suppressed: Array<{ id: string; reason: string }> = [];
 	const store: AlertEmailDeliveryStore = {
 		async claimNext() {
 			return jobs.shift() ?? null;
@@ -40,8 +41,12 @@ function storeFor(jobs: AlertEmailJob[]) {
 			failed.push({ id: claimed.id, error });
 			return true;
 		},
+		async markSuppressed(claimed, reason) {
+			suppressed.push({ id: claimed.id, reason });
+			return true;
+		},
 	};
-	return { store, sent, failed };
+	return { store, sent, failed, suppressed };
 }
 
 describe("alert email outbox delivery", () => {
@@ -55,7 +60,10 @@ describe("alert email outbox delivery", () => {
 			{
 				async findByUserId(userId) {
 					recipients.push(userId);
-					return { email: "owner@example.com" };
+					return {
+						status: "deliverable",
+						recipient: { email: "owner@example.com" },
+					};
 				},
 			},
 			{
@@ -72,6 +80,7 @@ describe("alert email outbox delivery", () => {
 			claimed: 1,
 			sent: 1,
 			failed: 0,
+			suppressed: 0,
 			conflicts: 0,
 		});
 	});
@@ -80,7 +89,7 @@ describe("alert email outbox delivery", () => {
 		const state = storeFor([job()]);
 		const summary = await deliverPendingAlertEmails(
 			state.store,
-			{ async findByUserId() { return null; } },
+			{ async findByUserId() { return { status: "unavailable" }; } },
 			{ async send() { assert.fail("send must not be called"); } },
 		);
 
@@ -93,7 +102,14 @@ describe("alert email outbox delivery", () => {
 		const state = storeFor([job("bad"), job("good")]);
 		const summary = await deliverPendingAlertEmails(
 			state.store,
-			{ async findByUserId() { return { email: "owner@example.com" }; } },
+			{
+				async findByUserId() {
+					return {
+						status: "deliverable",
+						recipient: { email: "owner@example.com" },
+					};
+				},
+			},
 			{
 				async send(claimed) {
 					if (claimed.id === "bad") throw new Error("SMTP unavailable");
@@ -105,5 +121,24 @@ describe("alert email outbox delivery", () => {
 		assert.deepEqual(state.failed, [{ id: "bad", error: "SMTP unavailable" }]);
 		assert.equal(summary.sent, 1);
 		assert.equal(summary.failed, 1);
+	});
+
+	it("records suppression as a terminal outcome without sending or retrying", async () => {
+		const state = storeFor([job()]);
+		const summary = await deliverPendingAlertEmails(
+			state.store,
+			{
+				async findByUserId() {
+					return { status: "suppressed", reason: "complaint" };
+				},
+			},
+			{ async send() { assert.fail("send must not be called"); } },
+		);
+
+		assert.deepEqual(state.suppressed, [
+			{ id: "event-1", reason: "complaint" },
+		]);
+		assert.equal(state.failed.length, 0);
+		assert.equal(summary.suppressed, 1);
 	});
 });

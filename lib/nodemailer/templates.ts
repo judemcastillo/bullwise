@@ -8,6 +8,16 @@ export const VERIFICATION_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
     <title>Verify your Bull Wise email</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
     <style type="text/css">
         :root {
             color-scheme: dark only;
@@ -38,7 +48,13 @@ export const VERIFICATION_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <h1 style="margin:0 0 16px;color:#ffffff;font-size:26px;line-height:1.25;">Verify your email</h1>
                             <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hi {{name}},</p>
                             <p style="margin:0 0 28px;font-size:16px;line-height:1.6;">Confirm your email address to finish creating your Bull Wise account. This link expires in one hour.</p>
-                            <a href="{{verificationUrl}}" style="display:inline-block;background:#fdd458;color:#050505;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:700;">Verify email address</a>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td bgcolor="#FDD458" style="background-color:#fdd458;border-radius:8px;padding:14px 24px;">
+                                        <a href="{{verificationUrl}}" style="display:inline-block;color:#050505;text-decoration:none;font-weight:700;">Verify email address</a>
+                                    </td>
+                                </tr>
+                            </table>
                             <p style="margin:28px 0 0;color:#9095a1;font-size:13px;line-height:1.6;">If you did not create this account, you can safely ignore this email.</p>
                         </td>
                     </tr>
@@ -165,14 +181,14 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" height="35" style="display: block; max-width: 100%; width: 150px; height: auto; border: 0;">
                         </td>
                     </tr>
                     
                     <!-- Dashboard Preview Image -->
                     <tr>
                         <td align="center" class="dashboard-preview" style="padding: 40px 40px 0px 40px;">
-                            <img src="https://ik.imagekit.io/a6fkjou7d/dashboard-preview.png?updatedAt=1756378548102" alt="Bull Wise Dashboard Preview" width="100%" style="max-width: 520px; width: 100%; height: auto; border-radius: 12px; border: 1px solid #30333A;">
+                            <img src="{{dashboardPreviewUrl}}" alt="Bull Wise Dashboard Preview" width="520" style="display: block; max-width: 520px; width: 100%; height: auto; border-radius: 12px; border: 1px solid #30333A;">
                         </td>
                     </tr>
                     
@@ -196,20 +212,20 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <!-- Feature List -->
                             <ul class="mobile-text dark-text-secondary" style="margin: 0 0 30px 0; padding-left: 20px; font-size: 16px; line-height: 1.6; color: #CCDADC;">
                                 <li style="margin-bottom: 12px;">Set up your watchlist to follow your favorite stocks</li>
-                                <li style="margin-bottom: 12px;">Create price and volume alerts so you never miss a move</li>
+                                <li style="margin-bottom: 12px;">Create price alerts for the stocks you want to monitor</li>
                                 <li style="margin-bottom: 12px;">Explore the dashboard for trends and the latest market news</li>
                             </ul>
                             
                             <!-- Additional Text -->
                             <p class="mobile-text dark-text-secondary" style="margin: 0 0 40px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-                                We'll keep you informed with timely updates, insights, and alerts — so you can focus on making the right calls.
+                                Bull Wise helps you organize market information and review the alerts and news you choose to follow.
                             </p>
                             
                             <!-- CTA Button -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 40px 0; width: 100%;">
                                 <tr>
-                                    <td align="center">
-                                        <a href="https://stock-market-dev.vercel.app/" style="display: block; width: 100%; background-color: #FDD458; color: #000000; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center; box-sizing: border-box;">
+                                    <td align="center" bgcolor="#FDD458" style="background-color: #FDD458; border-radius: 8px; padding: 16px 32px;">
+                                        <a href="{{dashboardUrl}}" style="display: block; width: 100%; color: #000000; text-decoration: none; font-size: 16px; font-weight: 500; line-height: 1; text-align: center; box-sizing: border-box;">
                                             Go to Dashboard
                                         </a>
                                     </td>
@@ -218,10 +234,8 @@ export const WELCOME_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             
                             <!-- Footer Text -->
                             <p class="mobile-text dark-text-muted" style="margin: 40px 0 0 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important; text-align: center;">
-                               Bull Wise HQ, 200 Market Street, San Francisco, CA 94105<br>
-                                <a href="#" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
-                                <a href="https://stock-market-dev.vercel.app/" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a><br>
-                                © 2025 Bull Wise
+                                <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a><br>
+                                © {{currentYear}} Bull Wise
                             </p>
                         </td>
                     </tr>
@@ -244,7 +258,7 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="x-apple-disable-message-reformatting">
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
-    <title>Market News Summary Today</title>
+    <title>{{summaryTitle}}</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -345,7 +359,7 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" height="35" style="display: block; max-width: 100%; width: 150px; height: auto; border: 0;">
                         </td>
                     </tr>
                     
@@ -355,7 +369,7 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             
                             <!-- Header -->
                             <h1 class="mobile-title dark-text" style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: #FDD458; line-height: 1.2;">
-                                Market News Summary Today
+                                {{summaryTitle}}
                             </h1>
                             
                             <!-- Date -->
@@ -369,14 +383,17 @@ export const NEWS_SUMMARY_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <!-- Footer Text -->
                             <div style="text-align: center; margin: 40px 0 0 0;">
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    You're receiving this because you subscribed to Bull Wise news updates.
+                                    You're receiving this because you subscribed to Bull Wise market news.
                                 </p>
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    <a href="#" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
-                                    <a href="https://Bull Wise.app" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
+                                    <a href="{{unsubscribeUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> |
+                                    <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
+                                </p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
+                                    {{postalAddress}}
                                 </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    © 2025 Bull Wise
+                                    © {{currentYear}} Bull Wise
                                 </p>
                             </div>
                         </td>
@@ -512,7 +529,7 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -574,10 +591,10 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <!-- Success Message -->
                             <div style="background-color: #050505; border: 1px solid #374151; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
                                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #E8BA40;">
-                                    Opportunity Alert!
+                                    Price Alert Triggered
                                 </h3>
                                 <p class="mobile-text" style="margin: 0; font-size: 14px; line-height: 1.5; color: #ccdadc;">
-                                    {{symbol}} has reached your target price! This could be a good time to review your position and consider taking profits or adjusting your strategy.
+                                    {{symbol}} crossed the price threshold you configured. Review the current market information before making any investment decision.
                                 </p>
                             </div>
                             
@@ -585,7 +602,7 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="https://stock-market-dev.vercel.app/" style="display: block; width: 100%; max-width: 100%; box-sizing: border-box; color: #000000; background-color: #E8BA40; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center;">
+                                        <a href="{{dashboardUrl}}" style="display: block; width: 100%; max-width: 100%; box-sizing: border-box; color: #000000; background-color: #E8BA40; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center;">
                                             View Dashboard
                                         </a>
                                     </td>
@@ -598,11 +615,10 @@ export const STOCK_ALERT_UPPER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                                     You're receiving this because you subscribed to Bull Wise news updates.
                                 </p>
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    <a href="#" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
-                                    <a href="https://Bull Wise.app" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
+                                    <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
                                 </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    © 2025 Bull Wise
+                                    © {{currentYear}} Bull Wise
                                 </p>
                             </div>
                         </td>
@@ -738,7 +754,7 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -803,7 +819,7 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                                     Price Dropped
                                 </h3>
                                 <p class="mobile-text" style="margin: 0; font-size: 14px; line-height: 1.5; color: #ccdadc;">
-                                    {{symbol}} dropped below your target price. This might be a good time to buy.
+                                    {{symbol}} crossed below the price threshold you configured. Review the current market information before making any investment decision.
                                 </p>
                             </div>
                             
@@ -811,7 +827,7 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="https://stock-market-dev.vercel.app/" style="display: block; width: 100%; max-width: 100%; box-sizing: border-box; background-color: #E8BA40; color: #000000; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center;">
+                                        <a href="{{dashboardUrl}}" style="display: block; width: 100%; max-width: 100%; box-sizing: border-box; background-color: #E8BA40; color: #000000; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1; text-align: center;">
                                             View Dashboard
                                         </a>
                                     </td>
@@ -821,14 +837,13 @@ export const STOCK_ALERT_LOWER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                              <!-- Footer Text -->
                             <div style="text-align: center; margin: 40px 0 0 0;">
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    You're receiving this because you subscribed to Bull Wise news updates.
+                                    You're receiving this because you created a Bull Wise alert.
                                 </p>
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    <a href="#" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
-                                    <a href="https://Bull Wise.app" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
+                                    <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
                                 </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    © 2025 Bull Wise
+                                    © {{currentYear}} Bull Wise
                                 </p>
                             </div>
                         </td>
@@ -955,7 +970,7 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -1033,7 +1048,7 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
                                     💡 What This Means
                                 </h3>
                                 <p class="mobile-text dark-text-secondary" style="margin: 0; font-size: 16px; line-height: 1.5; color: #9ca3af;">
-                                    High volume often indicates increased investor interest, potential news events, or significant price movements. This could signal an opportunity to investigate what's driving the activity.
+                                    Higher-than-usual volume can accompany news or increased market activity, but it does not indicate future price direction.
                                 </p>
                             </div>
                             
@@ -1041,7 +1056,7 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 30px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="https://stock-market-dev.vercel.app/" style="display: inline-block; background-color: #E8BA40; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1;">
+                                        <a href="{{dashboardUrl}}" style="display: inline-block; background-color: #E8BA40; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 500; line-height: 1;">
                                             View Dashboard
                                         </a>
                                     </td>
@@ -1058,14 +1073,13 @@ export const VOLUME_ALERT_EMAIL_TEMPLATE = `<!DOCTYPE html>
                              <!-- Footer Text -->
                             <div style="text-align: center; margin: 40px 0 0 0;">
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    You're receiving this because you subscribed to Bull Wise news updates.
+                                    You're receiving this because you created a Bull Wise alert.
                                 </p>
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    <a href="#" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
-                                    <a href="https://Bull Wise.app" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
+                                    <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
                                 </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    © 2025 Bull Wise
+                                    © {{currentYear}} Bull Wise
                                 </p>
                             </div>
                         </td>
@@ -1089,7 +1103,7 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
     <meta name="x-apple-disable-message-reformatting">
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
-    <title>We Miss You! Your Market Insights Await</title>
+    <title>Your Bull Wise account is ready when you are</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -1195,7 +1209,7 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                     <!-- Header with Logo -->
                     <tr>
                         <td align="left" class="mobile-header-padding" style="padding: 40px 40px 20px 40px;">
-                            <img src="https://ik.imagekit.io/wj9zp9fle/tr:w-300,f-png/logo.svg" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
+                            <img src="{{logoUrl}}" alt="Bull Wise Logo" width="150" style="max-width: 100%; height: auto;">
                         </td>
                     </tr>
                     
@@ -1205,12 +1219,12 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             
                             <!-- Welcome Back Heading -->
                             <h1 class="mobile-title dark-text" style="margin: 0 0 15px 0; font-size: 28px; font-weight: 600; color: #FDD458; line-height: 1.2;">
-                                We Miss You, {{name}}!
+                                Your Bull Wise account is ready, {{name}}
                             </h1>
                             
                             <!-- Main Message -->
                             <p class="mobile-text dark-text-secondary" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-                                We noticed you haven't visited Bull Wise in a while. The markets have been moving, and there might be some opportunities you don't want to miss!
+                                You haven't visited Bull Wise recently. Your saved tools remain available whenever you want to review them.
                             </p>
 
                             <!-- Additional Motivation -->
@@ -1219,13 +1233,13 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                                     Market Update
                                 </h3>
                                 <p class="mobile-text" style="margin: 0; font-size: 14px; line-height: 1.5; color: #ccdadc;">
-                                    Markets have been active lately! Major indices have seen significant movements, and there might be opportunities in your tracked stocks that you don't want to miss.
+                                    Open Bull Wise to review current market information and the stocks you chose to follow.
                                 </p>
                             </div>
                             
                             <!-- Encouragement Message -->
                             <p class="mobile-text dark-text-secondary" style="margin: 0 0 40px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
-                                Your watchlists are still active and ready to help you stay on top of your investments. Don't let market opportunities pass you by!
+                                Market information can change quickly. Review current sources and your own circumstances before making an investment decision.
                             </p>
                             
                             <!-- CTA Button -->
@@ -1242,14 +1256,17 @@ export const INACTIVE_USER_REMINDER_EMAIL_TEMPLATE = `<!DOCTYPE html>
                             <!-- Footer Text -->
                             <div style="text-align: center; margin: 40px 0 0 0;">
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    Questions? Reply to this email or contact our support team.
+                                    You're receiving this optional account reminder from Bull Wise.
                                 </p>
                                 <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
                                     <a href="{{unsubscribeUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Unsubscribe</a> | 
                                     <a href="{{dashboardUrl}}" style="color: #CCDADC !important; text-decoration: underline;">Visit Bull Wise</a>
                                 </p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
+                                    {{postalAddress}}
+                                </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #CCDADC !important;">
-                                    © 2025 Bull Wise
+                                    © {{currentYear}} Bull Wise
                                 </p>
                             </div>
                         </td>
