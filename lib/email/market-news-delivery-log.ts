@@ -7,8 +7,14 @@ import { connectToDatabase } from "@/database/mongoose";
 export const MARKET_NEWS_DELIVERY_LEASE_MS = 5 * 60_000;
 
 export interface MarketNewsDeliveryClaim {
+	status: "claimed";
 	deliveryKey: string;
 	leaseId: string;
+}
+
+export interface ActiveMarketNewsDeliveryLease {
+	status: "active_lease";
+	leaseExpiresAt: Date;
 }
 
 const isDuplicateKeyError = (error: unknown) =>
@@ -22,7 +28,7 @@ const isDuplicateKeyError = (error: unknown) =>
 export async function claimMarketNewsDelivery(
 	deliveryKey: string,
 	now = new Date(),
-): Promise<MarketNewsDeliveryClaim | null> {
+): Promise<MarketNewsDeliveryClaim | ActiveMarketNewsDeliveryLease | null> {
 	await connectToDatabase();
 	await MarketNewsDeliveryLog.init();
 	const leaseId = randomUUID();
@@ -35,7 +41,7 @@ export async function claimMarketNewsDelivery(
 			leaseId,
 			leaseExpiresAt,
 		});
-		return { deliveryKey, leaseId };
+		return { status: "claimed", deliveryKey, leaseId };
 	} catch (error) {
 		if (!isDuplicateKeyError(error)) throw error;
 	}
@@ -56,7 +62,24 @@ export async function claimMarketNewsDelivery(
 		{ returnDocument: "after" },
 	);
 
-	return reclaimed ? { deliveryKey, leaseId } : null;
+	if (reclaimed) return { status: "claimed", deliveryKey, leaseId };
+
+	const existing = await MarketNewsDeliveryLog.findOne({ deliveryKey })
+		.select({ status: 1, leaseExpiresAt: 1, _id: 0 })
+		.lean<{ status?: string; leaseExpiresAt?: Date }>();
+	if (existing?.status === "completed") return null;
+	if (
+		existing?.status === "in_progress" &&
+		existing.leaseExpiresAt &&
+		existing.leaseExpiresAt > now
+	) {
+		return {
+			status: "active_lease",
+			leaseExpiresAt: existing.leaseExpiresAt,
+		};
+	}
+
+	throw new Error("Unable to resolve market-news delivery claim state");
 }
 
 export async function completeMarketNewsDelivery(

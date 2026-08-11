@@ -34,7 +34,7 @@ import {
 } from "@/lib/inngest/prompts";
 import { deliverAlertEmailOutbox } from "@/lib/alerts/email-delivery-worker";
 import { monitorDuePriceAlerts } from "@/lib/alerts/monitoring";
-import { type GetStepTools, NonRetriableError } from "inngest";
+import { type GetStepTools, NonRetriableError, RetryAfterError } from "inngest";
 import { getNews } from "../market-data/finnhub";
 import { getWatchlistSymbolsForUser } from "../data/watchlist";
 import { sendNewsSummaryEmail, sendWelcomeEmail } from "../nodemailer";
@@ -294,10 +294,17 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 
 			const { confirmationUrl, oneClickUrl } =
 				createDailyNewsUnsubscribeUrls(request.userId);
-			const claim = await claimMarketNewsDelivery(request.deliveryKey);
-			if (!claim) {
+			const claimResult = await claimMarketNewsDelivery(request.deliveryKey);
+			if (!claimResult) {
 				return { status: "skipped", reason: "duplicate_delivery" };
 			}
+			if (claimResult.status === "active_lease") {
+				throw new RetryAfterError(
+					"Market-news delivery is already in progress",
+					claimResult.leaseExpiresAt,
+				);
+			}
+			const claim = claimResult;
 
 			let accepted: boolean;
 			try {

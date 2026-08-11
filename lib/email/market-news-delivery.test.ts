@@ -189,4 +189,22 @@ describe("market-news Inngest delivery", () => {
 		assert.match(source, /status: "completed"/);
 		assert.match(source, /status: "in_progress"/);
 	});
+
+	it("retries active leases and treats only completed deliveries as duplicates", () => {
+		const claimSource = readFileSync(
+			new URL("market-news-delivery-log.ts", import.meta.url),
+			"utf8",
+		);
+		const functionSource = readFileSync(
+			new URL("../inngest/functions.ts", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(claimSource, /existing\?\.status === "completed"\) return null/);
+		assert.match(claimSource, /status: "active_lease"/);
+		assert.match(claimSource, /leaseExpiresAt: existing\.leaseExpiresAt/);
+		assert.match(functionSource, /if \(!claimResult\)/);
+		assert.match(functionSource, /claimResult\.status === "active_lease"/);
+		assert.match(functionSource, /new RetryAfterError/);
+	});
 });
