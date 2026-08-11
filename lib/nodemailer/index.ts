@@ -82,12 +82,12 @@ export const sendNewsSummaryEmail = async ({
 	newsContent: string;
 	unsubscribeUrl: string;
 	oneClickUnsubscribeUrl: string;
-}): Promise<void> => {
+}): Promise<boolean> => {
 	const eligibility = await getEmailEligibilityByEmail({
 		email,
 		request: { messageType: "market_news" },
 	});
-	if (!eligibility.eligible) return;
+	if (!eligibility.eligible) return false;
 
 	const content = renderNewsSummaryEmail({
 		frequency,
@@ -105,4 +105,5 @@ export const sendNewsSummaryEmail = async ({
 	};
 
 	await sendMailWithSuppressionCapture({ recipientEmail: email, message: mailOptions });
+	return true;
 };

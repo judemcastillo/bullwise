@@ -86,6 +86,24 @@ describe("market-news email rendering", () => {
 		assert.doesNotMatch(rendered.text, /<[^>]+>/);
 	});
 
+	it("preserves headings, paragraphs, and list items in plain text", () => {
+		const rendered = renderNewsSummaryEmail({
+			frequency: "daily",
+			date: "August 11, 2026",
+			newsContent:
+				"<h3>Market Overview</h3><p>Stocks rose.</p><h4>Watchlist</h4><ul><li><span>•</span>Alpha gained.</li><li>Beta declined.</li></ul><p>Trading remained active.</p>",
+			unsubscribeUrl: "https://bullwise.example/unsubscribe?token=abc",
+			oneClickUnsubscribeUrl:
+				"https://bullwise.example/api/email/unsubscribe?token=abc",
+			branding: marketingEmailBranding,
+		});
+
+		assert.match(
+			rendered.text,
+			/Market Overview\n\nStocks rose\.\n\nWatchlist\n\n- Alpha gained\.\n- Beta declined\.\n\nTrading remained active\./,
+		);
+	});
+
 	it("sanitizes AI content and keeps one-click unsubscribe headers", () => {
 		const rendered = renderNewsSummaryEmail({
 			frequency: "daily",

@@ -106,6 +106,15 @@ describe("market-news Inngest delivery", () => {
 
 		assert.ok(deliveryKeyIndex);
 		assert.equal(deliveryKeyIndex[1].unique, true);
+		assert.deepEqual(MarketNewsDeliveryLog.schema.path("status").options.enum, [
+			"in_progress",
+			"completed",
+			"failed",
+		]);
+		assert.ok(MarketNewsDeliveryLog.schema.path("leaseId"));
+		assert.ok(MarketNewsDeliveryLog.schema.path("leaseExpiresAt"));
+		assert.ok(MarketNewsDeliveryLog.schema.path("completedAt"));
+		assert.ok(MarketNewsDeliveryLog.schema.path("failedAt"));
 	});
 
 	it("requires the current eligible frequency immediately before delivery", () => {
@@ -149,7 +158,7 @@ describe("market-news Inngest delivery", () => {
 		assert.match(source, /"send-market-news-email"/);
 	});
 
-	it("claims the durable delivery key before sending email", () => {
+	it("leases before sending and completes only after provider acceptance", () => {
 		const source = readFileSync(
 			new URL("../inngest/functions.ts", import.meta.url),
 			"utf8",
@@ -158,10 +167,26 @@ describe("market-news Inngest delivery", () => {
 			"claimMarketNewsDelivery(request.deliveryKey)",
 		);
 		const send = source.indexOf("await sendNewsSummaryEmail");
+		const complete = source.indexOf("completeMarketNewsDelivery(claim)");
 
 		assert.ok(claim >= 0);
 		assert.ok(send >= 0);
+		assert.ok(complete >= 0);
 		assert.ok(claim < send);
+		assert.ok(send < complete);
 		assert.match(source, /reason: "duplicate_delivery"/);
+		assert.match(source, /await failMarketNewsDelivery\(claim\)/);
+	});
+
+	it("makes failed and expired delivery leases reclaimable", () => {
+		const source = readFileSync(
+			new URL("market-news-delivery-log.ts", import.meta.url),
+			"utf8",
+		);
+
+		assert.match(source, /status: "failed"/);
+		assert.match(source, /leaseExpiresAt: \{ \$lte: now \}/);
+		assert.match(source, /status: "completed"/);
+		assert.match(source, /status: "in_progress"/);
 	});
 });

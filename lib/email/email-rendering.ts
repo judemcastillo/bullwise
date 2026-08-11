@@ -86,10 +86,25 @@ export function renderNewsSummaryEmail({
 	const subject = sanitizeEmailHeader(`📈 ${summaryTitle} - ${date}`);
 
 	const sanitizedNewsContent = sanitizeGeneratedMarketNewsHtml(newsContent);
-	const plainTextNewsContent = sanitizeHtml(sanitizedNewsContent, {
+	const structuredPlainTextContent = sanitizedNewsContent
+		.replace(
+			/(<li\b[^>]*>)\s*<span\b[^>]*>\s*•\s*<\/span>\s*/gi,
+			"$1",
+		)
+		.replace(/<(?:h3|h4|p)\b[^>]*>/gi, "\n\n")
+		.replace(/<\/(?:h3|h4|p)>/gi, "\n\n")
+		.replace(/<li\b[^>]*>/gi, "\n- ")
+		.replace(/<\/li>/gi, "")
+		.replace(/<br\b[^>]*>/gi, "\n")
+		.replace(/<\/?(?:ul|div)\b[^>]*>/gi, "\n\n");
+	const plainTextNewsContent = sanitizeHtml(structuredPlainTextContent, {
 		allowedTags: [],
 		allowedAttributes: {},
-	}).trim();
+	})
+		.replace(/[^\S\n]+\n/g, "\n")
+		.replace(/\n[^\S\n]+/g, "\n")
+		.replace(/\n{3,}/g, "\n\n")
+		.trim();
 
 	return {
 		subject,

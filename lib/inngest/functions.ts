@@ -11,7 +11,11 @@ import {
 	parseMarketNewsDeliveryRequest,
 	type MarketNewsDeliveryFrequency,
 } from "@/lib/email/market-news-delivery-policy";
-import { claimMarketNewsDelivery } from "@/lib/email/market-news-delivery-log";
+import {
+	claimMarketNewsDelivery,
+	completeMarketNewsDelivery,
+	failMarketNewsDelivery,
+} from "@/lib/email/market-news-delivery-log";
 import { getMarketNewsPreference } from "@/lib/email/market-news-preference";
 import { createDailyNewsUnsubscribeUrls } from "@/lib/email/unsubscribe-token";
 import { ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG } from "@/lib/inngest/alert-email-delivery.config";
@@ -290,18 +294,33 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 
 			const { confirmationUrl, oneClickUrl } =
 				createDailyNewsUnsubscribeUrls(request.userId);
-			const claimed = await claimMarketNewsDelivery(request.deliveryKey);
-			if (!claimed) {
+			const claim = await claimMarketNewsDelivery(request.deliveryKey);
+			if (!claim) {
 				return { status: "skipped", reason: "duplicate_delivery" };
 			}
-			await sendNewsSummaryEmail({
-				email: recipient.email,
-				frequency: request.frequency,
-				date: getFormattedTodayDate(),
-				newsContent,
-				unsubscribeUrl: confirmationUrl,
-				oneClickUnsubscribeUrl: oneClickUrl,
-			});
+
+			let accepted: boolean;
+			try {
+				accepted = await sendNewsSummaryEmail({
+					email: recipient.email,
+					frequency: request.frequency,
+					date: getFormattedTodayDate(),
+					newsContent,
+					unsubscribeUrl: confirmationUrl,
+					oneClickUnsubscribeUrl: oneClickUrl,
+				});
+			} catch (error) {
+				await failMarketNewsDelivery(claim);
+				throw error;
+			}
+
+			if (!accepted) {
+				await failMarketNewsDelivery(claim);
+				return { status: "skipped", reason: "suppressed_before_send" };
+			}
+			if (!(await completeMarketNewsDelivery(claim))) {
+				throw new Error("Market-news delivery lease was lost after sending");
+			}
 
 			return { status: "sent" };
 		});
