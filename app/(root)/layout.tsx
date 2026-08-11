@@ -21,6 +21,7 @@ export default async function Layout({
 		id: session.user.id,
 		name: session.user.name,
 		email: session.user.email,
+		image: session.user.image,
 	};
 	return (
 		<main className="min-h-screen text-gray-400">

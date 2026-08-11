@@ -116,7 +116,14 @@ The legacy field remains temporarily dual-written as rollback data, but it no
 longer controls delivery. Weekly subscribers are handled by the weekly schedule
 and cannot be selected by the daily schedule.
 
-Run the migration in dry-run mode first:
+Create the case-insensitive index used by recipient email lookups in each
+environment. The migration is idempotent:
+
+```bash
+npm run migrate:user-email-index
+```
+
+Run the communication-preferences migration in dry-run mode first:
 
 ```bash
 npm run migrate:communication-preferences

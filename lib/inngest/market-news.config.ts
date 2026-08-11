@@ -4,6 +4,9 @@ export const DAILY_MARKET_NEWS_CRON = "0 12 * * *";
 export const DAILY_MARKET_NEWS_EVENT = "app/send.daily.news";
 export const WEEKLY_MARKET_NEWS_CRON = "0 12 * * 1";
 export const WEEKLY_MARKET_NEWS_EVENT = "app/send.weekly.news";
+export const MARKET_NEWS_QUEUE_CONTINUATION_EVENT =
+	"app/market-news.queue.continue";
+export const MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN = 100;
 
 export const DAILY_MARKET_NEWS_FUNCTION_CONFIG = {
 	id: "daily-news-summary",
@@ -28,6 +31,15 @@ export const WEEKLY_MARKET_NEWS_FUNCTION_CONFIG = {
 	],
 	concurrency: 1,
 	singleton: { mode: "skip" as const },
+	retries: 3 as const,
+};
+
+export const MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG = {
+	id: "continue-market-news-summary-queue",
+	name: "Continue market-news recipient queue",
+	description: "Continue queueing market-news deliveries after a page limit",
+	triggers: [{ event: MARKET_NEWS_QUEUE_CONTINUATION_EVENT }],
+	concurrency: 1,
 	retries: 3 as const,
 };
 

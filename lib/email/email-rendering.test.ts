@@ -63,6 +63,29 @@ describe("transactional email rendering", () => {
 });
 
 describe("market-news email rendering", () => {
+	it("includes the date and sanitized summary in plain text", () => {
+		const rendered = renderNewsSummaryEmail({
+			frequency: "weekly",
+			date: "August 10, 2026",
+			newsContent:
+				'<p onclick="steal()">Markets gained on strong earnings.</p><script>steal()</script>',
+			unsubscribeUrl: "https://bullwise.example/unsubscribe?token=abc",
+			oneClickUnsubscribeUrl:
+				"https://bullwise.example/api/email/unsubscribe?token=abc",
+			branding: marketingEmailBranding,
+		});
+
+		assert.match(rendered.text, /Weekly Market News Summary from Bull Wise/);
+		assert.match(rendered.text, /August 10, 2026/);
+		assert.match(rendered.text, /Markets gained on strong earnings\./);
+		assert.match(
+			rendered.text,
+			/Unsubscribe: https:\/\/bullwise\.example\/unsubscribe\?token=abc/,
+		);
+		assert.doesNotMatch(rendered.text, /onclick|<script|steal\(\)/i);
+		assert.doesNotMatch(rendered.text, /<[^>]+>/);
+	});
+
 	it("sanitizes AI content and keeps one-click unsubscribe headers", () => {
 		const rendered = renderNewsSummaryEmail({
 			frequency: "daily",

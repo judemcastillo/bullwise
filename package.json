@@ -16,6 +16,7 @@
     "test:auth": "node --import tsx lib/auth/run-tests.ts",
     "test:email": "node --import tsx lib/email/run-tests.ts",
     "migrate:communication-preferences": "tsx database/migrations/migrate-communication-preferences.ts",
+    "migrate:user-email-index": "tsx database/migrations/create-user-email-index.ts",
     "test:db": "tsx database/test-db.ts"
   },
   "dependencies": {

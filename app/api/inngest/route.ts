@@ -1,5 +1,6 @@
 import { inngest } from "@/lib/inngest/client";
 import {
+	continueMarketNewsSummaryQueue,
 	deliverMarketNewsSummary,
 	deliverAlertEmails,
 	monitorPriceAlerts,
@@ -15,6 +16,7 @@ export const { GET, POST, PUT } = serve({
 		sendSignUpEmail,
 		sendDailyNewsSummary,
 		sendWeeklyNewsSummary,
+		continueMarketNewsSummaryQueue,
 		deliverMarketNewsSummary,
 		monitorPriceAlerts,
 		deliverAlertEmails,

@@ -11,6 +11,7 @@ import {
 	parseMarketNewsDeliveryRequest,
 	type MarketNewsDeliveryFrequency,
 } from "@/lib/email/market-news-delivery-policy";
+import { claimMarketNewsDelivery } from "@/lib/email/market-news-delivery-log";
 import { getMarketNewsPreference } from "@/lib/email/market-news-preference";
 import { createDailyNewsUnsubscribeUrls } from "@/lib/email/unsubscribe-token";
 import { ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG } from "@/lib/inngest/alert-email-delivery.config";
@@ -18,6 +19,9 @@ import { ALERT_MONITORING_FUNCTION_CONFIG } from "@/lib/inngest/alert-monitoring
 import {
 	DAILY_MARKET_NEWS_FUNCTION_CONFIG,
 	MARKET_NEWS_DELIVERY_FUNCTION_CONFIG,
+	MARKET_NEWS_QUEUE_CONTINUATION_EVENT,
+	MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG,
+	MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN,
 	WEEKLY_MARKET_NEWS_FUNCTION_CONFIG,
 } from "@/lib/inngest/market-news.config";
 import {
@@ -37,15 +41,20 @@ type BullwiseStepTools = GetStepTools<typeof inngest>;
 async function queueMarketNewsDeliveries({
 	step,
 	frequency,
+	initialAfterUserId,
+	initialPeriodKey,
 }: {
 	step: BullwiseStepTools;
 	frequency: MarketNewsDeliveryFrequency;
+	initialAfterUserId?: string;
+	initialPeriodKey?: string;
 }) {
-	const MAX_PAGES = 1000;
-	const periodKey = await step.run("resolve-market-news-period", () =>
-		getMarketNewsPeriodKey(frequency, new Date()),
-	);
-	let afterUserId: string | undefined;
+	const periodKey =
+		initialPeriodKey ??
+		(await step.run("resolve-market-news-period", () =>
+			getMarketNewsPeriodKey(frequency, new Date()),
+		));
+	let afterUserId = initialAfterUserId;
 	let queued = 0;
 	let pages = 0;
 
@@ -69,16 +78,16 @@ async function queueMarketNewsDeliveries({
 		queued += page.userIds.length;
 		pages += 1;
 		afterUserId = page.nextCursor ?? undefined;
+	} while (afterUserId && pages < MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN);
 
-		if (pages >= MAX_PAGES && afterUserId) {
-			console.warn(
-				`Reached maximum page limit (${MAX_PAGES}). Remaining recipients after userId: ${afterUserId}`,
-			);
-			break;
-		}
-	} while (afterUserId);
+	if (afterUserId) {
+		await step.sendEvent(`continue-market-news-recipient-pages-${pages}`, {
+			name: MARKET_NEWS_QUEUE_CONTINUATION_EVENT,
+			data: { frequency, periodKey, afterUserId },
+		});
+	}
 
-	return { frequency, periodKey, queued, pages, remainingAfterUserId: afterUserId };
+	return { frequency, periodKey, queued, pages, afterUserId };
 }
 
 export const deliverAlertEmails = inngest.createFunction(
@@ -187,6 +196,32 @@ export const sendWeeklyNewsSummary = inngest.createFunction(
 	},
 );
 
+export const continueMarketNewsSummaryQueue = inngest.createFunction(
+	MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG,
+	async ({ event, step }) => {
+		const { frequency, periodKey, afterUserId } = event.data as Record<
+			string,
+			unknown
+		>;
+		if (
+			(frequency !== "daily" && frequency !== "weekly") ||
+			typeof periodKey !== "string" ||
+			!/^\d{4}-\d{2}-\d{2}$/.test(periodKey) ||
+			typeof afterUserId !== "string" ||
+			!afterUserId
+		) {
+			throw new NonRetriableError("Invalid market-news queue continuation");
+		}
+
+		return queueMarketNewsDeliveries({
+			step,
+			frequency,
+			initialAfterUserId: afterUserId,
+			initialPeriodKey: periodKey,
+		});
+	},
+);
+
 export const deliverMarketNewsSummary = inngest.createFunction(
 	MARKET_NEWS_DELIVERY_FUNCTION_CONFIG,
 	async ({ event, step }) => {
@@ -240,33 +275,6 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 		}
 
 		return step.run("send-market-news-email", async () => {
-			const { connectToDatabase } = await import("@/database/mongoose");
-			const { default: EmailDeliveryLog } = await import(
-				"@/database/models/email-delivery-log.model"
-			);
-			await connectToDatabase();
-
-			try {
-				await EmailDeliveryLog.create({
-					deliveryKey: request.deliveryKey,
-					userId: request.userId,
-					messageType: "market_news",
-					frequency: request.frequency,
-					periodKey: request.periodKey,
-					deliveredAt: new Date(),
-				});
-			} catch (error: unknown) {
-				if (
-					error &&
-					typeof error === "object" &&
-					"code" in error &&
-					error.code === 11000
-				) {
-					return { status: "skipped", reason: "already_delivered" };
-				}
-				throw error;
-			}
-
 			const eligibility = await getEmailEligibility({
 				userId: request.userId,
 				request: { messageType: "market_news" },
@@ -282,6 +290,10 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 
 			const { confirmationUrl, oneClickUrl } =
 				createDailyNewsUnsubscribeUrls(request.userId);
+			const claimed = await claimMarketNewsDelivery(request.deliveryKey);
+			if (!claimed) {
+				return { status: "skipped", reason: "duplicate_delivery" };
+			}
 			await sendNewsSummaryEmail({
 				email: recipient.email,
 				frequency: request.frequency,

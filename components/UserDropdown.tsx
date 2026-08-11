@@ -24,6 +24,7 @@ export default function UserDropdown({
 	onOpenSearch: () => void;
 }) {
 	const router = useRouter();
+	const avatarUrl = user.image?.trim();
 
 	const handleSignOut: () => Promise<void> = async () => {
 		await signOut();
@@ -38,6 +39,7 @@ export default function UserDropdown({
 					className="flex items-center gap-3 text-gray-400 hover:text-yellow-500 h-11"
 				>
 					<Avatar className="h-8 w-8">
+						{avatarUrl ? <AvatarImage src={avatarUrl} /> : null}
 						<AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
 							{user.name[0]}
 						</AvatarFallback>
@@ -53,6 +55,7 @@ export default function UserDropdown({
 				<DropdownMenuLabel>
 					<div className="flex relative items-center gap-3 py-2">
 						<Avatar className="h-10 w-10">
+							{avatarUrl ? <AvatarImage src={avatarUrl} /> : null}
 							<AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
 								{user.name[0]}
 							</AvatarFallback>

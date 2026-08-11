@@ -15,6 +15,7 @@ import {
 	VERIFICATION_EMAIL_TEMPLATE,
 	WELCOME_EMAIL_TEMPLATE,
 } from "@/lib/nodemailer/templates";
+import sanitizeHtml from "sanitize-html";
 
 export function renderAccountVerificationEmail({
 	name,
@@ -85,10 +86,14 @@ export function renderNewsSummaryEmail({
 	const subject = sanitizeEmailHeader(`📈 ${summaryTitle} - ${date}`);
 
 	const sanitizedNewsContent = sanitizeGeneratedMarketNewsHtml(newsContent);
+	const plainTextNewsContent = sanitizeHtml(sanitizedNewsContent, {
+		allowedTags: [],
+		allowedAttributes: {},
+	}).trim();
 
 	return {
 		subject,
-		text: `${summaryTitle} from Bull Wise\n\n${date}\n\n${sanitizedNewsContent.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').replace(/\s+/g, ' ').trim()}\n\nUnsubscribe: ${safeUnsubscribeUrl}`,
+		text: `${summaryTitle} from Bull Wise\n${date}\n\n${plainTextNewsContent}\n\nUnsubscribe: ${safeUnsubscribeUrl}`,
 		html: NEWS_SUMMARY_EMAIL_TEMPLATE.replaceAll(
 			"{{summaryTitle}}",
 			() => escapeHtml(summaryTitle),

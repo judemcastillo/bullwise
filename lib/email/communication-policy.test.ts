@@ -86,12 +86,34 @@ describe("communication eligibility policy", () => {
 		}
 	});
 
-	it("suppresses every class after a hard bounce, complaint, or deletion", () => {
-		for (const reason of [
-			"hard_bounce",
-			"complaint",
-			"account_deleted",
+	it("suppresses every class after account deletion", () => {
+		for (const messageType of [
+			"email_verification",
+			"account_welcome",
+			"account_security",
+			"price_alert",
+			"market_news",
+			"product_updates",
 		] as const) {
+			const preference = subscribedPreference();
+			preference.emailSuppression = {
+				reason: "account_deleted",
+				source: "account_lifecycle",
+				recordedAt: consentedAt,
+			};
+
+			assert.deepEqual(
+				evaluateEmailEligibility({
+					preference,
+					request: { messageType },
+				}),
+				{ eligible: false, reason: "account_deleted" },
+			);
+		}
+	});
+
+	it("limits hard-bounce and complaint suppression to marketing", () => {
+		for (const reason of ["hard_bounce", "complaint"] as const) {
 			const preference = subscribedPreference();
 			preference.emailSuppression = {
 				reason,
@@ -99,13 +121,24 @@ describe("communication eligibility policy", () => {
 				recordedAt: consentedAt,
 			};
 
-			assert.deepEqual(
-				evaluateEmailEligibility({
-					preference,
-					request: { messageType: "price_alert" },
-				}),
-				{ eligible: false, reason },
-			);
+			for (const messageType of [
+				"email_verification",
+				"account_welcome",
+				"account_security",
+				"price_alert",
+			] as const) {
+				assert.deepEqual(
+					evaluateEmailEligibility({ preference, request: { messageType } }),
+					{ eligible: true, reason: "eligible" },
+				);
+			}
+
+			for (const messageType of ["market_news", "product_updates"] as const) {
+				assert.deepEqual(
+					evaluateEmailEligibility({ preference, request: { messageType } }),
+					{ eligible: false, reason },
+				);
+			}
 		}
 	});
 

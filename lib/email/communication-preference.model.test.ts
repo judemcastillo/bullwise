@@ -38,7 +38,10 @@ describe("CommunicationPreference model", () => {
 			subscriptions: [subscription],
 		});
 
-		await assert.rejects(preference.validate(), /complete consent state/i);
+		await assert.rejects(
+			preference.validate(),
+			/Subscribed records must have complete consent state\./,
+		);
 	});
 
 	it("requires unsubscribed records to be off and timestamped", async () => {
@@ -54,7 +57,10 @@ describe("CommunicationPreference model", () => {
 			],
 		});
 
-		await assert.rejects(preference.validate(), /complete consent state/i);
+		await assert.rejects(
+			preference.validate(),
+			/Unsubscribed records must have frequency off and unsubscribedAt timestamp\./,
+		);
 	});
 
 	it("rejects duplicate streams and product categories", async () => {

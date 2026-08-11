@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import MarketNewsDeliveryLog from "@/database/models/market-news-delivery-log.model";
 import {
 	createMarketNewsDeliveryEvents,
 	getMarketNewsPeriodKey,
@@ -14,6 +15,9 @@ import {
 	DAILY_MARKET_NEWS_EVENT,
 	DAILY_MARKET_NEWS_FUNCTION_CONFIG,
 	MARKET_NEWS_DELIVERY_FUNCTION_CONFIG,
+	MARKET_NEWS_QUEUE_CONTINUATION_EVENT,
+	MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG,
+	MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN,
 	WEEKLY_MARKET_NEWS_CRON,
 	WEEKLY_MARKET_NEWS_EVENT,
 	WEEKLY_MARKET_NEWS_FUNCTION_CONFIG,
@@ -39,6 +43,12 @@ describe("market-news Inngest delivery", () => {
 		assert.equal(MARKET_NEWS_RECIPIENT_PAGE_SIZE, 50);
 		assert.equal(DAILY_MARKET_NEWS_FUNCTION_CONFIG.concurrency, 1);
 		assert.equal(WEEKLY_MARKET_NEWS_FUNCTION_CONFIG.concurrency, 1);
+		assert.equal(MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN, 100);
+		assert.equal(MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG.concurrency, 1);
+		assert.deepEqual(
+			MARKET_NEWS_QUEUE_CONTINUATION_FUNCTION_CONFIG.triggers,
+			[{ event: MARKET_NEWS_QUEUE_CONTINUATION_EVENT }],
+		);
 		assert.equal(MARKET_NEWS_DELIVERY_FUNCTION_CONFIG.concurrency, 4);
 		assert.equal(
 			MARKET_NEWS_DELIVERY_FUNCTION_CONFIG.idempotency,
@@ -85,6 +95,19 @@ describe("market-news Inngest delivery", () => {
 		assert.equal(getMarketNewsPeriodKey("weekly", sunday), "2026-08-10");
 	});
 
+	it("defines a unique durable delivery key index", () => {
+		const indexes = MarketNewsDeliveryLog.schema.indexes() as Array<
+			[Record<string, number>, { unique?: boolean }]
+		>;
+		const deliveryKeyIndex = indexes.find(
+			([fields]) =>
+				Object.keys(fields).length === 1 && fields.deliveryKey === 1,
+		);
+
+		assert.ok(deliveryKeyIndex);
+		assert.equal(deliveryKeyIndex[1].unique, true);
+	});
+
 	it("requires the current eligible frequency immediately before delivery", () => {
 		assert.equal(
 			isEligibleForScheduledMarketNews(
@@ -119,6 +142,26 @@ describe("market-news Inngest delivery", () => {
 		assert.doesNotMatch(source, /summarize-news-\$\{user\.email\}/);
 		assert.match(source, /listMarketNewsRecipientIdsPage/);
 		assert.match(source, /step\.sendEvent/);
+		assert.match(source, /load-market-news-recipient-page-\$\{pages\}/);
+		assert.match(source, /enqueue-market-news-recipient-batch-\$\{pages\}/);
+		assert.match(source, /MARKET_NEWS_RECIPIENT_MAX_PAGES_PER_RUN/);
+		assert.match(source, /MARKET_NEWS_QUEUE_CONTINUATION_EVENT/);
 		assert.match(source, /"send-market-news-email"/);
+	});
+
+	it("claims the durable delivery key before sending email", () => {
+		const source = readFileSync(
+			new URL("../inngest/functions.ts", import.meta.url),
+			"utf8",
+		);
+		const claim = source.indexOf(
+			"claimMarketNewsDelivery(request.deliveryKey)",
+		);
+		const send = source.indexOf("await sendNewsSummaryEmail");
+
+		assert.ok(claim >= 0);
+		assert.ok(send >= 0);
+		assert.ok(claim < send);
+		assert.match(source, /reason: "duplicate_delivery"/);
 	});
 });
