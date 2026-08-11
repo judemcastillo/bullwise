@@ -74,8 +74,8 @@ describe("CommunicationPreference model", () => {
 			],
 		});
 
-		await assert.rejects(duplicateStreams.validate(), /unique streams/i);
-		await assert.rejects(invalidProductCategories.validate(), /complete consent state/i);
+		await assert.rejects(duplicateStreams.validate(), /must contain unique streams/i);
+		await assert.rejects(invalidProductCategories.validate(), /must not have categories/i);
 	});
 
 	it("rejects duplicate market-news categories", async () => {
@@ -86,14 +86,16 @@ describe("CommunicationPreference model", () => {
 			subscriptions: [subscription],
 		});
 
-		await assert.rejects(preference.validate(), /complete consent state/i);
+		await assert.rejects(preference.validate(), /must not contain duplicate categories/i);
 	});
 
 	it("defines one preference document per user", () => {
 		const indexes = CommunicationPreference.schema.indexes() as Array<
 			[Record<string, number>, { unique?: boolean }]
 		>;
-		const userIndex = indexes.find(([fields]) => fields.userId === 1);
+		const userIndex = indexes.find(
+			([fields]) => Object.keys(fields).length === 1 && fields.userId === 1,
+		);
 
 		assert.ok(userIndex);
 		assert.equal(userIndex[1].unique, true);

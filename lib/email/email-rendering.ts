@@ -84,17 +84,17 @@ export function renderNewsSummaryEmail({
 	const safeDashboardUrl = requireSafeEmailUrl(branding.dashboardUrl);
 	const subject = sanitizeEmailHeader(`📈 ${summaryTitle} - ${date}`);
 
+	const sanitizedNewsContent = sanitizeGeneratedMarketNewsHtml(newsContent);
+
 	return {
 		subject,
-		text: `${summaryTitle} from Bull Wise\n\nUnsubscribe: ${safeUnsubscribeUrl}`,
+		text: `${summaryTitle} from Bull Wise\n\n${date}\n\n${sanitizedNewsContent.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').replace(/\s+/g, ' ').trim()}\n\nUnsubscribe: ${safeUnsubscribeUrl}`,
 		html: NEWS_SUMMARY_EMAIL_TEMPLATE.replaceAll(
 			"{{summaryTitle}}",
 			() => escapeHtml(summaryTitle),
 		)
 			.replace("{{date}}", () => escapeHtml(date))
-			.replace("{{newsContent}}", () =>
-				sanitizeGeneratedMarketNewsHtml(newsContent),
-			)
+			.replace("{{newsContent}}", () => sanitizedNewsContent)
 			.replace("{{logoUrl}}", () => escapeHtml(branding.logoUrl))
 			.replace("{{unsubscribeUrl}}", () => escapeHtml(safeUnsubscribeUrl))
 			.replace("{{dashboardUrl}}", () => escapeHtml(safeDashboardUrl))

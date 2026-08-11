@@ -23,9 +23,30 @@ export async function POST(request: Request) {
 		return Response.json({ error: "Payload too large." }, { status: 413 });
 	}
 
-	const body = await request.text();
-	if (Buffer.byteLength(body, "utf8") > EMAIL_EVENT_WEBHOOK_MAX_BODY_BYTES) {
-		return Response.json({ error: "Payload too large." }, { status: 413 });
+	const reader = request.body?.getReader();
+	if (!reader) {
+		return Response.json({ error: "Missing request body." }, { status: 400 });
+	}
+
+	const decoder = new TextDecoder("utf-8");
+	let body = "";
+	let totalBytes = 0;
+
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+
+			totalBytes += value.byteLength;
+			if (totalBytes > EMAIL_EVENT_WEBHOOK_MAX_BODY_BYTES) {
+				return Response.json({ error: "Payload too large." }, { status: 413 });
+			}
+
+			body += decoder.decode(value, { stream: true });
+		}
+		body += decoder.decode();
+	} finally {
+		reader.releaseLock();
 	}
 
 	const authenticated = verifyEmailEventWebhook({

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "npm run test:concurrency && npm run test:stock-data && npm run test:stock-search && npm run test:watchlist-policy && npm run test:alerts && npm run test:auth && npm run test:email",

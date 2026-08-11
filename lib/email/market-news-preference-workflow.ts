@@ -27,9 +27,9 @@ export const saveMarketNewsPreferenceWorkflow = async ({
 	repository: MarketNewsPreferenceWriteRepository;
 }) => {
 	if (frequency === "off") {
-		// Clear the rollback field first. The live job re-checks the dedicated
-		// preference document and cannot deliver after the unsubscribe is recorded.
-		await repository.writeLegacyEnabled(false);
+		// Record the unsubscribe before mirroring rollback state. The live job
+		// re-checks the dedicated preference document and cannot deliver after
+		// the unsubscribe is recorded.
 		await repository.writeCommunicationSubscription({
 			stream: "market_news",
 			status: "unsubscribed",
@@ -37,6 +37,7 @@ export const saveMarketNewsPreferenceWorkflow = async ({
 			categories,
 			unsubscribedAt: now,
 		});
+		await repository.writeLegacyEnabled(false);
 		return;
 	}
 

@@ -11,9 +11,15 @@ export default async function UnsubscribePage({
 }) {
 	const { token, status } = await searchParams;
 	const success = status === "success";
-	const tokenIsValid = token
-		? verifyDailyNewsUnsubscribeToken(token) !== null
-		: false;
+	let tokenIsValid = false;
+	if (token) {
+		try {
+			tokenIsValid = verifyDailyNewsUnsubscribeToken(token) !== null;
+		} catch (error) {
+			console.error("Token verification configuration error:", error);
+			tokenIsValid = false;
+		}
+	}
 	const invalid = status === "invalid" || (!success && !tokenIsValid);
 
 	return (

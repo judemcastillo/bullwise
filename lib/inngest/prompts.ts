@@ -174,7 +174,7 @@ Stock Market Had Mixed Results Today
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="ARTICLE_URL_FROM_NEWS_DATA" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>
 
@@ -204,7 +204,7 @@ Apple Stock Jumped After Great Earnings Report
 </div>
 
 <div style="margin: 20px 0 0 0;">
-<a href="ARTICLE_URL_FROM_NEWS_DATA" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
+<a href="ARTICLE_URL" style="color: #FDD458; text-decoration: none; font-weight: 500; font-size: 14px;" target="_blank" rel="noopener noreferrer">Read Full Story →</a>
 </div>
 </div>`;
 

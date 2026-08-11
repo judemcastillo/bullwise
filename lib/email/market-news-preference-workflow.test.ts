@@ -62,7 +62,6 @@ describe("market-news preference dual-write workflow", () => {
 		});
 
 		assert.deepEqual(events, [
-			{ operation: "legacy", value: false },
 			{
 				operation: "communication",
 				value: {
@@ -73,6 +72,7 @@ describe("market-news preference dual-write workflow", () => {
 					unsubscribedAt: now,
 				},
 			},
+			{ operation: "legacy", value: false },
 		]);
 	});
 

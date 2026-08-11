@@ -130,11 +130,17 @@ describe("email event webhook authentication", () => {
 			}),
 			false,
 		);
+		const futureTimestamp = String(Math.floor(now.getTime() / 1000) + 61);
+		const futureSignature = createEmailEventWebhookSignature({
+			body,
+			timestamp: futureTimestamp,
+			secret,
+		});
 		assert.equal(
 			verifyEmailEventWebhook({
 				body,
-				timestamp: String(Math.floor(now.getTime() / 1000) + 61),
-				signature,
+				timestamp: futureTimestamp,
+				signature: futureSignature,
 				secret,
 				now,
 			}),

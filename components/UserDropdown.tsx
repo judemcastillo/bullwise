@@ -38,7 +38,6 @@ export default function UserDropdown({
 					className="flex items-center gap-3 text-gray-400 hover:text-yellow-500 h-11"
 				>
 					<Avatar className="h-8 w-8">
-						<AvatarImage src="" />
 						<AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
 							{user.name[0]}
 						</AvatarFallback>
@@ -54,7 +53,6 @@ export default function UserDropdown({
 				<DropdownMenuLabel>
 					<div className="flex relative items-center gap-3 py-2">
 						<Avatar className="h-10 w-10">
-							<AvatarImage src="" />
 							<AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
 								{user.name[0]}
 							</AvatarFallback>

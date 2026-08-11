@@ -41,6 +41,7 @@ async function queueMarketNewsDeliveries({
 	step: BullwiseStepTools;
 	frequency: MarketNewsDeliveryFrequency;
 }) {
+	const MAX_PAGES = 1000;
 	const periodKey = await step.run("resolve-market-news-period", () =>
 		getMarketNewsPeriodKey(frequency, new Date()),
 	);
@@ -49,13 +50,14 @@ async function queueMarketNewsDeliveries({
 	let pages = 0;
 
 	do {
-		const page = await step.run("load-market-news-recipient-page", () =>
-			listMarketNewsRecipientIdsPage({ frequency, afterUserId }),
+		const page = await step.run(
+			`load-market-news-recipient-page-${pages}`,
+			() => listMarketNewsRecipientIdsPage({ frequency, afterUserId }),
 		);
 
 		if (page.userIds.length > 0) {
 			await step.sendEvent(
-				"enqueue-market-news-recipient-batch",
+				`enqueue-market-news-recipient-batch-${pages}`,
 				createMarketNewsDeliveryEvents({
 					userIds: page.userIds,
 					frequency,
@@ -67,9 +69,16 @@ async function queueMarketNewsDeliveries({
 		queued += page.userIds.length;
 		pages += 1;
 		afterUserId = page.nextCursor ?? undefined;
+
+		if (pages >= MAX_PAGES && afterUserId) {
+			console.warn(
+				`Reached maximum page limit (${MAX_PAGES}). Remaining recipients after userId: ${afterUserId}`,
+			);
+			break;
+		}
 	} while (afterUserId);
 
-	return { frequency, periodKey, queued, pages };
+	return { frequency, periodKey, queued, pages, remainingAfterUserId: afterUserId };
 }
 
 export const deliverAlertEmails = inngest.createFunction(
@@ -201,6 +210,10 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 				: [];
 			const news = await getNews(symbols);
 
+			if (news.length === 0) {
+				return { ready: false as const, reason: "no_news" as const };
+			}
+
 			return { ready: true as const, news: news.slice(0, 6) };
 		});
 
@@ -222,7 +235,38 @@ export const deliverMarketNewsSummary = inngest.createFunction(
 		const newsContent =
 			(part && "text" in part ? part.text : null) || "No market news.";
 
+		if (newsContent === "No market news.") {
+			return { status: "skipped", reason: "no_news_content" };
+		}
+
 		return step.run("send-market-news-email", async () => {
+			const { connectToDatabase } = await import("@/database/mongoose");
+			const { default: EmailDeliveryLog } = await import(
+				"@/database/models/email-delivery-log.model"
+			);
+			await connectToDatabase();
+
+			try {
+				await EmailDeliveryLog.create({
+					deliveryKey: request.deliveryKey,
+					userId: request.userId,
+					messageType: "market_news",
+					frequency: request.frequency,
+					periodKey: request.periodKey,
+					deliveredAt: new Date(),
+				});
+			} catch (error: unknown) {
+				if (
+					error &&
+					typeof error === "object" &&
+					"code" in error &&
+					error.code === 11000
+				) {
+					return { status: "skipped", reason: "already_delivered" };
+				}
+				throw error;
+			}
+
 			const eligibility = await getEmailEligibility({
 				userId: request.userId,
 				request: { messageType: "market_news" },

@@ -92,42 +92,56 @@ const emailSubscriptionSchema = new Schema(
 	{ _id: false },
 );
 
-const validSubscriptions = (
+const subscriptionsValidationError = (
 	subscriptions: CommunicationPreferenceDocument["subscriptions"],
-) => {
-	if (!Array.isArray(subscriptions)) return false;
+): string | null => {
+	if (!Array.isArray(subscriptions)) return "Subscriptions must be an array.";
 	if (new Set(subscriptions.map(({ stream }) => stream)).size !== subscriptions.length) {
-		return false;
+		return "Communication subscriptions must contain unique streams.";
 	}
 
-	return subscriptions.every((subscription) => {
+	for (const subscription of subscriptions) {
 		if (new Set(subscription.categories).size !== subscription.categories.length) {
-			return false;
+			return "Communication subscriptions must not contain duplicate categories.";
 		}
 		if (
 			subscription.stream === "product_updates" &&
 			subscription.categories.length > 0
 		) {
-			return false;
+			return "Product updates subscriptions must not have categories.";
 		}
 
 		if (subscription.status === "subscribed") {
-			return Boolean(
-				subscription.frequency !== "off" &&
-					subscription.consentSource &&
-					subscription.consentedAt &&
-					subscription.consentPolicyVersion &&
-					(subscription.stream !== "market_news" ||
-						subscription.categories.length > 0),
-			);
+			if (
+				!subscription.frequency ||
+				subscription.frequency === "off" ||
+				!subscription.consentSource ||
+				!subscription.consentedAt ||
+				!subscription.consentPolicyVersion ||
+				(subscription.stream === "market_news" && subscription.categories.length === 0)
+			) {
+				return "Subscribed records must have complete consent state.";
+			}
 		}
 
 		if (subscription.status === "unsubscribed") {
-			return subscription.frequency === "off" && Boolean(subscription.unsubscribedAt);
+			if (subscription.frequency !== "off" || !subscription.unsubscribedAt) {
+				return "Unsubscribed records must have frequency off and unsubscribedAt timestamp.";
+			}
 		}
 
-		return subscription.frequency === "off";
-	});
+		if (subscription.status === "unknown" && subscription.frequency !== "off") {
+			return "Unknown status records must have frequency off.";
+		}
+	}
+
+	return null;
+};
+
+const validSubscriptions = (
+	subscriptions: CommunicationPreferenceDocument["subscriptions"],
+) => {
+	return subscriptionsValidationError(subscriptions) === null;
 };
 
 const communicationPreferenceSchema =
@@ -154,7 +168,8 @@ const communicationPreferenceSchema =
 				default: [],
 				validate: {
 					validator: validSubscriptions,
-					message:
+					message: (props: { value: CommunicationPreferenceDocument["subscriptions"] }) =>
+						subscriptionsValidationError(props.value) ||
 						"Communication subscriptions must contain unique streams and complete consent state.",
 				},
 			},

@@ -40,21 +40,24 @@ describe("Finnhub stock search normalization", () => {
 		);
 
 		assert.deepEqual(
-			results.map(({ symbol, name, type }) => ({
+			results.map(({ symbol, name, type, isInWatchlist }) => ({
 				symbol,
 				name,
 				type,
+				isInWatchlist,
 			})),
 			[
 				{
 					symbol: "AAPL",
 					name: "Apple Inc.",
 					type: "Stock",
+					isInWatchlist: false,
 				},
 				{
 					symbol: "BARC.L",
 					name: "BARC.L",
 					type: "Stock",
+					isInWatchlist: false,
 				},
 			],
 		);

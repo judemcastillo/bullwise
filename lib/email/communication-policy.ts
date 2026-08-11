@@ -196,7 +196,16 @@ export const evaluateEmailEligibility = ({
 }): EmailEligibilityResult => {
 	const suppressionReason = preference?.emailSuppression?.reason;
 	if (suppressionReason) {
-		return { eligible: false, reason: suppressionReason };
+		if (suppressionReason === "account_deleted") {
+			return { eligible: false, reason: suppressionReason };
+		}
+		const stream = streamForMessage(request);
+		if (stream && (suppressionReason === "complaint" || suppressionReason === "hard_bounce")) {
+			return { eligible: false, reason: suppressionReason };
+		}
+		if (!stream) {
+			return { eligible: true, reason: "eligible" };
+		}
 	}
 
 	const stream = streamForMessage(request);

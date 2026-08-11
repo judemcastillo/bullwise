@@ -52,7 +52,7 @@ For every message, also verify:
 
 - Subject and visible message type are correct.
 - Plain-text content is present when HTML is disabled.
-- Logo, dashboard preview, and every link use the expected production origin.
+- Logo, dashboard preview, and every link use the expected configured application origin.
 - Buttons work and are large enough to tap on mobile.
 - No raw placeholders such as `{{name}}` remain.
 - No content is cut off around 320 px viewport width.
