@@ -36,7 +36,7 @@ export default function UserDropdown({
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant="ghost"
-					className="flex items-center gap-3 text-gray-400 hover:text-yellow-500 h-11"
+					className="flex items-center gap-3 text-gray-400 hover:text-yellow-500 h-auto px-0! rounded-full py-0! cursor-pointer border-2 hover:border-yellow-500 "
 				>
 					<Avatar className="h-8 w-8">
 						{avatarUrl ? <AvatarImage src={avatarUrl} /> : null}
@@ -44,11 +44,11 @@ export default function UserDropdown({
 							{user.name[0]}
 						</AvatarFallback>
 					</Avatar>
-					<div className="hidden md:flex flex-col items-start">
+					{/* <div className="hidden md:flex flex-col items-start">
 						<span className="text-base font-medium text-gray-400">
 							{user.name}
 						</span>
-					</div>
+					</div> */}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="text-gray-400 w-full">

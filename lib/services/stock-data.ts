@@ -264,3 +264,18 @@ export const getStocksDetails = cache(async (symbol: string) => {
 		throw new Error("Failed to fetch stock details");
 	}
 });
+
+export const getListedSecurityQuoteDetails = cache(async (symbol: string) => {
+	const quote = await getStockQuote(symbol);
+	if (!quote.currentPrice) {
+		throw new Error("Invalid listed security quote received from API");
+	}
+
+	const changePercent = quote.changePercent ?? 0;
+	return {
+		currentPrice: quote.currentPrice,
+		changePercent,
+		priceFormatted: formatPrice(quote.currentPrice),
+		changeFormatted: formatChangePercent(changePercent),
+	};
+});

@@ -362,11 +362,11 @@ export const NO_MARKET_NEWS =
 
 export const WATCHLIST_TABLE_HEADER = [
     '',
-    'Company',
+    'Instrument',
     'Symbol',
     'Price',
     'Change',
-    'Market Cap',
-    'P/E Ratio',
+    'Venue',
+    'Details',
     'Alert',
 ];

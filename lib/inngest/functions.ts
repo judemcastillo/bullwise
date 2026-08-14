@@ -18,7 +18,10 @@ import {
 } from "@/lib/email/market-news-delivery-log";
 import { getMarketNewsPreference } from "@/lib/email/market-news-preference";
 import { createDailyNewsUnsubscribeUrls } from "@/lib/email/unsubscribe-token";
-import { ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG } from "@/lib/inngest/alert-email-delivery.config";
+import {
+	ALERT_EMAIL_DELIVERY_EVENT,
+	ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG,
+} from "@/lib/inngest/alert-email-delivery.config";
 import { ALERT_MONITORING_FUNCTION_CONFIG } from "@/lib/inngest/alert-monitoring.config";
 import {
 	DAILY_MARKET_NEWS_FUNCTION_CONFIG,
@@ -115,6 +118,13 @@ export const monitorPriceAlerts = inngest.createFunction(
 		const summary = await step.run("monitor-due-price-alerts", () =>
 			monitorDuePriceAlerts(),
 		);
+
+		if (summary.triggered > 0) {
+			await step.sendEvent("request-alert-email-delivery", {
+				name: ALERT_EMAIL_DELIVERY_EVENT,
+				data: {},
+			});
+		}
 
 		return {
 			success: true,

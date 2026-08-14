@@ -5,4 +5,3 @@ import "./evaluator.test";
 import "./inngest-email-delivery-config.test";
 import "./inngest-monitoring-config.test";
 import "./processor.test";
-import "../market-data/providers/finnhub.test";

@@ -9,6 +9,7 @@ type DashboardWatchlistItem = Pick<
 	| "changeFormatted"
 	| "changePercent"
 	| "company"
+	| "canonicalKey"
 	| "currency"
 	| "currentPrice"
 	| "logo"
@@ -47,8 +48,8 @@ export default function DashboardWatchlist({
 
 								return (
 									<Link
-										href={`/stocks/${encodeURIComponent(stock.symbol)}`}
-										key={stock.symbol}
+										href={`/instruments/${encodeURIComponent(stock.canonicalKey)}`}
+										key={stock.canonicalKey}
 										className="group min-w-0 rounded-md border border-gray-600 bg-gray-700 p-4 transition-colors hover:border-yellow-500/50 hover:bg-gray-600/80"
 									>
 										<div className="mb-2 flex items-start justify-between gap-2">

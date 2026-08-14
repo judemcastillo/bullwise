@@ -5,7 +5,8 @@ import StockCompanyInfoCard from "@/components/stocks/StockCompanyInfoCard";
 import StockNewsCard from "@/components/stocks/StockNewsCard";
 import StockOverviewCard from "@/components/stocks/StockOverviewCard";
 import { requireUser } from "@/lib/auth/require-user";
-import { getWatchlistSymbolsForUser } from "@/lib/data/watchlist";
+import { getWatchlistInstrumentIdsForUser } from "@/lib/data/watchlist";
+import { resolveFinnhubEquityCatalogInstrument } from "@/lib/data/instruments";
 import { getNews } from "@/lib/market-data/finnhub";
 import { STOCK_DETAILS_RELATED_LIMIT } from "@/lib/constants";
 import {
@@ -14,6 +15,8 @@ import {
 	getStockDashboardData,
 } from "@/lib/services/stock-data";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { usesCompanyStockDashboard } from "@/lib/instruments/equity-security-type";
 
 async function StockNewsSection({ symbol }: { symbol: string }) {
 	const news = await getNews([symbol]).catch((error) => {
@@ -59,9 +62,24 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 	const { symbol } = await params;
 	const normalizedSymbol = symbol.trim().toUpperCase();
 	const user = await requireUser();
+	const instrument = await resolveFinnhubEquityCatalogInstrument(
+		normalizedSymbol,
+	).catch((error) => {
+			const reason = error instanceof Error ? error.message : "unknown error";
+			console.warn(
+				`Unable to resolve instrument ${normalizedSymbol} (${reason})`,
+			);
+			return null;
+		});
 
-	const [watchlistSymbols, stock] = await Promise.all([
-		getWatchlistSymbolsForUser(user.id).catch((error) => {
+	if (instrument && !usesCompanyStockDashboard(instrument.securityType)) {
+		redirect(
+			`/instruments/${encodeURIComponent(instrument.canonicalKey)}`,
+		);
+	}
+
+	const [watchlistInstrumentIds, stock] = await Promise.all([
+		getWatchlistInstrumentIdsForUser(user.id).catch((error) => {
 			console.error(
 				`Unable to load watchlist for ${user.id}:`,
 				error,
@@ -79,13 +97,19 @@ const StockDetails = async ({ params }: StockDetailsPageProps) => {
 	]);
 
 	const company = stock?.company ?? normalizedSymbol;
+	const instrumentId = instrument?._id.toString();
 
 	return (
 		<div className="stock-dashboard">
 			<div className="stock-primary-grid">
 				<StockChartCard
 					company={company}
-					isInWatchlist={watchlistSymbols.includes(normalizedSymbol)}
+					instrumentId={instrumentId}
+					isInWatchlist={
+						instrumentId
+							? watchlistInstrumentIds.includes(instrumentId)
+							: false
+					}
 					stock={stock}
 					symbol={normalizedSymbol}
 				/>

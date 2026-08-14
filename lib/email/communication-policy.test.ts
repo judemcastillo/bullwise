@@ -112,7 +112,7 @@ describe("communication eligibility policy", () => {
 		}
 	});
 
-	it("limits hard-bounce and complaint suppression to marketing", () => {
+	it("suppresses every class after a hard bounce or complaint", () => {
 		for (const reason of ["hard_bounce", "complaint"] as const) {
 			const preference = subscribedPreference();
 			preference.emailSuppression = {
@@ -126,14 +126,9 @@ describe("communication eligibility policy", () => {
 				"account_welcome",
 				"account_security",
 				"price_alert",
+				"market_news",
+				"product_updates",
 			] as const) {
-				assert.deepEqual(
-					evaluateEmailEligibility({ preference, request: { messageType } }),
-					{ eligible: true, reason: "eligible" },
-				);
-			}
-
-			for (const messageType of ["market_news", "product_updates"] as const) {
 				assert.deepEqual(
 					evaluateEmailEligibility({ preference, request: { messageType } }),
 					{ eligible: false, reason },

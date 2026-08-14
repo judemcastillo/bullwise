@@ -8,6 +8,7 @@ import type {
 	QuoteRequest,
 } from "@/lib/market-data/types";
 import type { AlertOperator, AlertStatus, AssetClass } from "@/types/alerts";
+import type { ProviderBinding } from "@/types/instruments";
 
 export type MonitorableAlert = {
 	id: string;
@@ -23,7 +24,9 @@ export type MonitorableAlert = {
 		displaySymbol: string;
 		name: string;
 		quoteCurrency: string;
-		providerBindings: Array<{ provider: string; symbol: string }>;
+		pricePrecision: number;
+		calendarId?: string;
+		providerBindings: ProviderBinding[];
 	};
 };
 
@@ -87,9 +90,14 @@ export async function processAlertBatch({
 	const preparedByProvider = new Map<string, PreparedAlert[]>();
 
 	for (const alert of alerts) {
-		const binding = alert.instrument.providerBindings.find((candidate) =>
-			providers.has(candidate.provider.toLowerCase()),
-		);
+		const binding = alert.instrument.providerBindings
+			.filter(
+				(candidate) =>
+					candidate.enabled &&
+					candidate.capabilities.includes("alert_quote") &&
+					providers.has(candidate.provider.toLowerCase()),
+			)
+			.sort((left, right) => left.priority - right.priority)[0];
 
 		if (!binding) {
 			summary.skipped += 1;
@@ -107,6 +115,8 @@ export async function processAlertBatch({
 				provider: providerName,
 				providerSymbol: binding.symbol,
 				expectedCurrency: alert.instrument.quoteCurrency,
+				pricePrecision: alert.instrument.pricePrecision,
+				calendarId: alert.instrument.calendarId,
 			},
 		});
 		preparedByProvider.set(providerName, prepared);
