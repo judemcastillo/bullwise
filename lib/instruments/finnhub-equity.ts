@@ -26,7 +26,7 @@ const US_EQUITY_VENUES: Array<{
 }> = [
 	{ pattern: /NYSE\s+ARCA/, code: "arcx", mic: "ARCX" },
 	{ pattern: /NYSE\s+AMERICAN|NYSE\s+MKT|AMEX/, code: "xase", mic: "XASE" },
-	{ pattern: /NASDAQ/, code: "xnas", mic: "XNAS" },
+	{ pattern: /^NASDAQ(?:\s+NMS\b.*)?$/, code: "xnas", mic: "XNAS" },
 	{ pattern: /NEW\s+YORK\s+STOCK\s+EXCHANGE|^NYSE$/, code: "xnys", mic: "XNYS" },
 ];
 

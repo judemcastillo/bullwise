@@ -22,6 +22,10 @@ describe("Finnhub equity instrument definitions", () => {
 			code: "london-stock-exchange",
 			timezone: "Etc/UTC",
 		});
+		assert.deepEqual(resolveFinnhubEquityVenue("NASDAQ OMX STOCKHOLM"), {
+			code: "nasdaq-omx-stockholm",
+			timezone: "Etc/UTC",
+		});
 	});
 
 	it("builds a capability-aware canonical equity definition", () => {
