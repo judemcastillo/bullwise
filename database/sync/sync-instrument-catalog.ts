@@ -36,6 +36,14 @@ loadEnvConfig(process.cwd());
 const applyChanges = process.argv.includes("--apply");
 const deactivateOnly = process.argv.includes("--deactivate-only");
 const BULK_WRITE_SIZE = 500;
+const OPTIONAL_INSTRUMENT_FIELDS = [
+	"securityType",
+	"venueMic",
+	"calendarId",
+	"contract",
+	"tickSize",
+	"lotSize",
+] as const;
 
 type SupportedCatalog = Extract<
 	AssetClass,
@@ -55,6 +63,16 @@ type PreparedCatalog = {
 	providerCounts: Record<string, number>;
 	rejectedCounts: Record<string, number>;
 };
+
+function omittedInstrumentFields(definition: InstrumentDefinition) {
+	const optionalDefinition = definition as InstrumentDefinition &
+		Partial<Record<(typeof OPTIONAL_INSTRUMENT_FIELDS)[number], unknown>>;
+	return Object.fromEntries(
+		OPTIONAL_INSTRUMENT_FIELDS.filter(
+			(field) => optionalDefinition[field] === undefined,
+		).map((field) => [field, ""]),
+	);
+}
 
 function readAssetClassArgument(): SupportedCatalog {
 	const inline = process.argv.find((argument) =>
@@ -350,6 +368,7 @@ async function persistCatalog(catalog: PreparedCatalog) {
 						update: {
 							$set: { ...plan.definition, updatedAt: now },
 							$setOnInsert: { createdAt: now },
+							$unset: omittedInstrumentFields(plan.definition),
 						},
 						upsert: true,
 					},

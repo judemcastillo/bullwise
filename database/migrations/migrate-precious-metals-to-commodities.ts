@@ -152,7 +152,10 @@ async function runMigration() {
 						canonicalKey: instrument.canonicalKey,
 						assetClass: "forex",
 					},
-					{ $set: { ...definition, updatedAt: now } },
+					{
+						$set: { ...definition, updatedAt: now },
+						$unset: { venueMic: "", securityType: "" },
+					},
 					{ session },
 				);
 				if (result.modifiedCount !== 1) {
