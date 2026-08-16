@@ -47,14 +47,15 @@ async function searchStoredInstruments(
 
 	if (!query && !securityType) {
 		const canonicalKeys = popularInstrumentCanonicalKeys(assetClass);
-		if (canonicalKeys.length === 0) return [];
-		const instruments = await Instrument.find({
-			...filter,
-			canonicalKey: { $in: canonicalKeys },
-		})
-			.select(projection)
-			.lean<SearchableInstrument[]>();
-		return orderPopularInstruments(instruments, canonicalKeys);
+		if (canonicalKeys.length > 0) {
+			const instruments = await Instrument.find({
+				...filter,
+				canonicalKey: { $in: canonicalKeys },
+			})
+				.select(projection)
+				.lean<SearchableInstrument[]>();
+			return orderPopularInstruments(instruments, canonicalKeys);
+		}
 	}
 	if (!query) {
 		return Instrument.find(filter)
