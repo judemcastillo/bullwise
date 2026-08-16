@@ -62,6 +62,10 @@ export function invertBars(
 		high: invertPositiveDecimal(bar.low, pricePrecision),
 		low: invertPositiveDecimal(bar.high, pricePrecision),
 		close: invertPositiveDecimal(bar.close, pricePrecision),
+		...(bar.volume !== undefined ? { volume: bar.volume } : {}),
+		...(bar.vwap !== undefined
+			? { vwap: invertPositiveDecimal(bar.vwap, pricePrecision) }
+			: {}),
 		...(bar.transactionCount !== undefined
 			? { transactionCount: bar.transactionCount }
 			: {}),

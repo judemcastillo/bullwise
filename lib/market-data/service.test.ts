@@ -92,6 +92,7 @@ class FakeBarsProvider implements BarsProvider {
 					low: "1",
 					close: "2.5",
 					volume: "100",
+					vwap: "2",
 				},
 			],
 		};
@@ -176,6 +177,8 @@ describe("InstrumentMarketDataService", () => {
 			high: "1",
 			low: "0.25",
 			close: "0.4",
+			volume: "100",
+			vwap: "0.5",
 		});
 	});
 });
