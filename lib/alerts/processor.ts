@@ -2,6 +2,7 @@ import {
 	evaluatePriceAlert,
 	type AlertEvaluationReason,
 } from "@/lib/alerts/evaluator";
+import { invertQuote } from "@/lib/market-data/normalization";
 import type {
 	MarketQuote,
 	QuoteProvider,
@@ -70,6 +71,7 @@ type ProcessAlertBatchOptions = {
 type PreparedAlert = {
 	alert: MonitorableAlert;
 	request: QuoteRequest;
+	orientation: ProviderBinding["orientation"];
 };
 
 export async function processAlertBatch({
@@ -109,6 +111,7 @@ export async function processAlertBatch({
 		const prepared = preparedByProvider.get(providerName) ?? [];
 		prepared.push({
 			alert,
+			orientation: binding.orientation,
 			request: {
 				instrumentId: alert.instrumentId,
 				assetClass: alert.instrument.assetClass,
@@ -145,13 +148,17 @@ export async function processAlertBatch({
 			continue;
 		}
 
-		for (const { alert, request } of preparedAlerts) {
-			const quote = quotes.get(request.instrumentId);
-			if (!quote) {
+		for (const { alert, orientation, request } of preparedAlerts) {
+			const providerQuote = quotes.get(request.instrumentId);
+			if (!providerQuote) {
 				summary.skipped += 1;
 				await store.recordSkipped(alert, "provider_unavailable", now);
 				continue;
 			}
+			const quote =
+				orientation === "inverse"
+					? invertQuote(providerQuote, request.pricePrecision)
+					: providerQuote;
 
 			const evaluation = evaluatePriceAlert({
 				status: alert.status,

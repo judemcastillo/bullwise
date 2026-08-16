@@ -75,6 +75,7 @@ class FakeProvider implements QuoteProvider {
 class FakeStore implements AlertMonitoringStore {
 	observed: string[] = [];
 	triggered: string[] = [];
+	triggeredPrices: string[] = [];
 	skipped: string[] = [];
 	triggerResult: TriggerWriteResult = "created";
 
@@ -83,8 +84,9 @@ class FakeStore implements AlertMonitoringStore {
 		return true;
 	}
 
-	async recordTrigger(alertValue: MonitorableAlert) {
+	async recordTrigger(alertValue: MonitorableAlert, quote: MarketQuote) {
 		this.triggered.push(alertValue.id);
+		this.triggeredPrices.push(quote.price);
 		return this.triggerResult;
 	}
 
@@ -137,6 +139,25 @@ describe("processAlertBatch", () => {
 
 		assert.equal(summary.triggered, 0);
 		assert.equal(summary.deduplicated, 1);
+	});
+
+	it("evaluates inverse alert quotes using the inverted price", async () => {
+		const provider = new FakeProvider();
+		provider.quote = marketQuote({ price: "0.01" });
+		const store = new FakeStore();
+		const value = alert();
+		value.instrument.providerBindings[0].orientation = "inverse";
+
+		const summary = await processAlertBatch({
+			alerts: [value],
+			providers: new Map([[provider.provider, provider]]),
+			store,
+			now,
+		});
+
+		assert.equal(summary.triggered, 1);
+		assert.deepEqual(store.triggered, ["alert-1"]);
+		assert.deepEqual(store.triggeredPrices, ["100"]);
 	});
 
 	it("isolates provider failures and defers affected alerts", async () => {
