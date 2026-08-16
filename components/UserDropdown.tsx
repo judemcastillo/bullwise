@@ -35,6 +35,7 @@ export default function UserDropdown({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
+					aria-label={`Open user menu for ${user.name}`}
 					variant="ghost"
 					className="flex items-center gap-3 text-gray-400 hover:text-yellow-500 h-auto px-0! rounded-full py-0! cursor-pointer border-2 hover:border-yellow-500 "
 				>
