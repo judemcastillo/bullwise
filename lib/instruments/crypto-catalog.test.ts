@@ -48,6 +48,34 @@ describe("Coinbase crypto catalog reconciliation", () => {
 		]);
 	});
 
+	it("rejects a Finnhub binding that differs from its display pair", () => {
+		assert.throws(
+			() =>
+				normalizeFinnhubCoinbaseCatalogEntry({
+					description: "COINBASE BTC-USD",
+					displaySymbol: "BTC-USD",
+					symbol: "COINBASE:ETH-USD",
+				}),
+			/Finnhub Coinbase symbol does not match its display pair/,
+		);
+	});
+
+	it("rejects a Massive ticker that differs from its currency pair", () => {
+		assert.throws(
+			() =>
+				normalizeMassiveCryptoCatalogEntry({
+					ticker: "X:ETHUSD",
+					name: "Bitcoin - United States dollar",
+					market: "crypto",
+					base_currency_symbol: "BTC",
+					base_currency_name: "Bitcoin",
+					currency_symbol: "USD",
+					currency_name: "United States dollar",
+				}),
+			/Massive crypto ticker does not match its currency pair/,
+		);
+	});
+
 	it("excludes pairs that are not shared with Massive", () => {
 		const finnhub = normalizeFinnhubCoinbaseCatalogEntry({
 			description: "COINBASE BTC-USD",

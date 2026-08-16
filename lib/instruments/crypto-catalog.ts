@@ -37,6 +37,9 @@ export function normalizeFinnhubCoinbaseCatalogEntry(
 	}
 	const baseCurrency = currency(parts[0], "Base currency");
 	const quoteCurrency = currency(parts[1], "Quote currency");
+	if (providerSymbol !== `COINBASE:${baseCurrency}-${quoteCurrency}`) {
+		throw new Error("Finnhub Coinbase symbol does not match its display pair");
+	}
 
 	return {
 		baseCurrency,
@@ -63,6 +66,9 @@ export function normalizeMassiveCryptoCatalogEntry(
 	}
 	const baseCurrency = currency(entry.base_currency_symbol, "Base currency");
 	const quoteCurrency = currency(entry.currency_symbol, "Quote currency");
+	if (providerSymbol !== `X:${baseCurrency}${quoteCurrency}`) {
+		throw new Error("Massive crypto ticker does not match its currency pair");
+	}
 	const baseName = entry.base_currency_name?.trim() || baseCurrency;
 	const quoteName = entry.currency_name?.trim() || quoteCurrency;
 
