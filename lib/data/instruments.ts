@@ -16,6 +16,15 @@ export class InstrumentResolutionError extends Error {
 	}
 }
 
+function isDuplicateKeyError(error: unknown) {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"code" in error &&
+		error.code === 11000
+	);
+}
+
 function normalizeFinnhubSymbol(providerSymbol: string) {
 	const normalizedProviderSymbol = providerSymbol.trim().toUpperCase();
 	if (!/^[A-Z0-9._:/-]{1,40}$/.test(normalizedProviderSymbol)) {
@@ -28,7 +37,7 @@ export async function resolveFinnhubEquityCatalogInstrument(
 	providerSymbol: string,
 ) {
 	const normalizedProviderSymbol = normalizeFinnhubSymbol(providerSymbol);
-	await connectToDatabase();
+	const mongoose = await connectToDatabase();
 
 	const existing = await Instrument.findOne({
 		providerBindings: {
@@ -75,50 +84,73 @@ export async function resolveFinnhubEquityCatalogInstrument(
 	}
 
 	if (existing) {
-		if (existing.canonicalKey !== definition.canonicalKey) {
-			await Instrument.collection.updateOne(
-				{ _id: existing._id },
-				{ $set: { canonicalKey: definition.canonicalKey } },
-			);
-		}
-		const upgraded = await Instrument.findByIdAndUpdate(
-			existing._id,
-			{
-				$set: {
-					instrumentType: definition.instrumentType,
-					securityType: definition.securityType,
-					status: definition.status,
-					displaySymbol: definition.displaySymbol,
-					name: definition.name,
-					venue: definition.venue,
-					venueMic: definition.venueMic,
-					quoteCurrency: definition.quoteCurrency,
-					pricePrecision: definition.pricePrecision,
-					quantityPrecision: definition.quantityPrecision,
-					timezone: definition.timezone,
-					calendarId: definition.calendarId,
-					"providerBindings.$[binding].capabilities":
-						definition.providerBindings[0].capabilities,
-					"providerBindings.$[binding].enabled": true,
-					"providerBindings.$[binding].priority": 100,
-					"providerBindings.$[binding].venue":
-						definition.providerBindings[0].venue,
-					"providerBindings.$[binding].orientation": "direct",
-				},
-			},
-			{
-				arrayFilters: [
+		try {
+			return await mongoose.connection.transaction(async (session) => {
+				if (existing.canonicalKey !== definition.canonicalKey) {
+					const conflictingInstrument = await Instrument.exists({
+						_id: { $ne: existing._id },
+						canonicalKey: definition.canonicalKey,
+					}).session(session);
+					if (conflictingInstrument) {
+						throw new InstrumentResolutionError(
+							"Instrument catalog data conflicts with an existing instrument",
+						);
+					}
+
+					await Instrument.collection.updateOne(
+						{ _id: existing._id },
+						{ $set: { canonicalKey: definition.canonicalKey } },
+						{ session },
+					);
+				}
+				const upgraded = await Instrument.findByIdAndUpdate(
+					existing._id,
 					{
-						"binding.provider": "finnhub",
-						"binding.symbol": normalizedProviderSymbol,
+						$set: {
+							instrumentType: definition.instrumentType,
+							securityType: definition.securityType,
+							status: definition.status,
+							displaySymbol: definition.displaySymbol,
+							name: definition.name,
+							venue: definition.venue,
+							venueMic: definition.venueMic,
+							quoteCurrency: definition.quoteCurrency,
+							pricePrecision: definition.pricePrecision,
+							quantityPrecision: definition.quantityPrecision,
+							timezone: definition.timezone,
+							calendarId: definition.calendarId,
+							"providerBindings.$[binding].capabilities":
+								definition.providerBindings[0].capabilities,
+							"providerBindings.$[binding].enabled": true,
+							"providerBindings.$[binding].priority": 100,
+							"providerBindings.$[binding].venue":
+								definition.providerBindings[0].venue,
+							"providerBindings.$[binding].orientation": "direct",
+						},
 					},
-				],
-				returnDocument: "after",
-				runValidators: true,
-			},
-		);
-		if (!upgraded) throw new Error("Unable to upgrade this instrument");
-		return upgraded;
+					{
+						arrayFilters: [
+							{
+								"binding.provider": "finnhub",
+								"binding.symbol": normalizedProviderSymbol,
+							},
+						],
+						returnDocument: "after",
+						runValidators: true,
+						session,
+					},
+				);
+				if (!upgraded) throw new Error("Unable to upgrade this instrument");
+				return upgraded;
+			});
+		} catch (error) {
+			if (isDuplicateKeyError(error)) {
+				throw new InstrumentResolutionError(
+					"Instrument catalog data conflicts with an existing instrument",
+				);
+			}
+			throw error;
+		}
 	}
 
 	const instrument = await Instrument.findOneAndUpdate(
