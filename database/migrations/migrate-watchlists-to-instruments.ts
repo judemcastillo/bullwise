@@ -24,6 +24,15 @@ type FinnhubProfile = {
 	currency?: string;
 };
 
+function isDuplicateKeyError(error: unknown) {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"code" in error &&
+		error.code === 11000
+	);
+}
+
 async function getFinnhubProfile(symbol: string): Promise<FinnhubProfile> {
 	const token = process.env.FINNHUB_API_KEY?.trim();
 	if (!token) throw new Error("FINNHUB_API_KEY is not configured");
@@ -71,6 +80,7 @@ async function runMigration() {
 		mode: applyChanges ? "apply" : "dry-run",
 		legacyRows: legacyCount,
 		migratedRows: 0,
+		duplicateRowsRemoved: 0,
 		profileCounterMismatches: counterMismatches.length,
 		updatedProfileCounters: 0,
 	};
@@ -143,11 +153,19 @@ async function runMigration() {
 				throw new Error(`Unable to resolve ${providerSymbol}`);
 			}
 
-			const result = await collection.updateOne(
-				{ _id: row._id, instrumentId: { $exists: false } },
-				{ $set: { instrumentId: instrument._id } },
-			);
-			summary.migratedRows += result.modifiedCount;
+			try {
+				const result = await collection.updateOne(
+					{ _id: row._id, instrumentId: { $exists: false } },
+					{ $set: { instrumentId: instrument._id } },
+				);
+				summary.migratedRows += result.modifiedCount;
+			} catch (error) {
+				if (!isDuplicateKeyError(error)) throw error;
+
+				await collection.deleteOne({ _id: row._id });
+				summary.duplicateRowsRemoved += 1;
+				continue;
+			}
 		}
 
 		const remaining = await collection.countDocuments(LEGACY_WATCHLIST_FILTER);
