@@ -29,7 +29,17 @@ function alert(overrides: Partial<MonitorableAlert> = {}): MonitorableAlert {
 			displaySymbol: "TEST",
 			name: "Test Instrument",
 			quoteCurrency: "USD",
-			providerBindings: [{ provider: "test", symbol: "TEST" }],
+			pricePrecision: 2,
+			providerBindings: [
+				{
+					provider: "test",
+					symbol: "TEST",
+					capabilities: ["quote", "alert_quote"],
+					enabled: true,
+					priority: 100,
+					orientation: "direct",
+				},
+			],
 		},
 		...overrides,
 	};
@@ -43,6 +53,8 @@ function marketQuote(overrides: Partial<MarketQuote> = {}): MarketQuote {
 		price: "101",
 		currency: "USD",
 		observedAt: new Date("2026-08-01T11:59:30.000Z"),
+		marketState: "unknown",
+		timeliness: "unknown",
 		...overrides,
 	};
 }
@@ -63,6 +75,7 @@ class FakeProvider implements QuoteProvider {
 class FakeStore implements AlertMonitoringStore {
 	observed: string[] = [];
 	triggered: string[] = [];
+	triggeredPrices: string[] = [];
 	skipped: string[] = [];
 	triggerResult: TriggerWriteResult = "created";
 
@@ -71,8 +84,9 @@ class FakeStore implements AlertMonitoringStore {
 		return true;
 	}
 
-	async recordTrigger(alertValue: MonitorableAlert) {
+	async recordTrigger(alertValue: MonitorableAlert, quote: MarketQuote) {
 		this.triggered.push(alertValue.id);
+		this.triggeredPrices.push(quote.price);
 		return this.triggerResult;
 	}
 
@@ -127,6 +141,25 @@ describe("processAlertBatch", () => {
 		assert.equal(summary.deduplicated, 1);
 	});
 
+	it("evaluates inverse alert quotes using the inverted price", async () => {
+		const provider = new FakeProvider();
+		provider.quote = marketQuote({ price: "0.01" });
+		const store = new FakeStore();
+		const value = alert();
+		value.instrument.providerBindings[0].orientation = "inverse";
+
+		const summary = await processAlertBatch({
+			alerts: [value],
+			providers: new Map([[provider.provider, provider]]),
+			store,
+			now,
+		});
+
+		assert.equal(summary.triggered, 1);
+		assert.deepEqual(store.triggered, ["alert-1"]);
+		assert.deepEqual(store.triggeredPrices, ["100"]);
+	});
+
 	it("isolates provider failures and defers affected alerts", async () => {
 		const provider = new FakeProvider();
 		provider.shouldFail = true;
@@ -179,5 +212,22 @@ describe("processAlertBatch", () => {
 
 		assert.equal(summary.skipped, 1);
 		assert.deepEqual(store.skipped, ["alert-1"]);
+	});
+
+	it("does not use a provider binding without alert quote capability", async () => {
+		const provider = new FakeProvider();
+		const store = new FakeStore();
+		const value = alert();
+		value.instrument.providerBindings[0].capabilities = ["catalog", "quote"];
+
+		const summary = await processAlertBatch({
+			alerts: [value],
+			providers: new Map([[provider.provider, provider]]),
+			store,
+			now,
+		});
+
+		assert.equal(provider.requests.length, 0);
+		assert.equal(summary.skipped, 1);
 	});
 });

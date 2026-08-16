@@ -17,6 +17,8 @@ function quote(overrides: Partial<MarketQuote> = {}): MarketQuote {
 		price: "101",
 		currency: "USD",
 		observedAt: new Date("2026-08-01T11:59:30.000Z"),
+		marketState: "unknown",
+		timeliness: "unknown",
 		...overrides,
 	};
 }

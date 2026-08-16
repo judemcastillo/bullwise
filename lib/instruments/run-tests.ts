@@ -1,0 +1,14 @@
+import "./canonical-key.test";
+import "./commodity-catalog.test";
+import "./crypto-catalog.test";
+import "./equity-catalog.test";
+import "./equity-security-type.test";
+import "./finnhub-equity.test";
+import "./forex-catalog.test";
+import "./forex-provider-clients.test";
+import "./instrument.model.test";
+import "./massive-forex.test";
+import "./pair-policy.test";
+import "./search.test";
+import "./tradingview-provider-client.test";
+import "./watchlist.model.test";

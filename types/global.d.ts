@@ -1,3 +1,9 @@
+import type {
+	AssetClass,
+	EquitySecurityType,
+	InstrumentType,
+} from "@/types/instruments";
+
 declare global {
 	type SignInFormData = {
 		email: string;
@@ -63,7 +69,7 @@ declare global {
 	type SearchCommandProps = {
 		open: boolean;
 		setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-		onWatchlistChange?: (symbol: string, isAdded: boolean) => void;
+		onWatchlistChange?: (instrumentId: string, isAdded: boolean) => void;
 	};
 
 	type WelcomeEmailData = {
@@ -108,12 +114,13 @@ declare global {
 	};
 
 	type WatchlistButtonProps = {
+		instrumentId: string;
 		symbol: string;
 		company: string;
 		isInWatchlist: boolean;
 		showTrashIcon?: boolean;
 		type?: "button" | "icon";
-		onWatchlistChange?: (symbol: string, isAdded: boolean) => void;
+		onWatchlistChange?: (instrumentId: string, isAdded: boolean) => void;
 	};
 
 	type QuoteData = {
@@ -141,8 +148,24 @@ declare global {
 	};
 
 	type StockWithData = {
+		instrumentId: string;
+		canonicalKey: string;
+		assetClass: AssetClass;
+		instrumentType: InstrumentType;
+		securityType?: EquitySecurityType;
 		symbol: string;
 		company: string;
+		venue?: string;
+		baseCurrency?: string;
+		quoteCurrency: string;
+		calendarId?: string;
+		provider?: string;
+		providerSymbol?: string;
+		quoteProvider?: string;
+		quoteProviderSymbol?: string;
+		newsProvider?: string;
+		newsProviderSymbol?: string;
+		supportsAlerts: boolean;
 		currentPrice?: number;
 		currency?: string | null;
 		logo?: string | null;

@@ -14,6 +14,7 @@ import type { StockDashboardData } from "./types";
 
 type StockChartCardProps = {
 	company: string;
+	instrumentId?: string;
 	isInWatchlist: boolean;
 	stock: StockDashboardData | null;
 	symbol: string;
@@ -21,6 +22,7 @@ type StockChartCardProps = {
 
 export default function StockChartCard({
 	company,
+	instrumentId,
 	isInWatchlist,
 	stock,
 	symbol,
@@ -92,13 +94,16 @@ export default function StockChartCard({
 						</span>
 					</div>
 				</div>
-				<WatchlistButton
-					key={symbol}
-					symbol={symbol}
-					company={company}
-					isInWatchlist={isInWatchlist}
-					type="icon"
-				/>
+				{instrumentId ? (
+					<WatchlistButton
+						key={instrumentId}
+						instrumentId={instrumentId}
+						symbol={symbol}
+						company={company}
+						isInWatchlist={isInWatchlist}
+						type="icon"
+					/>
+				) : null}
 			</header>
 
 			<TradingViewWidget

@@ -36,6 +36,7 @@ describe("FinnhubQuoteProvider", () => {
 		assert.equal(urls.length, 1);
 		assert.equal(quotes.size, 2);
 		assert.equal(quotes.get("instrument-1")?.price, "210.25");
+		assert.equal(quotes.get("instrument-1")?.timeliness, "unknown");
 		assert.equal(
 			quotes.get("instrument-2")?.observedAt.toISOString(),
 			"2025-08-01T11:59:30.000Z",

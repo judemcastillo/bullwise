@@ -2,12 +2,14 @@ import {
 	evaluatePriceAlert,
 	type AlertEvaluationReason,
 } from "@/lib/alerts/evaluator";
+import { invertQuote } from "@/lib/market-data/normalization";
 import type {
 	MarketQuote,
 	QuoteProvider,
 	QuoteRequest,
 } from "@/lib/market-data/types";
 import type { AlertOperator, AlertStatus, AssetClass } from "@/types/alerts";
+import type { ProviderBinding } from "@/types/instruments";
 
 export type MonitorableAlert = {
 	id: string;
@@ -23,7 +25,9 @@ export type MonitorableAlert = {
 		displaySymbol: string;
 		name: string;
 		quoteCurrency: string;
-		providerBindings: Array<{ provider: string; symbol: string }>;
+		pricePrecision: number;
+		calendarId?: string;
+		providerBindings: ProviderBinding[];
 	};
 };
 
@@ -67,6 +71,7 @@ type ProcessAlertBatchOptions = {
 type PreparedAlert = {
 	alert: MonitorableAlert;
 	request: QuoteRequest;
+	orientation: ProviderBinding["orientation"];
 };
 
 export async function processAlertBatch({
@@ -87,9 +92,14 @@ export async function processAlertBatch({
 	const preparedByProvider = new Map<string, PreparedAlert[]>();
 
 	for (const alert of alerts) {
-		const binding = alert.instrument.providerBindings.find((candidate) =>
-			providers.has(candidate.provider.toLowerCase()),
-		);
+		const binding = alert.instrument.providerBindings
+			.filter(
+				(candidate) =>
+					candidate.enabled &&
+					candidate.capabilities.includes("alert_quote") &&
+					providers.has(candidate.provider.toLowerCase()),
+			)
+			.sort((left, right) => left.priority - right.priority)[0];
 
 		if (!binding) {
 			summary.skipped += 1;
@@ -101,12 +111,15 @@ export async function processAlertBatch({
 		const prepared = preparedByProvider.get(providerName) ?? [];
 		prepared.push({
 			alert,
+			orientation: binding.orientation,
 			request: {
 				instrumentId: alert.instrumentId,
 				assetClass: alert.instrument.assetClass,
 				provider: providerName,
 				providerSymbol: binding.symbol,
 				expectedCurrency: alert.instrument.quoteCurrency,
+				pricePrecision: alert.instrument.pricePrecision,
+				calendarId: alert.instrument.calendarId,
 			},
 		});
 		preparedByProvider.set(providerName, prepared);
@@ -135,13 +148,17 @@ export async function processAlertBatch({
 			continue;
 		}
 
-		for (const { alert, request } of preparedAlerts) {
-			const quote = quotes.get(request.instrumentId);
-			if (!quote) {
+		for (const { alert, orientation, request } of preparedAlerts) {
+			const providerQuote = quotes.get(request.instrumentId);
+			if (!providerQuote) {
 				summary.skipped += 1;
 				await store.recordSkipped(alert, "provider_unavailable", now);
 				continue;
 			}
+			const quote =
+				orientation === "inverse"
+					? invertQuote(providerQuote, request.pricePrecision)
+					: providerQuote;
 
 			const evaluation = evaluatePriceAlert({
 				status: alert.status,

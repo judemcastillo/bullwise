@@ -8,6 +8,7 @@ import WatchlistSearch from "@/components/watchlist/WatchlistSearch";
 import { WatchlistTable } from "@/components/watchlist/WatchlistTable";
 import { getPaginatedWatchlistWithData } from "@/lib/data/watchlist";
 import { getUserAlerts } from "@/lib/data/user-alerts";
+import { getFinnhubWatchlistNewsSymbol } from "@/lib/watchlist-serialization";
 import { Star } from "lucide-react";
 import { Suspense } from "react";
 
@@ -25,26 +26,34 @@ async function WatchlistContent({
 		getPaginatedWatchlistWithData(page),
 		getUserAlerts(),
 	]);
-	const stockMembershipKey = watchlistPage.allItems
-		.map((item) => item.symbol)
+	const instrumentMembershipKey = watchlistPage.allItems
+		.map((item) => item.instrumentId)
 		.sort()
 		.join("|");
-	const currentPageStocks = new Map(
-		watchlistPage.items.map((item) => [item.symbol, item]),
+	const currentPageInstruments = new Map(
+		watchlistPage.items.map((item) => [item.instrumentId, item]),
 	);
-	const allSymbols = watchlistPage.allItems.map((item) => item.symbol);
-	const alertInstruments = watchlistPage.allItems.map((item) => {
-		const stock = currentPageStocks.get(item.symbol);
+	const allSymbols = Array.from(
+		new Set(
+			watchlistPage.allItems.flatMap((item) => {
+				const symbol = getFinnhubWatchlistNewsSymbol(item);
+				return symbol ? [symbol] : [];
+			}),
+		),
+	);
+	const alertInstruments = watchlistPage.allItems.flatMap((item) => {
+		if (!item.supportsAlerts || !item.provider || !item.providerSymbol) return [];
+		const currentInstrument = currentPageInstruments.get(item.instrumentId);
 
-		return {
-			assetClass: "equity" as const,
-			provider: "finnhub",
-			providerSymbol: item.symbol,
+		return [{
+			assetClass: item.assetClass,
+			provider: item.provider,
+			providerSymbol: item.providerSymbol,
 			displaySymbol: item.symbol,
-			name: stock?.company ?? item.company,
-			currency: stock?.currency,
-			currentPrice: stock?.currentPrice,
-		};
+			name: item.company,
+			currency: currentInstrument?.currency,
+			currentPrice: currentInstrument?.currentPrice,
+		}];
 	});
 
 	return (
@@ -58,7 +67,9 @@ async function WatchlistContent({
 								Watchlist
 							</h1>
 						</div>
-						<WatchlistSearch stockMembershipKey={stockMembershipKey} />
+						<WatchlistSearch
+							instrumentMembershipKey={instrumentMembershipKey}
+						/>
 					</div>
 
 					{watchlistPage.items.length > 0 ? (

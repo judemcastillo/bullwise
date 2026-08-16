@@ -18,6 +18,64 @@ import { useState, type MouseEvent } from "react";
 import { BellPlus } from "lucide-react";
 import { CreateAlertDialog } from "@/components/alerts/AlertDialogs";
 import type { AlertInstrumentOption } from "@/types/alerts";
+import {
+	equitySecurityTypeLabel,
+	usesCompanyStockDashboard,
+} from "@/lib/instruments/equity-security-type";
+
+function formatInstrumentType(instrumentType: StockWithData["instrumentType"]) {
+	return instrumentType.replaceAll("_", " ");
+}
+
+function WatchlistInstrumentDetails({ item }: { item: StockWithData }) {
+	if (item.assetClass === "equity") {
+		if (!usesCompanyStockDashboard(item.securityType)) {
+			return (
+				<div className="space-y-0.5 text-xs">
+					<div>{equitySecurityTypeLabel(item.securityType)}</div>
+					<div className="text-gray-500">Exchange-listed security</div>
+				</div>
+			);
+		}
+		return (
+			<div className="space-y-0.5 text-xs">
+				<div>{item.marketCap || "Market cap —"}</div>
+				<div className="text-gray-500">P/E {item.peRatio || "—"}</div>
+			</div>
+		);
+	}
+
+	if (
+		item.assetClass === "forex" ||
+		item.assetClass === "crypto" ||
+		item.assetClass === "commodity"
+	) {
+		const marketSession =
+			item.calendarId === "crypto-24x7"
+				? " · 24×7"
+				: item.calendarId === "forex-24x5" ||
+						item.calendarId === "commodity-spot-24x5"
+					? " · 24×5"
+					: "";
+		return (
+			<div className="space-y-0.5 text-xs">
+				<div>
+					{item.baseCurrency ?? "—"} / {item.quoteCurrency}
+				</div>
+				<div className="capitalize text-gray-500">
+					{formatInstrumentType(item.instrumentType)}
+					{marketSession}
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<span className="text-xs capitalize text-gray-400">
+			{formatInstrumentType(item.instrumentType)}
+		</span>
+	);
+}
 
 export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	const router = useRouter();
@@ -25,10 +83,10 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	const [selectedInstrument, setSelectedInstrument] =
 		useState<AlertInstrumentOption | null>(null);
 
-	const handleWatchlistChange = (symbol: string, isAdded: boolean) => {
+	const handleWatchlistChange = (instrumentId: string, isAdded: boolean) => {
 		if (!isAdded) {
 			setItems((currentItems) =>
-				currentItems.filter((item) => item.symbol !== symbol),
+				currentItems.filter((item) => item.instrumentId !== instrumentId),
 			);
 			router.refresh();
 		}
@@ -40,10 +98,11 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 	) => {
 		event.stopPropagation();
 		event.preventDefault();
+		if (!item.supportsAlerts || !item.provider || !item.providerSymbol) return;
 		setSelectedInstrument({
-			assetClass: "equity",
-			provider: "finnhub",
-			providerSymbol: item.symbol,
+			assetClass: item.assetClass,
+			provider: item.provider,
+			providerSymbol: item.providerSymbol,
 			displaySymbol: item.symbol,
 			name: item.company,
 			currency: item.currency,
@@ -70,14 +129,17 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 				<TableBody>
 					{items.map((item) => (
 						<TableRow
-							key={item.symbol}
+							key={item.instrumentId}
 							className="table-row"
 							onClick={() =>
-								router.push(`/stocks/${encodeURIComponent(item.symbol)}`)
+								router.push(
+									`/instruments/${encodeURIComponent(item.canonicalKey)}`,
+								)
 							}
 						>
 							<TableCell className="table-cell watchlist-status-cell">
 								<WatchlistButton
+									instrumentId={item.instrumentId}
 									symbol={item.symbol}
 									company={item.company}
 									isInWatchlist={true}
@@ -88,9 +150,21 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 							<TableCell className="table-cell company-cell">
 								<span title={item.company}>{item.company}</span>
 							</TableCell>
-							<TableCell className="table-cell">{item.symbol}</TableCell>
 							<TableCell className="table-cell">
-								{item.priceFormatted || "—"}
+								<div>{item.symbol}</div>
+								<div className="text-[10px] uppercase text-gray-500">
+									{item.assetClass === "equity"
+										? equitySecurityTypeLabel(item.securityType)
+										: item.assetClass}
+								</div>
+							</TableCell>
+							<TableCell className="table-cell">
+								{item.priceFormatted ||
+									(item.assetClass !== "equity" ? (
+										<span className="text-xs text-gray-500">Chart only</span>
+									) : (
+										"—"
+									))}
 							</TableCell>
 							<TableCell
 								className={cn(
@@ -100,21 +174,23 @@ export function WatchlistTable({ watchlist }: WatchlistTableProps) {
 							>
 								{item.changeFormatted || "—"}
 							</TableCell>
+							<TableCell className="table-cell">{item.venue || "—"}</TableCell>
 							<TableCell className="table-cell">
-								{item.marketCap || "—"}
-							</TableCell>
-							<TableCell className="table-cell">
-								{item.peRatio || "—"}
+								<WatchlistInstrumentDetails item={item} />
 							</TableCell>
 							<TableCell>
-								<Button
-									type="button"
-									className="add-alert"
-									onClick={(event) => openAlertDialog(event, item)}
-								>
-									<BellPlus aria-hidden="true" />
-									Add Alert
-								</Button>
+								{item.supportsAlerts ? (
+									<Button
+										type="button"
+										className="add-alert"
+										onClick={(event) => openAlertDialog(event, item)}
+									>
+										<BellPlus aria-hidden="true" />
+										Add Alert
+									</Button>
+								) : (
+									<span className="text-xs text-gray-500">Not available</span>
+								)}
 							</TableCell>
 						</TableRow>
 					))}

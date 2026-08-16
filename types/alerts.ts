@@ -1,9 +1,6 @@
-export type AssetClass =
-	| "equity"
-	| "forex"
-	| "crypto"
-	| "index"
-	| "commodity";
+import type { AssetClass } from "@/types/instruments";
+
+export type { AssetClass } from "@/types/instruments";
 
 export type AlertOperator = "crosses_above" | "crosses_below";
 export type AlertStatus = "active" | "paused" | "triggered";

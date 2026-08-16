@@ -3,6 +3,10 @@ import type {
 	QuoteProvider,
 	QuoteRequest,
 } from "@/lib/market-data/types";
+import {
+	marketStateForCalendar,
+	normalizeMarketNumber,
+} from "@/lib/market-data/normalization";
 
 type FinnhubQuotePayload = {
 	c?: unknown;
@@ -40,8 +44,7 @@ export class FinnhubQuoteProvider implements QuoteProvider {
 
 		const supportedRequests = requests.filter(
 			(request) =>
-				request.provider.toLowerCase() === this.provider &&
-				request.assetClass === "equity",
+				request.provider.toLowerCase() === this.provider,
 		);
 		const requestsBySymbol = new Map<string, QuoteRequest[]>();
 
@@ -92,13 +95,20 @@ export class FinnhubQuoteProvider implements QuoteProvider {
 					}
 
 					for (const request of matching) {
+						const normalizedPrice = normalizeMarketNumber(
+							price,
+							request.pricePrecision,
+						);
+						if (!normalizedPrice) continue;
 						results.set(request.instrumentId, {
 							instrumentId: request.instrumentId,
 							provider: this.provider,
 							providerSymbol: symbol,
-							price: String(price),
+							price: normalizedPrice,
 							currency: request.expectedCurrency.toUpperCase(),
 							observedAt: new Date(timestamp * 1000),
+							marketState: marketStateForCalendar(request.calendarId),
+							timeliness: "unknown",
 						});
 					}
 				} catch (error) {

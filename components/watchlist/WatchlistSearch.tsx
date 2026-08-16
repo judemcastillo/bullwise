@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function WatchlistSearch({
-	stockMembershipKey,
+	instrumentMembershipKey,
 }: {
-	stockMembershipKey: string;
+	instrumentMembershipKey: string;
 }) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
@@ -19,7 +19,7 @@ export default function WatchlistSearch({
 				Add stock
 			</Button>
 			<SearchCommand
-				key={stockMembershipKey}
+				key={instrumentMembershipKey}
 				open={open}
 				setOpen={setOpen}
 				onWatchlistChange={() => router.refresh()}

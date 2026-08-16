@@ -2,32 +2,35 @@ import {
 	type Document,
 	type Model,
 	Schema,
+	Types,
 	model,
 	models,
 } from "mongoose";
 
 export interface WatchlistItem extends Document {
 	userId: string;
-	symbol: string;
-	company: string;
+	instrumentId: Types.ObjectId;
 	addedAt: Date;
 }
 
 const watchlistSchema = new Schema<WatchlistItem>({
 	userId: { type: String, required: true, index: true },
-	symbol: {
-		type: String,
+	instrumentId: {
+		type: Schema.Types.ObjectId,
+		ref: "Instrument",
 		required: true,
-		uppercase: true,
-		trim: true,
-		maxlength: 40,
-		match: /^[A-Z0-9._:/-]+$/,
+		index: true,
 	},
-	company: { type: String, required: true, trim: true, maxlength: 160 },
 	addedAt: { type: Date, default: Date.now },
 });
 
-watchlistSchema.index({ userId: 1, symbol: 1 }, { unique: true });
+watchlistSchema.index(
+	{ userId: 1, instrumentId: 1 },
+	{
+		unique: true,
+		partialFilterExpression: { instrumentId: { $type: "objectId" } },
+	},
+);
 
 const Watchlist =
 	(models?.Watchlist as Model<WatchlistItem> | undefined) ||

@@ -1,11 +1,12 @@
 import "server-only";
 
 import Alert from "@/database/models/alert.model";
-import Instrument, {
-	type InstrumentItem,
-} from "@/database/models/instrument.model";
+import type { InstrumentItem } from "@/database/models/instrument.model";
 import { requireCompletedUser } from "@/lib/auth/require-user";
-import { getStockDashboardData } from "@/lib/services/stock-data";
+import {
+	InstrumentResolutionError,
+	resolveFinnhubEquityInstrument,
+} from "@/lib/data/instruments";
 import type {
 	AlertDto,
 	AlertInstrumentInput,
@@ -104,45 +105,15 @@ function validateInstrumentInput(
 
 async function resolveInstrument(input: AlertInstrumentInput) {
 	const validated = validateInstrumentInput(input);
-	const stock = await getStockDashboardData(validated.providerSymbol);
 
-	if (!stock?.company || !stock.currentPrice) {
-		throw new AlertInputError(
-			"Current market data is unavailable for this instrument",
-		);
+	try {
+		return await resolveFinnhubEquityInstrument(validated.providerSymbol);
+	} catch (error) {
+		if (error instanceof InstrumentResolutionError) {
+			throw new AlertInputError(error.message);
+		}
+		throw error;
 	}
-
-	const venue = stock.exchange && stock.exchange !== "—"
-		? stock.exchange.trim().toUpperCase()
-		: validated.provider;
-	const quoteCurrency = stock.currency?.trim().toUpperCase() || "USD";
-	const canonicalKey =
-		`${validated.assetClass}:${venue}:${stock.symbol}`.toLowerCase();
-
-	const instrument = await Instrument.findOneAndUpdate(
-		{ canonicalKey },
-		{
-			$setOnInsert: {
-				canonicalKey,
-				assetClass: validated.assetClass,
-				displaySymbol: stock.symbol,
-				name: stock.company,
-				venue,
-				quoteCurrency,
-				pricePrecision: 4,
-				providerBindings: [
-					{
-						provider: validated.provider,
-						symbol: validated.providerSymbol,
-					},
-				],
-			},
-		},
-		{ upsert: true, returnDocument: "after", runValidators: true },
-	);
-
-	if (!instrument) throw new Error("Unable to resolve this instrument");
-	return { instrument, currentPrice: stock.currentPrice };
 }
 
 function serializeAlert(alert: PopulatedAlert): AlertDto {

@@ -9,6 +9,7 @@ import { useState, type MouseEvent } from "react";
 import { toast } from "sonner";
 
 export default function WatchlistButton({
+	instrumentId,
 	symbol,
 	company,
 	isInWatchlist,
@@ -31,8 +32,8 @@ export default function WatchlistButton({
 
 		try {
 			const result = wasAdded
-				? await removeFromWatchlist(symbol)
-				: await addToWatchlist(symbol, company);
+				? await removeFromWatchlist(instrumentId)
+				: await addToWatchlist(instrumentId);
 
 			if (!result.success) {
 				throw new Error(
@@ -46,7 +47,7 @@ export default function WatchlistButton({
 					description: `${company} ${wasAdded ? "removed from" : "added to"} your watchlist`,
 				},
 			);
-			onWatchlistChange?.(symbol, nextIsAdded);
+			onWatchlistChange?.(instrumentId, nextIsAdded);
 		} catch (error) {
 			setIsAdded(wasAdded);
 			toast.error(

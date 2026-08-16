@@ -6,7 +6,12 @@ import {
 	WATCHLIST_MAX_ITEMS,
 	WATCHLIST_PAGE_SIZE,
 } from "./watchlist-policy";
-import { toWatchlistClientItem } from "./watchlist-serialization";
+import {
+	getFinnhubWatchlistNewsSymbol,
+	getFinnhubWatchlistQuoteSymbol,
+	toWatchlistClientItem,
+} from "./watchlist-serialization";
+import type { ProviderBinding } from "@/types/instruments";
 
 describe("watchlist policy", () => {
 	it("allows no more than 20 saved items", () => {
@@ -40,17 +45,130 @@ describe("watchlist policy", () => {
 
 	it("removes database-only values before rendering client components", () => {
 		const databaseRecord = {
-			_id: { toJSON: () => "database-id" },
-			__v: 0,
-			userId: "user-1",
-			symbol: "AAPL",
-			company: "Apple Inc.",
-			addedAt: new Date("2026-08-10T00:00:00.000Z"),
+			instrument: {
+				_id: { toString: () => "instrument-id" },
+				canonicalKey: "equity:xnas:aapl",
+				assetClass: "equity" as const,
+				instrumentType: "listing" as const,
+				securityType: "common_stock" as const,
+				displaySymbol: "AAPL",
+				name: "Apple Inc.",
+				venue: "NASDAQ",
+				quoteCurrency: "USD",
+				providerBindings: [
+					{
+						provider: "finnhub",
+						symbol: "AAPL",
+						capabilities: ["catalog", "quote", "alert_quote", "news"],
+						enabled: true,
+						priority: 100,
+						orientation: "direct",
+					} satisfies ProviderBinding,
+				],
+			},
 		};
 
 		assert.deepEqual(toWatchlistClientItem(databaseRecord), {
+			instrumentId: "instrument-id",
+			canonicalKey: "equity:xnas:aapl",
+			assetClass: "equity",
+			instrumentType: "listing",
+			securityType: "common_stock",
 			symbol: "AAPL",
 			company: "Apple Inc.",
+			venue: "NASDAQ",
+			baseCurrency: undefined,
+			quoteCurrency: "USD",
+			calendarId: undefined,
+			provider: "finnhub",
+			providerSymbol: "AAPL",
+			quoteProvider: "finnhub",
+			quoteProviderSymbol: "AAPL",
+			newsProvider: "finnhub",
+			newsProviderSymbol: "AAPL",
+			supportsAlerts: true,
 		});
+	});
+
+	it("keeps catalog-only forex out of Finnhub quote, news, and alert paths", () => {
+		const clientItem = toWatchlistClientItem({
+			instrument: {
+				_id: "forex-instrument-id",
+				canonicalKey: "forex:spot:eur:usd",
+				assetClass: "forex",
+				instrumentType: "spot_pair",
+				displaySymbol: "EUR/USD",
+				name: "Euro - United States dollar",
+				venue: "Global Forex",
+				baseCurrency: "EUR",
+				quoteCurrency: "USD",
+				calendarId: "forex-24x5",
+				providerBindings: [
+					{
+						provider: "finnhub",
+						symbol: "OANDA:EUR_USD",
+						capabilities: ["catalog"],
+						enabled: true,
+						priority: 100,
+						orientation: "direct",
+					},
+					{
+						provider: "massive",
+						symbol: "C:EURUSD",
+						capabilities: ["catalog", "bars", "indicators"],
+						enabled: true,
+						priority: 200,
+						orientation: "direct",
+					},
+					{
+						provider: "tradingview",
+						symbol: "OANDA:EURUSD",
+						capabilities: ["chart"],
+						enabled: true,
+						priority: 100,
+						orientation: "direct",
+					},
+				] satisfies ProviderBinding[],
+			},
+		});
+
+		assert.equal(clientItem.quoteProvider, undefined);
+		assert.equal(clientItem.newsProvider, undefined);
+		assert.equal(clientItem.provider, undefined);
+		assert.equal(clientItem.supportsAlerts, false);
+		assert.equal(getFinnhubWatchlistQuoteSymbol(clientItem), null);
+		assert.equal(getFinnhubWatchlistNewsSymbol(clientItem), null);
+	});
+
+	it("keeps commodity spot instruments out of alert and Finnhub quote paths", () => {
+		const clientItem = toWatchlistClientItem({
+			instrument: {
+				_id: "commodity-instrument-id",
+				canonicalKey: "commodity:oanda:spot:xau:usd",
+				assetClass: "commodity",
+				instrumentType: "spot",
+				displaySymbol: "XAU/USD",
+				name: "Gold Spot / United States dollar",
+				venue: "OANDA Spot",
+				baseCurrency: "XAU",
+				quoteCurrency: "USD",
+				calendarId: "commodity-spot-24x5",
+				providerBindings: [
+					{
+						provider: "finnhub",
+						symbol: "OANDA:XAU_USD",
+						capabilities: ["catalog"],
+						enabled: true,
+						priority: 100,
+						orientation: "direct",
+					},
+				] satisfies ProviderBinding[],
+			},
+		});
+
+		assert.equal(clientItem.quoteProvider, undefined);
+		assert.equal(clientItem.provider, undefined);
+		assert.equal(clientItem.supportsAlerts, false);
+		assert.equal(getFinnhubWatchlistQuoteSymbol(clientItem), null);
 	});
 });
