@@ -312,6 +312,8 @@ instrumentSchema.index(
 instrumentSchema.index({ assetClass: 1, instrumentType: 1, status: 1 });
 instrumentSchema.index({ assetClass: 1, securityType: 1, status: 1 });
 instrumentSchema.index({ venueMic: 1, displaySymbol: 1 });
+instrumentSchema.index({ displaySymbol: 1 });
+instrumentSchema.index({ name: 1 });
 
 const Instrument =
 	(models?.Instrument as Model<InstrumentItem> | undefined) ||

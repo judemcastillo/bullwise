@@ -65,13 +65,20 @@ async function searchStoredInstruments(
 			.lean<SearchableInstrument[]>();
 	}
 
-	const patterns = instrumentSearchAliases(query).map(
-		(alias) => new RegExp(escapeRegExp(alias), "i"),
+	const aliases = instrumentSearchAliases(query);
+	const symbolPatterns = aliases.map(
+		(alias) => new RegExp(`^${escapeRegExp(alias.toUpperCase())}`),
+	);
+	const namePatterns = aliases.map(
+		(alias) => new RegExp(`^${escapeRegExp(alias)}`),
+	);
+	const canonicalKeyPatterns = aliases.map(
+		(alias) => new RegExp(`^${escapeRegExp(alias.toLowerCase())}`),
 	);
 	filter.$or = [
-		...patterns.map((pattern) => ({ displaySymbol: pattern })),
-		...patterns.map((pattern) => ({ name: pattern })),
-		...patterns.map((pattern) => ({ canonicalKey: pattern })),
+		...symbolPatterns.map((pattern) => ({ displaySymbol: pattern })),
+		...namePatterns.map((pattern) => ({ name: pattern })),
+		...canonicalKeyPatterns.map((pattern) => ({ canonicalKey: pattern })),
 	];
 
 	return Instrument.find(filter)
