@@ -1,8 +1,10 @@
-import StockDataRow from "@/components/stocks/StockDataRow";
+import StockAlertButton from "@/components/alerts/StockAlertButton";
+import AiTechnicalAnalysisCard from "@/components/instruments/AiTechnicalAnalysisCard";
 import TradingViewWidget from "@/components/TradingViewWidget";
 import WatchlistButton from "@/components/watchlist/WatchlistButton";
 import {
 	CANDLE_CHART_WIDGET_CONFIG,
+	COMPANY_PROFILE_WIDGET_CONFIG,
 	SYMBOL_INFO_WIDGET_CONFIG,
 	TRADING_VIEW_EMBED_URL,
 } from "@/lib/constants";
@@ -30,59 +32,29 @@ type ForexInstrumentDashboardProps = {
 };
 
 export default function ForexInstrumentDashboard({
-	assetClass = "forex",
-	baseCurrency,
-	calendarId,
 	displaySymbol,
 	instrumentId,
 	isInWatchlist,
 	name,
-	pricePrecision,
 	providers,
-	quoteCurrency,
-	timezone,
 	tradingViewSymbol,
-	venue,
 }: ForexInstrumentDashboardProps) {
-	const isCrypto = assetClass === "crypto";
-	const isCommodity = assetClass === "commodity";
-	const assetLabel = isCrypto ? "Crypto" : isCommodity ? "Commodity" : "Forex";
-	const identityMark = isCrypto
-		? "₿"
-		: isCommodity
-			? baseCurrency === "XAG"
-				? "Ag"
-				: "Au"
-			: "FX";
 	return (
 		<div className="stock-dashboard">
 			<div className="stock-primary-grid">
-				<section className="stock-chart-card p-1" aria-labelledby="instrument-heading">
-					<header className="stock-identity">
-						<div className="company-mark" aria-hidden="true">
-							{identityMark}
-						</div>
-						<div className="min-w-0 flex-1">
-							<p className="text-xs font-semibold uppercase tracking-wider text-yellow-500">
-								{assetLabel} · {isCommodity ? "Spot" : "Spot pair"}
-							</p>
-							<div className="mt-1 flex flex-wrap items-center gap-2">
-								<h1 id="instrument-heading" className="stock-company-name">
-									{name}
-								</h1>
-								<span className="stock-symbol">{displaySymbol}</span>
-							</div>
-							<div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-500">
-								{venue ? <span>{venue}</span> : null}
-								<span>Quoted in {quoteCurrency}</span>
-							</div>
-						</div>
-						<WatchlistButton
-							instrumentId={instrumentId}
-							symbol={displaySymbol}
-							company={name}
-							isInWatchlist={isInWatchlist}
-							type="icon"
+				<section
+					className="stock-chart-card p-1"
+					aria-labelledby="instrument-heading"
+				>
+					<header className="stock-identity p-0!">
+						<h1 id="instrument-heading" className="sr-only">
+							{name} ({displaySymbol})
+						</h1>
+						<TradingViewWidget
+							scriptUrl={`${TRADING_VIEW_EMBED_URL}symbol-info.js`}
+							config={SYMBOL_INFO_WIDGET_CONFIG(tradingViewSymbol)}
+							height={170}
+							className="stock-identity-widget border-0"
 						/>
 					</header>
 
@@ -90,64 +62,48 @@ export default function ForexInstrumentDashboard({
 						scriptUrl={`${TRADING_VIEW_EMBED_URL}advanced-chart.js`}
 						config={CANDLE_CHART_WIDGET_CONFIG(tradingViewSymbol)}
 						height={510}
-						className="stock-main-chart border-0"
+						className="stock-main-chart border-0 shadow-none!"
 					/>
 				</section>
 
 				<aside className="stock-card h-full" aria-labelledby="overview-heading">
 					<div className="stock-card-heading">
 						<h2 id="overview-heading">Overview</h2>
+						<div className="flex items-center gap-2">
+							<WatchlistButton
+								instrumentId={instrumentId}
+								symbol={displaySymbol}
+								company={name}
+								isInWatchlist={isInWatchlist}
+								type="icon"
+							/>
+							<StockAlertButton
+								instrument={null}
+								label="Add alert"
+								disabledReason="Price alerts are not available for this instrument yet."
+							/>
+						</div>
 					</div>
 
-					<div className="stock-card-section">
+					<div className="pt-4">
 						<TradingViewWidget
-							scriptUrl={`${TRADING_VIEW_EMBED_URL}symbol-info.js`}
-							config={SYMBOL_INFO_WIDGET_CONFIG(tradingViewSymbol)}
-							height={170}
-							className="border-0"
+							scriptUrl={`${TRADING_VIEW_EMBED_URL}symbol-profile.js`}
+							config={COMPANY_PROFILE_WIDGET_CONFIG(tradingViewSymbol)}
+							height={440}
+							className="stock-overview-widget border-0"
 						/>
-					</div>
-
-					<div className="stock-card-section">
-						<h3>Pair details</h3>
-						<div className="space-y-3">
-							<StockDataRow label="Base currency" value={baseCurrency ?? "—"} />
-							<StockDataRow label="Quote currency" value={quoteCurrency} />
-							<StockDataRow label="Venue" value={venue ?? "—"} />
-							<StockDataRow
-								label="Price precision"
-								value={`${pricePrecision} decimals`}
-							/>
-							<StockDataRow label="Timezone" value={timezone} />
-							<StockDataRow
-								label="Market session"
-								value={
-									calendarId === "forex-24x5"
-										? "24 hours · Mon–Fri"
-										: calendarId === "crypto-24x7"
-											? "24 hours · 7 days"
-											: calendarId === "commodity-spot-24x5"
-												? "24 hours · Mon–Fri"
-										: (calendarId ?? "—")
-								}
-							/>
-						</div>
-					</div>
-
-					<div className="stock-card-section border-b-0! pb-0!">
-						<h3>Data providers</h3>
-						<div className="space-y-3">
-							<StockDataRow label="Quote & chart" value={providers.marketDisplay} />
-							<StockDataRow label="Catalog" value={providers.catalog} />
-							<StockDataRow label="AI analysis" value={providers.analysis} />
-						</div>
 					</div>
 				</aside>
 			</div>
 
+			<AiTechnicalAnalysisCard
+				displaySymbol={displaySymbol}
+				provider={providers.analysis}
+			/>
+
 			<p className="px-1 text-xs leading-5 text-gray-500">
-				Quote and chart data are displayed by TradingView. They are not used for
-				alerts or AI analysis.
+				Quote, chart, and company profile data are displayed by TradingView.
+				They are not used for alerts or AI analysis.
 			</p>
 		</div>
 	);

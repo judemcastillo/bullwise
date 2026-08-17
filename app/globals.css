@@ -623,6 +623,12 @@
 	.stock-identity {
 		@apply flex min-h-24 items-center gap-3 border-b border-gray-600 px-4 py-4 sm:px-5;
 	}
+	.stock-identity-widget.tradingview-widget-container,
+	.stock-identity-widget .tradingview-widget-container__widget,
+	.stock-overview-widget.tradingview-widget-container,
+	.stock-overview-widget .tradingview-widget-container__widget {
+		background-color: transparent !important;
+	}
 	.company-mark {
 		@apply flex size-12 shrink-0 items-center justify-center rounded-lg border border-gray-600 bg-gray-700 bg-cover bg-center bg-no-repeat text-lg font-bold text-yellow-500;
 	}
