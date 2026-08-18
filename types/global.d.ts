@@ -107,12 +107,6 @@ declare global {
 		result: FinnhubSearchResult[];
 	};
 
-	type StockDetailsPageProps = {
-		params: Promise<{
-			symbol: string;
-		}>;
-	};
-
 	type WatchlistButtonProps = {
 		instrumentId: string;
 		symbol: string;

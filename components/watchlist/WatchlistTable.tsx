@@ -20,7 +20,7 @@ import { CreateAlertDialog } from "@/components/alerts/AlertDialogs";
 import type { AlertInstrumentOption } from "@/types/alerts";
 import {
 	equitySecurityTypeLabel,
-	usesCompanyStockDashboard,
+	supportsCompanyStockData,
 } from "@/lib/instruments/equity-security-type";
 
 function formatInstrumentType(instrumentType: StockWithData["instrumentType"]) {
@@ -29,7 +29,7 @@ function formatInstrumentType(instrumentType: StockWithData["instrumentType"]) {
 
 function WatchlistInstrumentDetails({ item }: { item: StockWithData }) {
 	if (item.assetClass === "equity") {
-		if (!usesCompanyStockDashboard(item.securityType)) {
+		if (!supportsCompanyStockData(item.securityType)) {
 			return (
 				<div className="space-y-0.5 text-xs">
 					<div>{equitySecurityTypeLabel(item.securityType)}</div>

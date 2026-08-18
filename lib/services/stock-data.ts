@@ -10,7 +10,6 @@ import { cache } from "react";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const DEFAULT_FINNHUB_TIMEOUT_MS = 5000;
-const PEERS_TIMEOUT_MS = 1500;
 
 type DashboardQuoteData = QuoteData & {
 	d?: number;
@@ -127,104 +126,6 @@ export const getStockMetrics = cache(
 		};
 	},
 );
-
-export const getStockDashboardData = cache(async (symbol: string) => {
-	const cleanSymbol = normalizeSymbol(symbol);
-	const [quote, profile, financials] = await Promise.all([
-		getStockQuote(cleanSymbol),
-		getStockProfile(cleanSymbol),
-		getStockMetrics(cleanSymbol),
-	]);
-
-	const metrics = financials.values;
-	const currentPrice = quote.currentPrice ?? 0;
-	const changePercent = quote.changePercent ?? 0;
-	const marketCapInUsd = (profile.marketCapitalization ?? 0) * 1_000_000;
-
-	return {
-		symbol: cleanSymbol,
-		company: profile.name || profile.ticker || cleanSymbol,
-		currentPrice,
-		priceFormatted: currentPrice ? formatPrice(currentPrice) : "—",
-		change: quote.change ?? 0,
-		changePercent,
-		changeFormatted: formatChangePercent(changePercent) || "0.00%",
-		dayHigh: quote.dayHigh ?? 0,
-		dayLow: quote.dayLow ?? 0,
-		openPrice: quote.openPrice ?? 0,
-		previousClose: quote.previousClose ?? 0,
-		marketCapitalization: marketCapInUsd,
-		peRatio: metrics.peNormalizedAnnual?.toFixed(1) || "—",
-		eps:
-			metrics.epsBasicExclExtraItemsAnnual ??
-			metrics.epsNormalizedAnnual ??
-			null,
-		week52High: metrics["52WeekHigh"] ?? null,
-		week52Low: metrics["52WeekLow"] ?? null,
-		country: profile.country || "—",
-		currency: profile.currency || null,
-		exchange: profile.exchange || "—",
-		industry: profile.finnhubIndustry || "—",
-		ipo: profile.ipo || "—",
-		logo: profile.logo || "",
-		shareOutstanding: profile.shareOutstanding ?? null,
-		webUrl: profile.weburl || "",
-	};
-});
-
-export const getCompanyPeers = cache(async (symbol: string) => {
-	const cleanSymbol = symbol.trim().toUpperCase();
-	const encodedSymbol = encodeURIComponent(cleanSymbol);
-	let payload: unknown;
-
-	try {
-		payload = await fetchStockData<unknown>(
-			`stock/peers?symbol=${encodedSymbol}&grouping=sector`,
-			3600,
-			PEERS_TIMEOUT_MS,
-		);
-	} catch (error) {
-		const reason =
-			error instanceof Error ? `${error.name}: ${error.message}` : "unknown error";
-		console.warn(`Unable to load peers for ${cleanSymbol} (${reason})`);
-		return [];
-	}
-
-	if (!Array.isArray(payload)) return [];
-
-	return Array.from(
-		new Set(
-			payload
-				.filter((peer): peer is string => typeof peer === "string")
-				.map((peer) => peer.trim().toUpperCase())
-				.filter((peer) => peer.length > 0 && peer !== cleanSymbol),
-		),
-	);
-});
-
-export const getRelatedStockDetails = cache(async (symbol: string) => {
-	const cleanSymbol = normalizeSymbol(symbol);
-	const [quote, profile] = await Promise.all([
-		getStockQuote(cleanSymbol),
-		getStockProfile(cleanSymbol),
-	]);
-
-	if (!quote.currentPrice || !profile.name) {
-		throw new Error("Invalid stock data received from API");
-	}
-
-	const changePercent = quote.changePercent || 0;
-
-	return {
-		symbol: cleanSymbol,
-		company: profile.name,
-		currentPrice: quote.currentPrice,
-		currency: profile.currency || null,
-		logo: profile.logo || null,
-		changePercent,
-		changeFormatted: formatChangePercent(changePercent) || "0.00%",
-	};
-});
 
 export const getStocksDetails = cache(async (symbol: string) => {
 	const cleanSymbol = normalizeSymbol(symbol);

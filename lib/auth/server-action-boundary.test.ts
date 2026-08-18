@@ -50,7 +50,9 @@ describe("Server Action security boundary", () => {
 		const requireUser = source("./require-user.ts");
 		const userProfile = source("../data/user-profile.ts");
 		const protectedLayout = source("../../app/(root)/layout.tsx");
-		const stockPage = source("../../app/(root)/stocks/[symbol]/page.tsx");
+		const instrumentPage = source(
+			"../../app/(root)/instruments/[canonicalKey]/page.tsx",
+		);
 		const preferencesPage = source(
 			"../../app/(root)/settings/preferences/page.tsx",
 		);
@@ -59,10 +61,10 @@ describe("Server Action security boundary", () => {
 		assert.match(requireUser, /await getRequestSession\(\)/);
 		assert.match(userProfile, /hasCompletedOnboarding\s*=\s*cache\(/);
 		assert.match(protectedLayout, /await getRequestSession\(\)/);
-		assert.match(stockPage, /await requireUser\(\)/);
+		assert.match(instrumentPage, /await requireUser\(\)/);
 		assert.match(preferencesPage, /await requireUser\(\)/);
 
-		for (const page of [protectedLayout, stockPage, preferencesPage]) {
+		for (const page of [protectedLayout, instrumentPage, preferencesPage]) {
 			assert.doesNotMatch(page, /auth\.api\.getSession/);
 		}
 	});
@@ -89,6 +91,26 @@ describe("Server Action security boundary", () => {
 			),
 			false,
 		);
+	});
+
+	it("removes the legacy stock details route", () => {
+		assert.equal(
+			existsSync(
+				new URL("../../app/(root)/stocks/[symbol]/page.tsx", import.meta.url),
+			),
+			false,
+		);
+	});
+
+	it("serves equities from the canonical instrument route", () => {
+		const instrumentPage = source(
+			"../../app/(root)/instruments/[canonicalKey]/page.tsx",
+		);
+
+		assert.match(instrumentPage, /import InstrumentDashboard/);
+		assert.match(instrumentPage, /instrument\.assetClass === "equity"/);
+		assert.doesNotMatch(instrumentPage, /redirect\(/);
+		assert.doesNotMatch(instrumentPage, /\/stocks\//);
 	});
 
 	it("shows one account-creation disclosure without a checkbox", () => {

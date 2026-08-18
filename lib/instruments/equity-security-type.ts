@@ -113,7 +113,7 @@ export function equitySecurityTypeLabel(
 	return EQUITY_SECURITY_TYPE_LABELS[securityType ?? "other"];
 }
 
-export function usesCompanyStockDashboard(
+export function supportsCompanyStockData(
 	securityType?: EquitySecurityType,
 ) {
 	return securityType === "common_stock";

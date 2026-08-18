@@ -8,37 +8,27 @@ import {
 	SYMBOL_INFO_WIDGET_CONFIG,
 	TRADING_VIEW_EMBED_URL,
 } from "@/lib/constants";
+import type { AlertInstrumentOption } from "@/types/alerts";
 
-type ForexProviderSummary = {
-	analysis: string;
-	catalog: string;
-	marketDisplay: string;
-};
-
-type ForexInstrumentDashboardProps = {
-	assetClass?: "forex" | "crypto" | "commodity";
-	baseCurrency?: string;
-	calendarId?: string;
+type InstrumentDashboardProps = {
+	alertInstrument: AlertInstrumentOption | null;
+	analysisProvider: string;
 	displaySymbol: string;
 	instrumentId: string;
 	isInWatchlist: boolean;
 	name: string;
-	pricePrecision: number;
-	providers: ForexProviderSummary;
-	quoteCurrency: string;
-	timezone: string;
 	tradingViewSymbol: string;
-	venue?: string;
 };
 
-export default function ForexInstrumentDashboard({
+export default function InstrumentDashboard({
+	alertInstrument,
+	analysisProvider,
 	displaySymbol,
 	instrumentId,
 	isInWatchlist,
 	name,
-	providers,
 	tradingViewSymbol,
-}: ForexInstrumentDashboardProps) {
+}: InstrumentDashboardProps) {
 	return (
 		<div className="stock-dashboard">
 			<div className="stock-primary-grid">
@@ -78,7 +68,7 @@ export default function ForexInstrumentDashboard({
 								type="icon"
 							/>
 							<StockAlertButton
-								instrument={null}
+								instrument={alertInstrument}
 								label="Add alert"
 								disabledReason="Price alerts are not available for this instrument yet."
 							/>
@@ -98,12 +88,15 @@ export default function ForexInstrumentDashboard({
 
 			<AiTechnicalAnalysisCard
 				displaySymbol={displaySymbol}
-				provider={providers.analysis}
+				provider={analysisProvider}
 			/>
 
 			<p className="px-1 text-xs leading-5 text-gray-500">
 				Quote, chart, and company profile data are displayed by TradingView.
-				They are not used for alerts or AI analysis.
+				{alertInstrument
+					? ` Price alerts are monitored with ${alertInstrument.provider}.`
+					: " They are not used for alerts."}{" "}
+				TradingView display data are not used for AI analysis.
 			</p>
 		</div>
 	);
