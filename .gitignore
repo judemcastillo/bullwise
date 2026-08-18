@@ -12,6 +12,19 @@
 
 # testing
 /coverage
+/history.json
+/report.json
+/batch-history.json
+/batch-report.json
+/alpaca-batch-history.json
+/alpaca-batch-report.json
+/provider-audit.json
+/v2-holdout-history.json
+/v2-holdout-report.json
+/portfolio-report.json
+/v3-holdout-history.json
+/v3-holdout-source-report.json
+/v3-holdout-report.json
 
 # next.js
 /.next/
