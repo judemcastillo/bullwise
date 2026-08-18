@@ -2,7 +2,6 @@ import DashboardNews from "@/components/dashboard/DashboardNews";
 import DashboardWatchlist from "@/components/dashboard/DashboardWatchlist";
 import TradingViewWidget from "@/components/TradingViewWidget";
 import { getWatchlistWithData } from "@/lib/data/watchlist";
-import { getNews } from "@/lib/market-data/finnhub";
 import {
 	MARKET_OVERVIEW_WIDGET_CONFIG,
 	TOP_STOCKS_WIDGET_CONFIG,
@@ -21,18 +20,13 @@ const MARKET_SUMMARY_WIDGET_CONFIG = {
 };
 
 export default async function Home() {
-	const [watchlist, news] = await Promise.all([
-		getWatchlistWithData(DASHBOARD_WATCHLIST_LIMIT).catch((error) => {
-			unstable_rethrow(error);
-			console.error("Unable to load dashboard watchlist:", error);
-			return [] as StockWithData[];
-		}),
-		getNews().catch((error) => {
-			unstable_rethrow(error);
-			console.error("Unable to load dashboard news:", error);
-			return [] as MarketNewsArticle[];
-		}),
-	]);
+	const watchlist = await getWatchlistWithData(
+		DASHBOARD_WATCHLIST_LIMIT,
+	).catch((error) => {
+		unstable_rethrow(error);
+		console.error("Unable to load dashboard watchlist:", error);
+		return [] as StockWithData[];
+	});
 
 	return (
 		<div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
@@ -96,7 +90,7 @@ export default async function Home() {
 				</div>
 			</section>
 
-			<DashboardNews news={news} />
+			<DashboardNews />
 		</div>
 	);
 }

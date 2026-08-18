@@ -10,7 +10,7 @@ import {
 	getListedSecurityQuoteDetails,
 	getStocksDetails,
 } from "@/lib/services/stock-data";
-import { usesCompanyStockDashboard } from "@/lib/instruments/equity-security-type";
+import { supportsCompanyStockData } from "@/lib/instruments/equity-security-type";
 import {
 	paginateWatchlist,
 	WATCHLIST_MAX_ITEMS,
@@ -262,7 +262,7 @@ async function enrichWatchlistItems(watchlist: readonly WatchlistRecord[]) {
 			try {
 				if (
 					clientItem.assetClass === "equity" &&
-					!usesCompanyStockDashboard(clientItem.securityType)
+					!supportsCompanyStockData(clientItem.securityType)
 				) {
 					return {
 						...clientItem,

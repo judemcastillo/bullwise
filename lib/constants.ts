@@ -53,9 +53,6 @@ export const CONDITION_OPTIONS = [
 export const TRADING_VIEW_EMBED_URL =
     'https://s3.tradingview.com/external-embedding/embed-widget-';
 
-export const STOCK_DETAILS_RELATED_LIMIT = 4;
-export const STOCK_DETAILS_NEWS_LIMIT = 3;
-
 export const MARKET_OVERVIEW_WIDGET_CONFIG = {
     colorTheme: 'dark', // dark mode
     dateRange: '12M', // last 12 months
@@ -135,11 +132,10 @@ export const HEATMAP_WIDGET_CONFIG = {
 
 export const TOP_STORIES_WIDGET_CONFIG = {
     displayMode: 'regular',
-    feedMode: 'market',
+    feedMode: 'all_symbols',
     colorTheme: 'dark',
     isTransparent: true,
     locale: 'en',
-    market: 'stock',
     width: '100%',
     height: '600',
 };
@@ -281,7 +277,7 @@ export const COMPANY_PROFILE_WIDGET_CONFIG = (symbol: string) => ({
     isTransparent: 'true',
     locale: 'en',
     width: '100%',
-    height: 440,
+    height: 500,
 });
 
 export const COMPANY_FINANCIALS_WIDGET_CONFIG = (symbol: string) => ({

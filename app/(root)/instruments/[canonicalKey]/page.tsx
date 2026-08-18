@@ -1,10 +1,8 @@
-import ForexInstrumentDashboard from "@/components/instruments/ForexInstrumentDashboard";
-import ListedInstrumentDashboard from "@/components/instruments/ListedInstrumentDashboard";
+import InstrumentDashboard from "@/components/instruments/InstrumentDashboard";
 import { requireUser } from "@/lib/auth/require-user";
 import { getInstrumentByCanonicalKey } from "@/lib/data/instruments";
 import { getWatchlistInstrumentIdsForUser } from "@/lib/data/watchlist";
-import { notFound, redirect } from "next/navigation";
-import { usesCompanyStockDashboard } from "@/lib/instruments/equity-security-type";
+import { notFound } from "next/navigation";
 
 export default async function InstrumentPage({
 	params,
@@ -16,15 +14,11 @@ export default async function InstrumentPage({
 	if (!instrument) notFound();
 
 	const finnhubBinding = instrument.providerBindings.find(
-		(binding) => binding.provider === "finnhub" && binding.enabled !== false,
+		(binding) =>
+			binding.provider === "finnhub" &&
+			binding.enabled !== false &&
+			binding.capabilities.includes("alert_quote"),
 	);
-	if (
-		instrument.assetClass === "equity" &&
-		usesCompanyStockDashboard(instrument.securityType) &&
-		finnhubBinding
-	) {
-		redirect(`/stocks/${encodeURIComponent(finnhubBinding.symbol)}`);
-	}
 
 	const tradingViewBinding = instrument.providerBindings.find(
 		(binding) =>
@@ -32,33 +26,9 @@ export default async function InstrumentPage({
 			binding.enabled !== false &&
 			binding.capabilities.includes("chart"),
 	);
-	if (instrument.assetClass === "equity" && tradingViewBinding) {
-		const user = await requireUser();
-		const instrumentId = instrument._id.toString();
-		const watchlistInstrumentIds = await getWatchlistInstrumentIdsForUser(
-			user.id,
-		).catch((error) => {
-			console.error(`Unable to load watchlist for ${user.id}:`, error);
-			return [] as string[];
-		});
-
-		return (
-			<ListedInstrumentDashboard
-				displaySymbol={instrument.displaySymbol}
-				finnhubSymbol={finnhubBinding?.symbol}
-				instrumentId={instrumentId}
-				isInWatchlist={watchlistInstrumentIds.includes(instrumentId)}
-				name={instrument.name}
-				quoteCurrency={instrument.quoteCurrency}
-				securityType={instrument.securityType}
-				timezone={instrument.timezone}
-				tradingViewSymbol={tradingViewBinding.symbol}
-				venue={instrument.venue}
-			/>
-		);
-	}
 	if (
-		(instrument.assetClass === "forex" ||
+		(instrument.assetClass === "equity" ||
+			instrument.assetClass === "forex" ||
 			instrument.assetClass === "crypto" ||
 			instrument.assetClass === "commodity") &&
 		tradingViewBinding
@@ -71,31 +41,32 @@ export default async function InstrumentPage({
 			console.error(`Unable to load watchlist for ${user.id}:`, error);
 			return [] as string[];
 		});
-		const providerNames = new Set(
-			instrument.providerBindings
-				.filter((binding) => binding.enabled !== false)
-				.map((binding) => binding.provider),
+		const hasMassiveAnalysis = instrument.providerBindings.some(
+			(binding) =>
+				binding.provider === "massive" && binding.enabled !== false,
 		);
 
 		return (
-			<ForexInstrumentDashboard
-				assetClass={instrument.assetClass}
-				baseCurrency={instrument.baseCurrency}
-				calendarId={instrument.calendarId}
+			<InstrumentDashboard
+				alertInstrument={
+					instrument.assetClass === "equity" && finnhubBinding
+						? {
+								assetClass: "equity",
+								provider: "finnhub",
+								providerSymbol: finnhubBinding.symbol,
+								displaySymbol: instrument.displaySymbol,
+								name: instrument.name,
+								venue: instrument.venue,
+								currency: instrument.quoteCurrency,
+							}
+						: null
+				}
+				analysisProvider={hasMassiveAnalysis ? "Massive · planned" : "—"}
 				displaySymbol={instrument.displaySymbol}
 				instrumentId={instrumentId}
 				isInWatchlist={watchlistInstrumentIds.includes(instrumentId)}
 				name={instrument.name}
-				pricePrecision={instrument.pricePrecision}
-				providers={{
-					analysis: providerNames.has("massive") ? "Massive · planned" : "—",
-					catalog: providerNames.has("finnhub") ? "Finnhub" : "—",
-					marketDisplay: "TradingView",
-				}}
-				quoteCurrency={instrument.quoteCurrency}
-				timezone={instrument.timezone}
 				tradingViewSymbol={tradingViewBinding.symbol}
-				venue={instrument.venue}
 			/>
 		);
 	}

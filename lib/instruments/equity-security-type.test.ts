@@ -5,7 +5,7 @@ import {
 	normalizeFinnhubEquitySecurityType,
 	normalizeMassiveEquitySecurityType,
 	reconcileEquitySecurityType,
-	usesCompanyStockDashboard,
+	supportsCompanyStockData,
 } from "./equity-security-type";
 
 describe("equity security-type classification", () => {
@@ -33,10 +33,10 @@ describe("equity security-type classification", () => {
 		assert.equal(reconcileEquitySecurityType("other", "unit"), "unit");
 	});
 
-	it("routes only common stocks to the company dashboard", () => {
-		assert.equal(usesCompanyStockDashboard("common_stock"), true);
-		assert.equal(usesCompanyStockDashboard("etf"), false);
-		assert.equal(usesCompanyStockDashboard("unit"), false);
+	it("uses company fundamentals only for common stocks", () => {
+		assert.equal(supportsCompanyStockData("common_stock"), true);
+		assert.equal(supportsCompanyStockData("etf"), false);
+		assert.equal(supportsCompanyStockData("unit"), false);
 		assert.equal(equitySecurityTypeLabel("preferred_stock"), "Preferred stock");
 	});
 });
