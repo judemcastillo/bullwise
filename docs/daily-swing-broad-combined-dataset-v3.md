@@ -29,8 +29,26 @@ Both scans must use setup-scan version `2.0.0`, backtest version `1.3.0`, engine
 
 This operation may count rows and signal sessions to verify inventory. It must not aggregate or inspect label rates, R multiples, profitability, exit distributions, per-symbol outcomes, validation metrics, or sealed-test labels.
 
+## Export and integrity-audit result
+
+The protected export completed on 2026-08-19. `analysis-broad-combined-dataset-v3.json` is 216,121,409 bytes, has SHA-256 `3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030`, and records generation at `2026-08-19T10:25:13.706Z`.
+
+The two sources contributed 92,676 base rows and 18,722 expansion rows. They contained 112,020 liquidity-eligible outcomes before the unchanged final-boundary purge removed 622 rows, leaving 111,398 combined rows:
+
+- Train: 60,381 rows across 1,429 signal sessions, from 2017-03-13 through 2022-12-29.
+- Validation: 25,935 rows across 500 signal sessions, from 2023-01-03 through 2024-12-27.
+- Sealed test: 25,082 rows across 407 signal sessions, from 2025-01-02 through 2026-08-18.
+
+The combined inventory records three coverage exclusions and 24,034 signal-time liquidity rejections. The expanding development inventories are:
+
+- `evaluate_2020`: 29,969 fit rows and 10,742 evaluation rows; 2,847 boundary-crossing rows purged.
+- `evaluate_2021`: 41,939 fit rows and 13,212 evaluation rows; 2,090 boundary-crossing rows purged.
+- `evaluate_2022`: 56,770 fit rows and 3,140 evaluation rows; 869 boundary-crossing rows purged.
+
+The read-only artifact audit found zero violations: source hashes and provenance match, row IDs are unique, rows are chronologically ordered, resolution never precedes signal, split and fold summaries reconcile, source tags are valid, every feature vector has the same 50 fields, every feature value is finite/string/schema-nullable, and no provenance field appears inside a feature vector. The audit did not access any row's `labels` field.
+
+No target rate, profitability statistic, R-multiple aggregation, exit distribution, symbol ranking, model fit, validation metric, or sealed-test-label summary was calculated.
+
 ## Authorized next step
 
-Run `npm run export:analysis-broad-combined-dataset`. The protected command accepts no overrides or overwrite flag and writes `analysis-broad-combined-dataset-v3.json` with the streaming large-file writer.
-
-After export, record its SHA-256 and audit chronological order, unique row IDs, resolution order, source provenance, split/fold inventories, feature-schema uniformity, finite-or-null values, and absence of provenance fields from feature vectors. Only after that audit passes may a train-only episode exporter be frozen against the exact dataset hash.
+Freeze a train-only episode exporter against the exact combined dataset SHA-256. It must reuse the existing episode-first grouping, suppression, and target definitions; read and materialize only train rows; copy validation/test counts from metadata without opening their features or labels; and report only whether the 5,000-row coverage gate passes.
