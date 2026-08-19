@@ -47,8 +47,23 @@ Coverage and liquidity rules will not be loosened based on the number or outcome
 
 This static, currently available fund list has survival and present-day-liquidity selection bias. The coarse screen does not determine whether any historical setup is eligible; only the frozen 20-session, signal-time liquidity calculation can do that.
 
+## Retrieval and coverage audit result
+
+The frozen Alpaca retrieval completed on 2026-08-19. `analysis-broad-v2-expansion-history.json` is 24,110,790 bytes, has SHA-256 `7262c1a32e3cac8651c57daee97812c72edd6d39036e310e4259b25b37559505`, and records artifact creation at `2026-08-19T09:21:28.915Z`.
+
+The read-only, outcome-blind audit found:
+
+- The schema version, universe name, exact ordered 30-symbol manifest, Alpaca provider, requested dates, SPY benchmark, standard-ETF profiles, adjustment flags, and daily intervals all match the frozen contract.
+- Twenty-eight candidates pass coverage, exceeding the frozen minimum of 24.
+- Those 28 candidates each contain 2,671 bars from 2016-01-04 through 2026-08-18.
+- GDXJ and OIH are the only coverage exclusions. Each contains 2,589 bars from 2016-05-02 through 2026-08-18, so each passes the 2,500-bar minimum but fails `first_bar_after_maximum_delay`.
+- SPY contains 2,671 bars from 2016-01-04 through 2026-08-18.
+- No candidate or benchmark history has a missing or non-positive reported volume, an invalid/duplicate/non-chronological timestamp, or a missing requested final session.
+
+The 24-instrument coverage gate passes without changing any rule. No setup was generated, no label or return was inspected, and no validation or sealed-test data was opened.
+
 ## Authorized next step
 
-Run `npm run fetch:analysis-broad-development-v2`. The command accepts no overrides or overwrite flag and writes `analysis-broad-v2-expansion-history.json`. Then audit only manifest identity, provider metadata, requested dates, bar counts, first/last timestamps, missing volume, and the frozen coverage gate.
+Add an expansion-specific exhaustive-scan policy that requires this exact source hash and automatically excludes only GDXJ and OIH under the frozen coverage function. Reuse strategy v1, objective-feature v1, independent fixed-equity labeling, and the unchanged point-in-time liquidity rule.
 
-Do not generate setup outcomes until that audit is recorded. Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability at this checkpoint.
+Do not combine datasets or inspect training-label totals until that expansion scan is complete and its integrity is audited. Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability at this checkpoint.
