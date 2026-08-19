@@ -50,3 +50,9 @@ This is a historical, point-in-time eligibility rule. Present-day liquidity and 
 This is a static list of funds known during universe design, so fund survival and availability can still bias coverage. Retrieval must record missing, shortened, or unavailable histories. The liquidity rule cannot reproduce bid/ask spread, market depth, or ETF underlying-basket liquidity from daily OHLCV data.
 
 No model, performance experiment, customer signal, or test evaluation is authorized by this manifest. The current sealed test labels remain unread.
+
+## Retrieval and coverage result
+
+The frozen Alpaca retrieval completed on 2026-08-19. `analysis-broad-history.json` has SHA-256 `a42ea177b110336cb905322370549deefa9a1fd54d620fa94b443757b6414e5f` and contains all 100 candidates through 2026-08-18.
+
+Ninety-nine candidates passed the frozen coverage gate. JNK is the sole coverage exclusion: Alpaca returned 1,832 bars beginning 2019-05-06 instead of the required 2016 window. Every other candidate returned at least 2,500 bars within the allowed start delay. No candidate history contained a missing or non-positive reported volume, and every history ended on the requested final session. The minimum-50-instrument coverage gate passes. No setup outcomes were inspected for this coverage decision.
