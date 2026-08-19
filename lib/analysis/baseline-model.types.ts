@@ -32,7 +32,11 @@ export type BaselineFeatureEncoder = {
 
 export type BaselineLinearModel = {
 	kind: "logistic_regression" | "ridge_linear_regression";
-	target: "triggered" | "profitable_if_triggered" | "net_r_if_triggered";
+	target:
+		| "triggered"
+		| "profitable_if_triggered"
+		| "net_r_if_triggered"
+		| "actionable_success";
 	intercept: number;
 	coefficients: Record<string, number>;
 	trainingRows: number;

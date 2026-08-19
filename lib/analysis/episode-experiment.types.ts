@@ -3,6 +3,14 @@ import type { DailySwingEpisodeTrainingDataset } from "@/lib/analysis/episode-da
 export const DAILY_SWING_EPISODE_EXPERIMENT_ID =
 	"daily-swing-episode-actionable-logistic-v1";
 export const DAILY_SWING_EPISODE_EXPERIMENT_PREREGISTRATION_VERSION = "1.0.0";
+export const DAILY_SWING_EPISODE_EXPERIMENT_FROZEN_SHA256 = {
+	sourceDataset:
+		"83a53bbf638c869d54067596668834d6a921d8c21ba96b78c47798870680cba4",
+	trainingDataset:
+		"43caababc2648f088b9a5958395c230d1f519ee65748d3e5781323034c22600c",
+	preregistration:
+		"7e12f53eee2aa3c6842770d7d8b11199d91e193eac9d64385b0c3fb69bae6d45",
+} as const;
 
 export type DailySwingEpisodeExperimentPreregistration = {
 	preregistrationVersion: typeof DAILY_SWING_EPISODE_EXPERIMENT_PREREGISTRATION_VERSION;

@@ -31,6 +31,7 @@ The frozen training artifact contains train episodes only. Validation receives o
 - Existing signal-time numeric and categorical features only; instrument identity is excluded.
 - Numeric medians, means, standard deviations, category encoding, model coefficients, and the score cutoff are fitted on train episodes only.
 - The selection cutoff is the 70th percentile of fitted training probabilities. That numeric cutoff is applied unchanged to validation; a validation percentile is forbidden.
+- The cutoff uses the deterministic nearest-rank definition: sort fitted training probabilities ascending and select rank `ceil(0.70 × training rows)`. Scores equal to or above that numeric cutoff are selected.
 - No feature selection, hyperparameter search, calibration adjustment, threshold tuning, or alternate model is allowed after validation is opened.
 
 ## Validation pass criteria
@@ -49,3 +50,9 @@ Every criterion must pass in the one validation run:
 ## Decision rule
 
 Any failed criterion rejects this candidate. The model, features, target, episode policy, cutoff, or gates will not be changed and rerun on validation. Passing would authorize exactly one test evaluation with the fitted model and cutoff frozen unchanged. Passing test would still lead only to forward paper validation, not customer signals or live execution.
+
+## One-shot evaluator
+
+The evaluator is implemented as `npm run evaluate:analysis-episode-validation`. It must first be tested and audited with synthetic fixtures only. The real command requires the explicit `--confirm-one-shot-validation` flag and refuses any source, training, or preregistration artifact whose SHA-256 differs from the frozen values above.
+
+Do not run the real command merely to check that it works. Once run against the frozen source dataset, validation is consumed and the resulting report must be preserved without rerunning or tuning.

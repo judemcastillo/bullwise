@@ -199,6 +199,8 @@ The frozen train artifact contains 854 episodes and has SHA-256 `43caababc2648f0
 
 Do not run a validation evaluator until the episode training artifact and preregistration checksums have been recorded. That future evaluator gets one run: any failed gate rejects the candidate without tuning or rerunning validation. Test remains sealed unless every gate passes.
 
+The one-shot evaluator is available as `npm run evaluate:analysis-episode-validation`, but it requires `--confirm-one-shot-validation` and exact frozen artifact checksums before reading inputs. Develop and audit it using synthetic fixtures only. Do not invoke the confirmed command on the real dataset until the implementation is committed and independently reviewed; its first real run consumes validation.
+
 ## Frozen v2 confirmation
 
 The v2 hypothesis, untouched cross-asset ETF universe, and pass criteria are recorded in `docs/daily-swing-v2-preregistration.md`. Reproduce its data retrieval and one-shot confirmation with:

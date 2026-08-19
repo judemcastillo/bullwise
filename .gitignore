@@ -33,6 +33,7 @@
 /analysis-training-diagnostic.json
 /analysis-episode-training.json
 /analysis-episode-experiment-preregistration.json
+/analysis-episode-validation-report.json
 
 # next.js
 /.next/

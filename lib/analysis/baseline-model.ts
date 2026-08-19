@@ -185,7 +185,7 @@ function linearPrediction(intercept: number, weights: readonly number[], row: re
 	return prediction;
 }
 
-function trainModel(input: {
+export function fitBaselineLinearModel(input: {
 	features: number[][];
 	targets: number[];
 	kind: BaselineLinearModel["kind"];
@@ -263,13 +263,19 @@ function trainModel(input: {
 	};
 }
 
-function probabilities(model: ReturnType<typeof trainModel>, features: number[][]) {
+export function predictBaselineProbabilities(
+	model: ReturnType<typeof fitBaselineLinearModel>,
+	features: number[][],
+) {
 	return features.map((row) =>
 		sigmoid(linearPrediction(model.intercept, model.weights, row)),
 	);
 }
 
-function predictions(model: ReturnType<typeof trainModel>, features: number[][]) {
+function predictions(
+	model: ReturnType<typeof fitBaselineLinearModel>,
+	features: number[][],
+) {
 	return features.map((row) =>
 		linearPrediction(model.intercept, model.weights, row),
 	);
@@ -488,7 +494,7 @@ export function trainDailySwingBaselineModels(input: {
 		return value;
 	});
 	const configuration = { ...BASELINE_TRAINING_CONFIGURATION };
-	const trigger = trainModel({
+	const trigger = fitBaselineLinearModel({
 		features: train.values,
 		targets: triggerTrainTargets,
 		kind: "logistic_regression",
@@ -496,7 +502,7 @@ export function trainDailySwingBaselineModels(input: {
 		featureNames: encoder.featureNames,
 		configuration,
 	});
-	const profitability = trainModel({
+	const profitability = fitBaselineLinearModel({
 		features: triggeredTrainFeatures,
 		targets: profitTrainTargets,
 		kind: "logistic_regression",
@@ -504,7 +510,7 @@ export function trainDailySwingBaselineModels(input: {
 		featureNames: encoder.featureNames,
 		configuration,
 	});
-	const expectedR = trainModel({
+	const expectedR = fitBaselineLinearModel({
 		features: triggeredTrainFeatures,
 		targets: rTrainTargets,
 		kind: "ridge_linear_regression",
@@ -549,13 +555,13 @@ export function trainDailySwingBaselineModels(input: {
 		validation: {
 			trigger: compareClassificationToConstantBaseline(
 				triggerValidationTargets,
-				probabilities(trigger, validation.values),
+		predictBaselineProbabilities(trigger, validation.values),
 				triggerTrainRate,
 				configuration.classificationThreshold,
 			),
 			profitability: compareClassificationToConstantBaseline(
 				profitValidationTargets,
-				probabilities(profitability, triggeredValidationFeatures),
+		predictBaselineProbabilities(profitability, triggeredValidationFeatures),
 				profitTrainRate,
 				configuration.classificationThreshold,
 			),
