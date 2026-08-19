@@ -40,3 +40,7 @@ Every feature must include a no-future-data test and be computed at the signal t
 6. Reject on any failed gate without tuning and rerunning the same holdout.
 
 No customer signal, live execution, or sealed-test evaluation is authorized by this plan.
+
+## Frozen broader universe
+
+The first phase is now specified in `docs/daily-swing-broad-development-v1.md` and the versioned TypeScript manifest. It freezes 100 non-overlapping ETF candidates, exact Alpaca retrieval dates, coverage gates, and point-in-time liquidity eligibility before retrieval. Fetching uses `npm run fetch:analysis-broad-development` and accepts no overrides or overwrite flag.

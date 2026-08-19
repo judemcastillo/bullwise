@@ -18,6 +18,7 @@
     "fetch:backtest-batch": "node --import tsx scripts/fetch-backtest-batch.ts",
 		"fetch:backtest-v2-holdout": "npm run fetch:backtest-batch -- --provider=alpaca --symbols=VTI,MDY,EFA,EEM,VNQ,TLT,IEF,HYG,LQD,GLD,SLV,USO,DBA,XBI,SMH --benchmark=SPY --from=2016-01-01 --universe-name=daily-swing-v2-cross-asset-etf-holdout --output=v2-holdout-history.json",
 		"fetch:backtest-v3-holdout": "npm run fetch:backtest-batch -- --provider=alpaca --symbols=ACWI,VEA,VWO,SCHD,RSP,IJH,IJR,VGK,EWJ,EWZ,MBB,TIP,SHY,BND,EMB,PDBC,DBC,IAU,GDX,KRE --benchmark=SPY --from=2016-01-01 --universe-name=daily-swing-v3-ranked-portfolio-holdout --output=v3-holdout-history.json",
+		"fetch:analysis-broad-development": "node --import tsx scripts/fetch-analysis-broad-development.ts",
     "audit:backtest-providers": "node --import tsx scripts/audit-backtest-providers.ts",
     "backtest:daily-swing": "node --import tsx scripts/backtest-daily-swing.ts",
     "backtest:daily-swing-batch": "node --import tsx scripts/backtest-daily-swing-batch.ts",
