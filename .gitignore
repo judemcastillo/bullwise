@@ -35,6 +35,7 @@
 /analysis-episode-experiment-preregistration.json
 /analysis-episode-validation-report.json
 /analysis-broad-history.json
+/analysis-broad-setup-scan.json
 
 # next.js
 /.next/

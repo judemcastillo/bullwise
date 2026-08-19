@@ -56,3 +56,21 @@ No model, performance experiment, customer signal, or test evaluation is authori
 The frozen Alpaca retrieval completed on 2026-08-19. `analysis-broad-history.json` has SHA-256 `a42ea177b110336cb905322370549deefa9a1fd54d620fa94b443757b6414e5f` and contains all 100 candidates through 2026-08-18.
 
 Ninety-nine candidates passed the frozen coverage gate. JNK is the sole coverage exclusion: Alpaca returned 1,832 bars beginning 2019-05-06 instead of the required 2016 window. Every other candidate returned at least 2,500 bars within the allowed start delay. No candidate history contained a missing or non-positive reported volume, and every history ended on the requested final session. The minimum-50-instrument coverage gate passes. No setup outcomes were inspected for this coverage decision.
+
+## Exhaustive setup generation result
+
+The first broad-development setup generation completed on 2026-08-19 using setup-scan version `2.0.0`, objective-feature version `1.0.0`, strategy `daily-swing-v1-draft`, and research policy `broad_development_v1`. The generated-at timestamp is `2026-08-19T07:56:40.626Z`.
+
+`analysis-broad-setup-scan.json` is 433 MB and has SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`. It records:
+
+- 100 candidates received, 99 instruments scanned, and one outcome-blind coverage exclusion (JNK).
+- 234,810 completed-bar analyses.
+- 108,027 setup-time objective feature snapshots.
+- 14,897 setups rejected by the frozen signal-time liquidity policy.
+- 93,130 liquidity-eligible labeled setups: 70,010 triggered and 23,120 untriggered.
+
+A read-only integrity audit found zero violations: every labeled setup joins to one eligible feature snapshot with the same instrument and timestamp, every snapshot uses feature version `1.0.0`, all numeric feature values are finite or null, instrument symbols are unique, and the aggregate and per-instrument counts reconcile.
+
+The first computation reached all 99 instruments but failed before producing an artifact because pretty-printing the report exceeded V8's maximum string length. No partial output was created. Commit `d655c24` replaced the monolithic stringify with an atomic, instrument-by-instrument streaming writer; the identical frozen scan was then rerun. All progress counts repeated exactly. No research rule, feature, setup, label, or threshold changed between attempts.
+
+This result is a source-data inventory, not a profitability evaluation. No return aggregation, symbol ranking, model fitting, validation inspection, or sealed-test access was performed.
