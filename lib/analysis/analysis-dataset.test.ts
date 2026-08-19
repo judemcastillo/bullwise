@@ -139,7 +139,7 @@ function batch(reports: DailySwingBacktestReport[]) {
 
 function setupScan(reports: DailySwingBacktestReport[]) {
 	return {
-		scanVersion: "1.0.0",
+		scanVersion: "2.0.0",
 		universeName: "development-etfs",
 		methodology: {
 			evaluationPolicy: "every_eligible_completed_bar",
@@ -195,6 +195,17 @@ describe("daily swing analysis dataset", () => {
 
 		assert.equal(dataset.source.kind, "exhaustive_setup_scan");
 		assert.equal(dataset.source.batchVersion, null);
+		assert.equal(dataset.source.setupScanVersion, "2.0.0");
+	});
+
+	it("keeps the frozen version-1 setup scan readable", () => {
+		const legacy = setupScan([developmentReport()]) as unknown as {
+			scanVersion: string;
+		};
+		legacy.scanVersion = "1.0.0";
+		const dataset = buildDailySwingAnalysisDataset({
+			report: legacy as unknown as DailySwingSetupScanReport,
+		});
 		assert.equal(dataset.source.setupScanVersion, "1.0.0");
 	});
 

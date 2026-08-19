@@ -6,6 +6,7 @@ import {
 	BROAD_DEVELOPMENT_LIQUIDITY_POLICY,
 	BROAD_DEVELOPMENT_SYMBOLS,
 	PREVIOUSLY_CONSUMED_RESEARCH_SYMBOLS,
+	evaluateBroadDevelopmentCoverage,
 } from "@/lib/analysis/broad-development-universe";
 
 describe("frozen broad development universe", () => {
@@ -53,5 +54,30 @@ describe("frozen broad development universe", () => {
 			BROAD_DEVELOPMENT_LIQUIDITY_POLICY.maximumPositionFractionOfMedianDollarVolume,
 			0.01,
 		);
+	});
+
+	it("applies the frozen coverage gate without setup outcomes", () => {
+		const startedAt = new Date("2016-01-04T00:00:00.000Z");
+		const bars = Array.from(
+			{ length: BROAD_DEVELOPMENT_DATA_POLICY.minimumBarsPerInstrument },
+			(_, index) => ({
+				startedAt: new Date(startedAt.getTime() + index * 86_400_000),
+				open: "100",
+				high: "101",
+				low: "99",
+				close: "100",
+			}),
+		);
+		assert.equal(
+			evaluateBroadDevelopmentCoverage({ symbol: "IVV", marketData: { bars } })
+				.eligible,
+			true,
+		);
+		const shortened = evaluateBroadDevelopmentCoverage({
+			symbol: "JNK",
+			marketData: { bars: bars.slice(0, 1_832) },
+		});
+		assert.equal(shortened.eligible, false);
+		assert.ok(shortened.reasons.includes("insufficient_bars"));
 	});
 });

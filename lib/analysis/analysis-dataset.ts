@@ -16,7 +16,7 @@ import {
 	type DailySwingBatchBacktestReport,
 } from "@/lib/analysis/batch-backtest.types";
 import {
-	DAILY_SWING_SETUP_SCAN_VERSION,
+	SUPPORTED_DAILY_SWING_SETUP_SCAN_VERSIONS,
 	type DailySwingInstrumentSetupScan,
 	type DailySwingSetupScanReport,
 } from "@/lib/analysis/setup-scan.types";
@@ -197,9 +197,13 @@ function validateReport(
 	report: DailySwingBatchBacktestReport | DailySwingSetupScanReport,
 ): ValidatedDatasetSource {
 	if ("scanVersion" in report) {
-		if (report.scanVersion !== DAILY_SWING_SETUP_SCAN_VERSION) {
+		if (
+			!SUPPORTED_DAILY_SWING_SETUP_SCAN_VERSIONS.includes(
+				report.scanVersion as (typeof SUPPORTED_DAILY_SWING_SETUP_SCAN_VERSIONS)[number],
+			)
+		) {
 			throw new Error(
-				`Setup scan version ${report.scanVersion} is not supported; expected ${DAILY_SWING_SETUP_SCAN_VERSION}`,
+				`Setup scan version ${report.scanVersion} is not supported; expected one of ${SUPPORTED_DAILY_SWING_SETUP_SCAN_VERSIONS.join(", ")}`,
 			);
 		}
 		if (

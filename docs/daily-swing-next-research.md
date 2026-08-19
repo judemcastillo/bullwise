@@ -30,6 +30,8 @@ Do not add subjective order blocks. An order-block feature is eligible only afte
 
 Every feature must include a no-future-data test and be computed at the signal timestamp. Instrument identity remains excluded from model inputs.
 
+The completed-bar objective feature schema is now frozen as `daily-swing-objective-features-v1` and documented in `docs/daily-swing-objective-features-v1.md`. Its code and synthetic leakage tests were completed before generating any broad-development setup outcomes.
+
 ## Phase 3: development process
 
 1. Version the new feature schema and regenerate exhaustive setup rows.

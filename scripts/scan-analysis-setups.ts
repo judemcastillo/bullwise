@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import type { BacktestConfiguration } from "@/lib/analysis/backtest.types";
 import { analyzeDailySwingV2 } from "@/lib/analysis/daily-swing-v2";
 import { scanDailySwingSetupBatch } from "@/lib/analysis/setup-scan";
+import type { DailySwingSetupResearchPolicy } from "@/lib/analysis/setup-scan.types";
 import type { TechnicalAnalysisInstrument } from "@/lib/analysis/technical-analysis.types";
 import type { MarketBar, MarketBars } from "@/lib/market-data/types";
 
@@ -33,6 +34,7 @@ Defaults:
 Options:
   --output=analysis-setup-scan.json
   --strategy=v1                 v1 or v2 (default: v1)
+  --research-policy=none        none or broad_development_v1 (default: none)
   --force                       Replace an existing output file
   --help
 
@@ -112,12 +114,23 @@ async function main() {
 	if (strategy !== "v1" && strategy !== "v2") {
 		throw new Error("strategy must be v1 or v2");
 	}
+	const researchPolicy = (option("research-policy") ??
+		"none") as DailySwingSetupResearchPolicy;
+	if (
+		researchPolicy !== "none" &&
+		researchPolicy !== "broad_development_v1"
+	) {
+		throw new Error(
+			"research-policy must be none or broad_development_v1",
+		);
+	}
 	const input = parseInput(await readFile(inputPath, "utf8"));
 	console.log(
-		`Scanning ${input.instruments.length} instruments with ${strategy}; no network access is required.`,
+		`Scanning ${input.instruments.length} candidates with ${strategy} and ${researchPolicy} research policy; no network access is required.`,
 	);
 	const report = scanDailySwingSetupBatch({
 		...input,
+		researchPolicy,
 		...(strategy === "v2" ? { dependencies: { analyze: analyzeDailySwingV2 } } : {}),
 		onInstrumentComplete: (instrumentReport, index, total) => {
 			const setups =
@@ -134,7 +147,7 @@ async function main() {
 	});
 	console.log(`Setup scan: ${outputPath}`);
 	console.log(
-		`${report.aggregate.analyses} analyses | ${report.aggregate.setups} setups | ${report.aggregate.triggered} triggered | ${report.aggregate.untriggered} untriggered`,
+		`${report.aggregate.analyses} analyses | ${report.aggregate.setups} setups | ${report.aggregate.liquidityRejected} liquidity-rejected | ${report.aggregate.triggered} triggered | ${report.aggregate.untriggered} untriggered`,
 	);
 }
 

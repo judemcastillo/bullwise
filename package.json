@@ -26,6 +26,7 @@
 		"backtest:daily-swing-v3-holdout": "npm run backtest:daily-swing-batch -- v3-holdout-history.json --output=v3-holdout-source-report.json",
 		"evaluate:daily-swing-v3-holdout": "node --import tsx scripts/evaluate-daily-swing-v3-holdout.ts",
 		"scan:analysis-setups": "node --import tsx scripts/scan-analysis-setups.ts",
+		"scan:analysis-broad-development": "npm run scan:analysis-setups -- analysis-broad-history.json --strategy=v1 --research-policy=broad_development_v1 --output=analysis-broad-setup-scan.json",
 		"export:analysis-dataset": "node --import tsx scripts/export-analysis-dataset.ts",
 		"train:analysis-baselines": "node --import tsx scripts/train-analysis-baselines.ts",
 		"train:analysis-boosted": "node --import tsx scripts/train-analysis-boosted.ts",

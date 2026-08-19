@@ -1,4 +1,5 @@
 import { FROZEN_CONFIRMATION_SYMBOLS } from "@/lib/analysis/analysis-dataset";
+import type { MarketBars } from "@/lib/market-data/types";
 
 export const BROAD_DEVELOPMENT_UNIVERSE_VERSION = "1.0.0";
 export const BROAD_DEVELOPMENT_UNIVERSE_NAME =
@@ -189,3 +190,38 @@ export const BROAD_DEVELOPMENT_LIQUIDITY_POLICY = {
 	description:
 		"At each signal, use only the latest 20 completed sessions. A setup is liquidity-eligible when at least 19 sessions have positive close and volume, median adjusted close times reported volume is at least $10 million, and planned position notional is no more than 1% of that median dollar volume.",
 } as const;
+
+export type BroadDevelopmentCoverageEvaluation = {
+	eligible: boolean;
+	reasons: Array<
+		| "symbol_not_in_frozen_universe"
+		| "insufficient_bars"
+		| "first_bar_after_maximum_delay"
+	>;
+};
+
+/** Applies only the outcome-blind coverage rules frozen in the v1 manifest. */
+export function evaluateBroadDevelopmentCoverage(input: {
+	symbol: string;
+	marketData: Pick<MarketBars, "bars">;
+}): BroadDevelopmentCoverageEvaluation {
+	const reasons: BroadDevelopmentCoverageEvaluation["reasons"] = [];
+	const symbol = input.symbol.trim().toUpperCase();
+	if (!(BROAD_DEVELOPMENT_SYMBOLS as readonly string[]).includes(symbol)) {
+		reasons.push("symbol_not_in_frozen_universe");
+	}
+	if (
+		input.marketData.bars.length <
+		BROAD_DEVELOPMENT_DATA_POLICY.minimumBarsPerInstrument
+	) {
+		reasons.push("insufficient_bars");
+	}
+	const firstAt = input.marketData.bars[0]?.startedAt.getTime();
+	const latestAllowedFirstAt =
+		Date.parse(`${BROAD_DEVELOPMENT_DATA_POLICY.requestedFrom}T00:00:00.000Z`) +
+		BROAD_DEVELOPMENT_DATA_POLICY.maximumFirstBarDelayDays * 86_400_000;
+	if (firstAt === undefined || firstAt > latestAllowedFirstAt) {
+		reasons.push("first_bar_after_maximum_delay");
+	}
+	return { eligible: reasons.length === 0, reasons };
+}

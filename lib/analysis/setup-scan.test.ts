@@ -188,6 +188,39 @@ describe("exhaustive daily swing setup scan", () => {
 		assert.equal(report.trades[1].signalAt, sourceBars[300].startedAt.toISOString());
 		assert.equal(report.trades[1].entryAt, sourceBars[302].startedAt.toISOString());
 		assert.equal(report.trades[1].signalFeatures?.rsi14, 58);
+		assert.equal(report.objectiveFeatures.length, 2);
+		assert.equal(report.eligibility.liquidityRejected, 0);
+		assert.equal(
+			report.objectiveFeatures[0].snapshot.signalAt,
+			sourceBars[299].startedAt.toISOString(),
+		);
+	});
+
+	it("enforces the broad-development liquidity policy before outcome simulation", () => {
+		const sourceBars = bars().map((bar) => ({ ...bar, volume: "1" }));
+		const input = {
+			instrument: {
+				instrumentId: "instrument-test",
+				displaySymbol: "TEST",
+				assetClass: "equity" as const,
+				securityType: "etf" as const,
+				currency: "USD",
+				pricePrecision: 2,
+			},
+			marketData: marketData(sourceBars),
+		};
+		const report = scanDailySwingSetups(
+			input,
+			{ analyze: (analysisInput) => readyResult(analysisInput, tradePlan()) },
+			"broad_development_v1",
+		);
+
+		assert.equal(report.eligibility.setupsEvaluated, 5);
+		assert.equal(report.eligibility.liquidityRejected, 5);
+		assert.equal(report.signalCounts.longSetups, 0);
+		assert.equal(report.trades.length, 0);
+		assert.equal(report.untriggeredSetups.length, 0);
+		assert.equal(report.objectiveFeatures.length, 5);
 	});
 
 	it("records exhaustive independent-label provenance in batch output", () => {
@@ -212,9 +245,10 @@ describe("exhaustive daily swing setup scan", () => {
 			dependencies: { analyze: (input) => readyResult(input, null) },
 		});
 
-		assert.equal(report.scanVersion, "1.0.0");
+		assert.equal(report.scanVersion, "2.0.0");
 		assert.equal(report.methodology.evaluationPolicy, "every_eligible_completed_bar");
 		assert.equal(report.methodology.labelPolicy, "independent_fixed_equity_simulation");
 		assert.equal(report.aggregate.analyses, 5);
+		assert.equal(report.aggregate.liquidityRejected, 0);
 	});
 });

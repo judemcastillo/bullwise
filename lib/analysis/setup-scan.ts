@@ -10,8 +10,16 @@ import {
 	type DailySwingBacktestInput,
 } from "@/lib/analysis/backtest.types";
 import {
+	BROAD_DEVELOPMENT_DATA_POLICY,
+	BROAD_DEVELOPMENT_SYMBOLS,
+	BROAD_DEVELOPMENT_UNIVERSE_NAME,
+	evaluateBroadDevelopmentCoverage,
+} from "@/lib/analysis/broad-development-universe";
+import { buildDailySwingObjectiveFeatures } from "@/lib/analysis/objective-features";
+import {
 	DAILY_SWING_SETUP_SCAN_VERSION,
 	type DailySwingInstrumentSetupScan,
+	type DailySwingSetupResearchPolicy,
 	type DailySwingSetupScanReport,
 } from "@/lib/analysis/setup-scan.types";
 import { analyzeDailySwing } from "@/lib/analysis/technical-analysis";
@@ -57,6 +65,7 @@ function assertValidInput(input: DailySwingBacktestInput) {
 export function scanDailySwingSetups(
 	input: DailySwingBacktestInput,
 	dependencies: DailySwingBacktestDependencies = {},
+	researchPolicy: DailySwingSetupResearchPolicy = "none",
 ): DailySwingInstrumentSetupScan {
 	assertValidInput(input);
 	const configuration = resolveBacktestConfiguration(input.configuration);
@@ -66,6 +75,9 @@ export function scanDailySwingSetups(
 	const analyze = dependencies.analyze ?? analyzeDailySwing;
 	const trades: DailySwingInstrumentSetupScan["trades"] = [];
 	const untriggeredSetups: DailySwingInstrumentSetupScan["untriggeredSetups"] = [];
+	const objectiveFeatures: DailySwingInstrumentSetupScan["objectiveFeatures"] = [];
+	let setupsEvaluated = 0;
+	let liquidityRejected = 0;
 	const signalCounts: DailySwingInstrumentSetupScan["signalCounts"] = {
 		analyses: 0,
 		unavailable: 0,
@@ -118,6 +130,25 @@ export function scanDailySwingSetups(
 			continue;
 		}
 		const plan = result.tradePlan;
+		setupsEvaluated += 1;
+		const snapshot = buildDailySwingObjectiveFeatures({
+			bars: visibleBars,
+			result,
+			equity: configuration.initialEquity,
+			riskPerTradePercent: configuration.riskPerTradePercent,
+		});
+		objectiveFeatures.push({
+			instrumentId: input.instrument.instrumentId,
+			signalAt,
+			snapshot,
+		});
+		if (
+			researchPolicy === "broad_development_v1" &&
+			!snapshot.liquidity.eligible
+		) {
+			liquidityRejected += 1;
+			continue;
+		}
 		signalCounts[plan.direction === "long" ? "longSetups" : "shortSetups"] += 1;
 		const simulation = simulateTradePlan({
 			instrumentId: input.instrument.instrumentId,
@@ -163,6 +194,12 @@ export function scanDailySwingSetups(
 			barsAvailable: sourceBars.length,
 		},
 		signalCounts,
+		eligibility: {
+			researchPolicy,
+			setupsEvaluated,
+			liquidityRejected,
+		},
+		objectiveFeatures,
 		trades,
 		untriggeredSetups,
 	};
@@ -173,6 +210,7 @@ export function scanDailySwingSetupBatch(input: {
 	instruments: DailySwingBacktestInput[];
 	dependencies?: DailySwingBacktestDependencies;
 	generatedAt?: Date;
+	researchPolicy?: DailySwingSetupResearchPolicy;
 	onInstrumentComplete?: (
 		report: DailySwingInstrumentSetupScan,
 		index: number,
@@ -189,9 +227,69 @@ export function scanDailySwingSetupBatch(input: {
 	}
 	const generatedAt = input.generatedAt ?? new Date();
 	if (Number.isNaN(generatedAt.getTime())) throw new Error("generatedAt must be valid");
-	const reports = input.instruments.map((instrument, index) => {
-		const report = scanDailySwingSetups(instrument, input.dependencies);
-		input.onInstrumentComplete?.(report, index, input.instruments.length);
+	const researchPolicy = input.researchPolicy ?? "none";
+	let scanInstruments = input.instruments;
+	if (researchPolicy === "broad_development_v1") {
+		if (input.universeName.trim() !== BROAD_DEVELOPMENT_UNIVERSE_NAME) {
+			throw new Error(
+				`broad_development_v1 requires universe ${BROAD_DEVELOPMENT_UNIVERSE_NAME}`,
+			);
+		}
+		const receivedSymbols = new Set(
+			input.instruments.map((instrument) =>
+				instrument.instrument.displaySymbol.trim().toUpperCase(),
+			),
+		);
+		const missingSymbols = BROAD_DEVELOPMENT_SYMBOLS.filter(
+			(symbol) => !receivedSymbols.has(symbol),
+		);
+		const unexpectedSymbols = [...receivedSymbols].filter(
+			(symbol) => !(BROAD_DEVELOPMENT_SYMBOLS as readonly string[]).includes(symbol),
+		);
+		if (
+			input.instruments.length !== BROAD_DEVELOPMENT_SYMBOLS.length ||
+			missingSymbols.length > 0 ||
+			unexpectedSymbols.length > 0
+		) {
+			throw new Error(
+				`broad_development_v1 requires the exact frozen ${BROAD_DEVELOPMENT_SYMBOLS.length}-candidate manifest`,
+			);
+		}
+		for (const instrument of input.instruments) {
+			if (
+				instrument.marketData.provider !== BROAD_DEVELOPMENT_DATA_POLICY.provider ||
+				instrument.marketData.interval !== BROAD_DEVELOPMENT_DATA_POLICY.interval ||
+				!instrument.marketData.adjusted ||
+				instrument.benchmarkData?.providerSymbol !==
+					BROAD_DEVELOPMENT_DATA_POLICY.benchmarkSymbol
+			) {
+				throw new Error(
+					"broad_development_v1 requires the frozen Alpaca adjusted-daily source and SPY benchmark",
+				);
+			}
+		}
+		scanInstruments = input.instruments.filter((instrument) =>
+			evaluateBroadDevelopmentCoverage({
+				symbol: instrument.instrument.displaySymbol,
+				marketData: instrument.marketData,
+			}).eligible,
+		);
+		if (
+			scanInstruments.length <
+			BROAD_DEVELOPMENT_DATA_POLICY.minimumCoverageEligibleInstruments
+		) {
+			throw new Error(
+				`broad_development_v1 requires at least ${BROAD_DEVELOPMENT_DATA_POLICY.minimumCoverageEligibleInstruments} coverage-eligible instruments`,
+			);
+		}
+	}
+	const reports = scanInstruments.map((instrument, index) => {
+		const report = scanDailySwingSetups(
+			instrument,
+			input.dependencies,
+			researchPolicy,
+		);
+		input.onInstrumentComplete?.(report, index, scanInstruments.length);
 		return report;
 	});
 	const analyses = reports.reduce(
@@ -207,6 +305,10 @@ export function scanDailySwingSetupBatch(input: {
 		(total, report) => total + report.signalCounts.triggered,
 		0,
 	);
+	const liquidityRejected = reports.reduce(
+		(total, report) => total + report.eligibility.liquidityRejected,
+		0,
+	);
 	return {
 		scanVersion: DAILY_SWING_SETUP_SCAN_VERSION,
 		generatedAt: generatedAt.toISOString(),
@@ -214,18 +316,27 @@ export function scanDailySwingSetupBatch(input: {
 		methodology: {
 			evaluationPolicy: "every_eligible_completed_bar",
 			labelPolicy: "independent_fixed_equity_simulation",
+			researchPolicy,
 			description:
-				"Every eligible completed bar is analyzed. Each setup is simulated independently at fixed reference equity, so active positions never suppress later signals.",
+				"Every eligible completed bar is analyzed. Each setup receives a completed-bar-only objective feature snapshot and is simulated independently at fixed reference equity. The broad-development policy excludes setups that fail its frozen signal-time liquidity gate.",
 		},
 		aggregate: {
+			candidatesReceived: input.instruments.length,
 			instrumentsScanned: reports.length,
+			coverageExcluded: input.instruments.length - reports.length,
 			analyses,
 			setups,
+			liquidityRejected,
 			triggered,
 			untriggered: setups - triggered,
 		},
 		reports,
 		warnings: [
+			...(input.instruments.length > reports.length
+				? [
+						`${input.instruments.length - reports.length} instrument(s) failed the frozen outcome-blind coverage gate and were excluded before analysis.`,
+					]
+				: []),
 			"Setup outcomes overlap and must not be summed as portfolio returns.",
 			"Consecutive signals can describe closely related setups and are not statistically independent.",
 			"Labels use the configured execution assumptions and fixed reference equity for every setup.",
