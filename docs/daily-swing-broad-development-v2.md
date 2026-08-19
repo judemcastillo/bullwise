@@ -62,10 +62,28 @@ The read-only, outcome-blind audit found:
 
 The 24-instrument coverage gate passes without changing any rule. No setup was generated, no label or return was inspected, and no validation or sealed-test data was opened.
 
-## Authorized next step
+## Frozen scan implementation
 
 The expansion-specific exhaustive-scan policy was implemented and verified before outcome generation. It requires the exact source SHA-256, exact ordered 30-symbol manifest, frozen Alpaca metadata, and at least 24 coverage-eligible instruments. It automatically excludes GDXJ and OIH with the frozen coverage function and reuses strategy v1, objective-feature v1, independent fixed-equity labeling, and the unchanged point-in-time liquidity rule.
 
-Run `npm run scan:analysis-broad-development-v2`. The protected command accepts no overrides or overwrite flag and writes `analysis-broad-v2-expansion-setup-scan.json` using the streaming large-report writer.
+## Exhaustive expansion scan and integrity audit
 
-After the scan, audit only source provenance, versions, coverage exclusions, aggregate reconciliation, feature joins, and finite/null feature values. Do not combine datasets or inspect training-label totals until that integrity audit passes. Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability at this checkpoint.
+The protected expansion scan completed on 2026-08-19. `analysis-broad-v2-expansion-setup-scan.json` is 99,373,971 bytes, has SHA-256 `9a21909cdc21ecc49521630cd873bd74f8711a77d276c99392618ba7fb695305`, and records generation at `2026-08-19T09:30:57.316Z`.
+
+It uses setup-scan version `2.0.0`, backtest version `1.3.0`, engine version `1.0.0`, strategy `daily-swing-v1-draft`, objective-feature version `1.0.0`, and research policy `broad_development_v2_expansion`. The scan records:
+
+- 30 candidates received, 28 instruments scanned, and the two frozen outcome-blind coverage exclusions.
+- 66,416 completed-bar analyses.
+- 28,027 objective feature snapshots.
+- 9,137 setups rejected before labeling by the frozen signal-time liquidity rule.
+- 18,890 liquidity-eligible labeled setups: 13,873 triggered and 5,017 untriggered.
+
+The read-only integrity audit found zero violations. All report versions and source provenance match the frozen contract; aggregate and per-instrument inventories reconcile; every objective snapshot has matching instrument/timestamp provenance and finite-or-null feature values; every liquidity-eligible label joins exactly one eligible snapshot; and no rejected snapshot has an outcome label.
+
+These are source-inventory counts, not profitability or model-quality results. No return, target rate, symbol ranking, training-episode total, validation result, or sealed-test label was inspected.
+
+## Authorized next step
+
+Implement a deterministic combined broad dataset that requires both frozen scan hashes, preserves the existing time splits and purges, and keeps the expansion rows separate in provenance. Then materialize episode-first training rows and check only whether the combined count reaches 5,000.
+
+Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability before the combined coverage gate is evaluated.
