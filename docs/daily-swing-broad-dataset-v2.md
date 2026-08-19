@@ -45,3 +45,23 @@ Outcome labels preserve trigger status, net R multiple, profitability, exit reas
 ## Next authorization boundary
 
 After export and checksum recording, only train rows may be used to materialize episodes, inspect targets, select preprocessing, or fit models. Walk-forward development must be completed and a new model experiment preregistered before final validation is opened. The sealed test remains unavailable unless the preregistered validation gates all pass.
+
+## Export result
+
+The frozen export completed on 2026-08-19 with generated-at timestamp `2026-08-19T08:27:22.526Z`. `analysis-broad-dataset-v2.json` is 170 MB and has SHA-256 `bcb6870affcaed823d188703776a30ffed9d571e60440a7257c5742bd94ed23e`. Its source checksum is the preregistered setup-scan SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`.
+
+The source contained 93,130 liquidity-eligible outcomes and 14,897 liquidity rejections. Exact outcome-resolution purging removed 454 rows at the final split boundaries, leaving 92,676 dataset rows:
+
+- Train: 51,038 rows across 1,421 signal sessions, from 2017-03-13 through 2022-12-29.
+- Validation: 21,528 rows across 499 signal sessions, from 2023-01-03 through 2024-12-27.
+- Sealed test: 20,110 rows across 407 signal sessions, from 2025-01-02 through 2026-08-18.
+
+The expanding development inventories are:
+
+- `evaluate_2020`: 25,751 fit rows and 8,773 evaluation rows; 2,438 boundary-crossing rows purged.
+- `evaluate_2021`: 35,628 fit rows and 11,019 evaluation rows; 1,729 boundary-crossing rows purged.
+- `evaluate_2022`: 47,981 fit rows and 2,662 evaluation rows; 710 boundary-crossing rows purged.
+
+A read-only artifact audit found zero violations: all row IDs are unique, rows are chronologically ordered, resolution never precedes signal, split and session summaries reconcile, every feature vector has the same 50 fields, every numeric value is finite or schema-nullable, and no instrument identifier appears inside a feature vector.
+
+No target rate, profitability statistic, R-multiple aggregation, exit distribution, symbol ranking, model fit, validation metric, or test-label summary was calculated during export or audit.
