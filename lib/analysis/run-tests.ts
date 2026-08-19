@@ -14,6 +14,7 @@ import "./training-diagnostics.test";
 import "./episode-dataset.test";
 import "./episode-validation.test";
 import "./broad-development-universe.test";
+import "./broad-development-v2-universe.test";
 import "./objective-features.test";
 import "./setup-scan-report.test";
 import "./broad-dataset.test";
