@@ -201,6 +201,8 @@ Do not run a validation evaluator until the episode training artifact and prereg
 
 The one-shot evaluator is available as `npm run evaluate:analysis-episode-validation`, but it requires `--confirm-one-shot-validation` and exact frozen artifact checksums before reading inputs. Develop and audit it using synthetic fixtures only. Do not invoke the confirmed command on the real dataset until the implementation is committed and independently reviewed; its first real run consumes validation.
 
+The 2026-08-19 one-shot validation rejected the episode model after only 3 of 9 gates passed. AUC was 0.5220, log-loss improvement was 0.0009, and Brier improvement was 0.0004. The training-derived cutoff selected 110 of 311 validation episodes, but actionable-success lift was only 0.0229 and average-utility improvement only 0.0042R. The report checksum is `fd8a338745b7c0ae62754ab26c6182b350ba599260ddf802876d3a535bb88aa4`. Do not tune or rerun this candidate, and do not open its test split.
+
 ## Frozen v2 confirmation
 
 The v2 hypothesis, untouched cross-asset ETF universe, and pass criteria are recorded in `docs/daily-swing-v2-preregistration.md`. Reproduce its data retrieval and one-shot confirmation with:

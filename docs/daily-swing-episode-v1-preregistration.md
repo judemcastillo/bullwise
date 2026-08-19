@@ -56,3 +56,11 @@ Any failed criterion rejects this candidate. The model, features, target, episod
 The evaluator is implemented as `npm run evaluate:analysis-episode-validation`. It must first be tested and audited with synthetic fixtures only. The real command requires the explicit `--confirm-one-shot-validation` flag and refuses any source, training, or preregistration artifact whose SHA-256 differs from the frozen values above.
 
 Do not run the real command merely to check that it works. Once run against the frozen source dataset, validation is consumed and the resulting report must be preserved without rerunning or tuning.
+
+## Final validation result
+
+The single authorized validation run was consumed on 2026-08-19. Its report, `analysis-episode-validation-report.json`, has SHA-256 `fd8a338745b7c0ae62754ab26c6182b350ba599260ddf802876d3a535bb88aa4`.
+
+The candidate passed 3 of 9 gates and is rejected. Validation contained 311 episode-first observations and 89 actionable successes. ROC AUC was 0.5220164, log-loss improvement was 0.00092248, and Brier-score improvement was 0.00039461. The frozen cutoff selected 110 episodes with a 0.02291728 actionable-success-rate lift, 0.08263291R average utility, and only 0.00415117R utility improvement. The coverage, success-count, and selected-row-count gates passed; all six predictive and economic-quality gates failed.
+
+The model, thresholds, and feature set must not be tuned or rerun on this validation split. Test features and labels remained sealed and must not be opened for this rejected candidate.
