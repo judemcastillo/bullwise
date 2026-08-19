@@ -37,6 +37,7 @@
 /analysis-broad-history.json
 /analysis-broad-setup-scan.json
 /analysis-broad-dataset-v2.json
+/analysis-broad-episode-training.json
 
 # next.js
 /.next/
