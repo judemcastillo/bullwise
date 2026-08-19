@@ -18,4 +18,5 @@ import "./broad-development-v2-universe.test";
 import "./objective-features.test";
 import "./setup-scan-report.test";
 import "./broad-dataset.test";
+import "./combined-broad-dataset.test";
 import "./broad-episode-dataset.test";

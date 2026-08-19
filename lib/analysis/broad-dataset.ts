@@ -36,6 +36,7 @@ import {
 import {
 	DAILY_SWING_SETUP_SCAN_VERSION,
 	type DailySwingInstrumentSetupScan,
+	type DailySwingSetupResearchPolicy,
 	type DailySwingSetupScanReport,
 } from "@/lib/analysis/setup-scan.types";
 import {
@@ -98,7 +99,10 @@ const OBJECTIVE_NULLABLE_FEATURES = new Set<keyof DailySwingObjectiveFeatureValu
 ]);
 
 type Outcome = BacktestTrade | UntriggeredSetup;
-type CandidateRow = Omit<DailySwingBroadDatasetRow, "split">;
+export type DailySwingBroadCandidateRow = Omit<
+	DailySwingBroadDatasetRow,
+	"split"
+>;
 
 function timestamp(value: string, label: string) {
 	const result = new Date(value).getTime();
@@ -241,8 +245,11 @@ function validateSource(report: DailySwingSetupScanReport) {
 	}
 }
 
-function collectRows(reports: readonly DailySwingInstrumentSetupScan[]) {
-	const rows: CandidateRow[] = [];
+export function collectDailySwingBroadRows(
+	reports: readonly DailySwingInstrumentSetupScan[],
+	researchPolicy: Exclude<DailySwingSetupResearchPolicy, "none">,
+) {
+	const rows: DailySwingBroadCandidateRow[] = [];
 	let featureRecords = 0;
 	let liquidityRejected = 0;
 	for (const report of reports) {
@@ -250,7 +257,7 @@ function collectRows(reports: readonly DailySwingInstrumentSetupScan[]) {
 			report.backtestVersion !== DAILY_SWING_BACKTEST_VERSION ||
 			report.engineVersion !== TECHNICAL_ANALYSIS_ENGINE_VERSION ||
 			report.strategyVersion !== DAILY_SWING_STRATEGY_VERSION ||
-			report.eligibility.researchPolicy !== "broad_development_v1"
+			report.eligibility.researchPolicy !== researchPolicy
 		) {
 			throw new Error(`${report.instrument.displaySymbol} has incompatible provenance`);
 		}
@@ -343,7 +350,7 @@ function summary(
 	};
 }
 
-function buildWalkForwardFolds(rows: readonly CandidateRow[]) {
+function buildWalkForwardFolds(rows: readonly DailySwingBroadCandidateRow[]) {
 	return DAILY_SWING_BROAD_WALK_FORWARD_FOLDS.map((policy) => {
 		const startsAt = timestamp(policy.evaluationStartsAt, `${policy.foldId}.startsAt`);
 		const endsBefore = timestamp(policy.evaluationEndsBefore, `${policy.foldId}.endsBefore`);
@@ -375,26 +382,18 @@ function buildWalkForwardFolds(rows: readonly CandidateRow[]) {
 	});
 }
 
-export function buildDailySwingBroadDataset(input: {
-	report: DailySwingSetupScanReport;
-	setupScanSha256: string;
-	generatedAt?: Date;
-}): DailySwingBroadDataset {
-	validateSource(input.report);
-	const setupScanSha256 = requireSha256(input.setupScanSha256);
-	if (setupScanSha256 !== DAILY_SWING_BROAD_SETUP_SCAN_SHA256) {
-		throw new Error("Broad dataset source checksum does not match the frozen setup scan");
-	}
-	const generatedAt = input.generatedAt ?? new Date();
-	if (Number.isNaN(generatedAt.getTime())) throw new Error("generatedAt must be valid");
-	const collected = collectRows(input.report.reports);
-	if (
-		collected.featureRecords !==
-			input.report.aggregate.setups + input.report.aggregate.liquidityRejected ||
-		collected.liquidityRejected !== input.report.aggregate.liquidityRejected ||
-		collected.rows.length !== input.report.aggregate.setups
-	) {
-		throw new Error("Broad aggregate feature and outcome counts do not reconcile");
+export function applyDailySwingBroadSplitPolicy<
+	T extends DailySwingBroadCandidateRow,
+>(candidateRows: readonly T[]) {
+	const collectedRows = [...candidateRows].sort(
+		(left, right) =>
+			timestamp(left.signalAt, `${left.rowId}.signalAt`) -
+				timestamp(right.signalAt, `${right.rowId}.signalAt`) ||
+			left.displaySymbol.localeCompare(right.displaySymbol) ||
+			left.rowId.localeCompare(right.rowId),
+	);
+	if (new Set(collectedRows.map((row) => row.rowId)).size !== collectedRows.length) {
+		throw new Error("Broad dataset row IDs must be unique across all sources");
 	}
 	const validationStartsAt = timestamp(
 		DAILY_SWING_BROAD_SPLIT_BOUNDARIES.validationStartsAt,
@@ -405,8 +404,8 @@ export function buildDailySwingBroadDataset(input: {
 		"testStartsAt",
 	);
 	let purgedFinalBoundaryRows = 0;
-	const rows: DailySwingBroadDatasetRow[] = [];
-	for (const row of collected.rows) {
+	const rows: Array<T & { split: AnalysisDatasetSplit }> = [];
+	for (const row of collectedRows) {
 		const signal = timestamp(row.signalAt, `${row.rowId}.signalAt`);
 		const resolution = timestamp(row.resolvedAt, `${row.rowId}.resolvedAt`);
 		let split: AnalysisDatasetSplit;
@@ -430,9 +429,46 @@ export function buildDailySwingBroadDataset(input: {
 	const trainRows = rows.filter((row) => row.split === "train");
 	const validationRows = rows.filter((row) => row.split === "validation");
 	const testRows = rows.filter((row) => row.split === "test");
-	const developmentRows = collected.rows.filter(
+	const developmentRows = collectedRows.filter(
 		(row) => timestamp(row.signalAt, `${row.rowId}.signalAt`) < validationStartsAt,
 	);
+	return {
+		rows,
+		purgedFinalBoundaryRows,
+		walkForwardFolds: buildWalkForwardFolds(developmentRows),
+		splits: {
+			train: summary(trainRows, "train"),
+			validation: summary(validationRows, "validation"),
+			test: summary(testRows, "test"),
+		},
+	};
+}
+
+export function buildDailySwingBroadDataset(input: {
+	report: DailySwingSetupScanReport;
+	setupScanSha256: string;
+	generatedAt?: Date;
+}): DailySwingBroadDataset {
+	validateSource(input.report);
+	const setupScanSha256 = requireSha256(input.setupScanSha256);
+	if (setupScanSha256 !== DAILY_SWING_BROAD_SETUP_SCAN_SHA256) {
+		throw new Error("Broad dataset source checksum does not match the frozen setup scan");
+	}
+	const generatedAt = input.generatedAt ?? new Date();
+	if (Number.isNaN(generatedAt.getTime())) throw new Error("generatedAt must be valid");
+	const collected = collectDailySwingBroadRows(
+		input.report.reports,
+		"broad_development_v1",
+	);
+	if (
+		collected.featureRecords !==
+			input.report.aggregate.setups + input.report.aggregate.liquidityRejected ||
+		collected.liquidityRejected !== input.report.aggregate.liquidityRejected ||
+		collected.rows.length !== input.report.aggregate.setups
+	) {
+		throw new Error("Broad aggregate feature and outcome counts do not reconcile");
+	}
+	const split = applyDailySwingBroadSplitPolicy(collected.rows);
 	return {
 		datasetVersion: DAILY_SWING_BROAD_DATASET_VERSION,
 		generatedAt: generatedAt.toISOString(),
@@ -463,18 +499,14 @@ export function buildDailySwingBroadDataset(input: {
 			validationStartsAt:
 				DAILY_SWING_BROAD_SPLIT_BOUNDARIES.validationStartsAt,
 			testStartsAt: DAILY_SWING_BROAD_SPLIT_BOUNDARIES.testStartsAt,
-			purgedFinalBoundaryRows,
+			purgedFinalBoundaryRows: split.purgedFinalBoundaryRows,
 			episodeSelection: "independently_within_each_fold_and_final_split",
 			description:
 				"Final splits use frozen calendar boundaries and purge outcomes crossing the next split. Expanding walk-forward folds are confined to train and apply the same resolution purge.",
 		},
-		walkForwardFolds: buildWalkForwardFolds(developmentRows),
-		splits: {
-			train: summary(trainRows, "train"),
-			validation: summary(validationRows, "validation"),
-			test: summary(testRows, "test"),
-		},
-		rows,
+		walkForwardFolds: split.walkForwardFolds,
+		splits: split.splits,
+		rows: split.rows,
 		warnings: [
 			"Row counts are source inventory, not independent sample counts; overlapping signals remain correlated.",
 			"Do not aggregate or inspect validation/test labels before the corresponding preregistered evaluation is authorized.",
