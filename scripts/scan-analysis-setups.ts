@@ -1,8 +1,9 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { BacktestConfiguration } from "@/lib/analysis/backtest.types";
 import { analyzeDailySwingV2 } from "@/lib/analysis/daily-swing-v2";
 import { scanDailySwingSetupBatch } from "@/lib/analysis/setup-scan";
+import { writeDailySwingSetupScanReport } from "@/lib/analysis/setup-scan-report";
 import type { DailySwingSetupResearchPolicy } from "@/lib/analysis/setup-scan.types";
 import type { TechnicalAnalysisInstrument } from "@/lib/analysis/technical-analysis.types";
 import type { MarketBar, MarketBars } from "@/lib/market-data/types";
@@ -141,9 +142,8 @@ async function main() {
 			);
 		},
 	});
-	await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, {
-		encoding: "utf8",
-		flag: process.argv.includes("--force") ? "w" : "wx",
+	await writeDailySwingSetupScanReport(outputPath, report, {
+		force: process.argv.includes("--force"),
 	});
 	console.log(`Setup scan: ${outputPath}`);
 	console.log(
