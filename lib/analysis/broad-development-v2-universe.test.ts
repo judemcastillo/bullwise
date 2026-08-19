@@ -7,6 +7,7 @@ import {
 	BROAD_DEVELOPMENT_V2_EXPANSION_INCEPTION_CUTOFF,
 	BROAD_DEVELOPMENT_V2_EXPANSION_LIQUIDITY_POLICY,
 	BROAD_DEVELOPMENT_V2_EXPANSION_SELECTION_POLICY,
+	BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256,
 	BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS,
 	BROAD_DEVELOPMENT_V2_PRIOR_RESEARCH_SYMBOLS,
 	evaluateBroadDevelopmentV2ExpansionCoverage,
@@ -63,6 +64,7 @@ describe("frozen broad development v2 expansion", () => {
 	});
 
 	it("freezes outcome-blind selection and the unchanged data rules", () => {
+		assert.match(BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256, /^[a-f0-9]{64}$/);
 		assert.equal(
 			BROAD_DEVELOPMENT_V2_EXPANSION_SELECTION_POLICY.strategyOutcomesUsedForSelection,
 			false,

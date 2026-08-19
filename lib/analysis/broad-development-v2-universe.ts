@@ -9,6 +9,8 @@ import type { MarketBars } from "@/lib/market-data/types";
 export const BROAD_DEVELOPMENT_V2_EXPANSION_VERSION = "2.0.0";
 export const BROAD_DEVELOPMENT_V2_EXPANSION_NAME =
 	"daily-swing-broad-development-v2-expansion";
+export const BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256 =
+	"7262c1a32e3cac8651c57daee97812c72edd6d39036e310e4259b25b37559505";
 export const BROAD_DEVELOPMENT_V2_EXPANSION_INCEPTION_CUTOFF = "2015-12-31";
 
 type FrozenExpansionCandidate = {

@@ -64,6 +64,8 @@ The 24-instrument coverage gate passes without changing any rule. No setup was g
 
 ## Authorized next step
 
-Add an expansion-specific exhaustive-scan policy that requires this exact source hash and automatically excludes only GDXJ and OIH under the frozen coverage function. Reuse strategy v1, objective-feature v1, independent fixed-equity labeling, and the unchanged point-in-time liquidity rule.
+The expansion-specific exhaustive-scan policy was implemented and verified before outcome generation. It requires the exact source SHA-256, exact ordered 30-symbol manifest, frozen Alpaca metadata, and at least 24 coverage-eligible instruments. It automatically excludes GDXJ and OIH with the frozen coverage function and reuses strategy v1, objective-feature v1, independent fixed-equity labeling, and the unchanged point-in-time liquidity rule.
 
-Do not combine datasets or inspect training-label totals until that expansion scan is complete and its integrity is audited. Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability at this checkpoint.
+Run `npm run scan:analysis-broad-development-v2`. The protected command accepts no overrides or overwrite flag and writes `analysis-broad-v2-expansion-setup-scan.json` using the streaming large-report writer.
+
+After the scan, audit only source provenance, versions, coverage exclusions, aggregate reconciliation, feature joins, and finite/null feature values. Do not combine datasets or inspect training-label totals until that integrity audit passes. Do not inspect validation or sealed-test labels, fit a model, rank symbols, or measure profitability at this checkpoint.

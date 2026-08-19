@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { BacktestConfiguration } from "@/lib/analysis/backtest.types";
@@ -35,7 +36,7 @@ Defaults:
 Options:
   --output=analysis-setup-scan.json
   --strategy=v1                 v1 or v2 (default: v1)
-  --research-policy=none        none or broad_development_v1 (default: none)
+  --research-policy=none        none, broad_development_v1, or broad_development_v2_expansion (default: none)
   --force                       Replace an existing output file
   --help
 
@@ -119,19 +120,23 @@ async function main() {
 		"none") as DailySwingSetupResearchPolicy;
 	if (
 		researchPolicy !== "none" &&
-		researchPolicy !== "broad_development_v1"
+		researchPolicy !== "broad_development_v1" &&
+		researchPolicy !== "broad_development_v2_expansion"
 	) {
 		throw new Error(
-			"research-policy must be none or broad_development_v1",
+			"research-policy must be none, broad_development_v1, or broad_development_v2_expansion",
 		);
 	}
-	const input = parseInput(await readFile(inputPath, "utf8"));
+	const raw = await readFile(inputPath, "utf8");
+	const sourceSha256 = createHash("sha256").update(raw).digest("hex");
+	const input = parseInput(raw);
 	console.log(
 		`Scanning ${input.instruments.length} candidates with ${strategy} and ${researchPolicy} research policy; no network access is required.`,
 	);
 	const report = scanDailySwingSetupBatch({
 		...input,
 		researchPolicy,
+		sourceSha256,
 		...(strategy === "v2" ? { dependencies: { analyze: analyzeDailySwingV2 } } : {}),
 		onInstrumentComplete: (instrumentReport, index, total) => {
 			const setups =

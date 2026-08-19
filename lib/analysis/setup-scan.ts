@@ -15,6 +15,13 @@ import {
 	BROAD_DEVELOPMENT_UNIVERSE_NAME,
 	evaluateBroadDevelopmentCoverage,
 } from "@/lib/analysis/broad-development-universe";
+import {
+	BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY,
+	BROAD_DEVELOPMENT_V2_EXPANSION_NAME,
+	BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256,
+	BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS,
+	evaluateBroadDevelopmentV2ExpansionCoverage,
+} from "@/lib/analysis/broad-development-v2-universe";
 import { buildDailySwingObjectiveFeatures } from "@/lib/analysis/objective-features";
 import {
 	DAILY_SWING_SETUP_SCAN_VERSION,
@@ -142,10 +149,7 @@ export function scanDailySwingSetups(
 			signalAt,
 			snapshot,
 		});
-		if (
-			researchPolicy === "broad_development_v1" &&
-			!snapshot.liquidity.eligible
-		) {
+		if (researchPolicy !== "none" && !snapshot.liquidity.eligible) {
 			liquidityRejected += 1;
 			continue;
 		}
@@ -211,6 +215,7 @@ export function scanDailySwingSetupBatch(input: {
 	dependencies?: DailySwingBacktestDependencies;
 	generatedAt?: Date;
 	researchPolicy?: DailySwingSetupResearchPolicy;
+	sourceSha256?: string;
 	onInstrumentComplete?: (
 		report: DailySwingInstrumentSetupScan,
 		index: number,
@@ -283,6 +288,71 @@ export function scanDailySwingSetupBatch(input: {
 			);
 		}
 	}
+	if (researchPolicy === "broad_development_v2_expansion") {
+		if (input.universeName.trim() !== BROAD_DEVELOPMENT_V2_EXPANSION_NAME) {
+			throw new Error(
+				`broad_development_v2_expansion requires universe ${BROAD_DEVELOPMENT_V2_EXPANSION_NAME}`,
+			);
+		}
+		if (input.sourceSha256 !== BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256) {
+			throw new Error(
+				"broad_development_v2_expansion requires the exact frozen source SHA-256",
+			);
+		}
+		const receivedSymbols = new Set(
+			input.instruments.map((instrument) =>
+				instrument.instrument.displaySymbol.trim().toUpperCase(),
+			),
+		);
+		const missingSymbols = BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS.filter(
+			(symbol) => !receivedSymbols.has(symbol),
+		);
+		const unexpectedSymbols = [...receivedSymbols].filter(
+			(symbol) =>
+				!(BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS as readonly string[]).includes(
+					symbol,
+				),
+		);
+		if (
+			input.instruments.length !==
+				BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS.length ||
+			missingSymbols.length > 0 ||
+			unexpectedSymbols.length > 0
+		) {
+			throw new Error(
+				`broad_development_v2_expansion requires the exact frozen ${BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS.length}-candidate manifest`,
+			);
+		}
+		for (const instrument of input.instruments) {
+			if (
+				instrument.marketData.provider !==
+					BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.provider ||
+				instrument.marketData.interval !==
+					BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.interval ||
+				!instrument.marketData.adjusted ||
+				instrument.benchmarkData?.providerSymbol !==
+					BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.benchmarkSymbol
+			) {
+				throw new Error(
+					"broad_development_v2_expansion requires the frozen Alpaca adjusted-daily source and SPY benchmark",
+				);
+			}
+		}
+		scanInstruments = input.instruments.filter((instrument) =>
+			evaluateBroadDevelopmentV2ExpansionCoverage({
+				symbol: instrument.instrument.displaySymbol,
+				marketData: instrument.marketData,
+			}).eligible,
+		);
+		if (
+			scanInstruments.length <
+			BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.minimumCoverageEligibleInstruments
+		) {
+			throw new Error(
+				`broad_development_v2_expansion requires at least ${BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.minimumCoverageEligibleInstruments} coverage-eligible instruments`,
+			);
+		}
+	}
 	const reports = scanInstruments.map((instrument, index) => {
 		const report = scanDailySwingSetups(
 			instrument,
@@ -313,6 +383,7 @@ export function scanDailySwingSetupBatch(input: {
 		scanVersion: DAILY_SWING_SETUP_SCAN_VERSION,
 		generatedAt: generatedAt.toISOString(),
 		universeName: input.universeName.trim(),
+		...(input.sourceSha256 ? { sourceSha256: input.sourceSha256 } : {}),
 		methodology: {
 			evaluationPolicy: "every_eligible_completed_bar",
 			labelPolicy: "independent_fixed_equity_simulation",

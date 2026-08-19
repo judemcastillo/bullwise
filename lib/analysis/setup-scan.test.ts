@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import {
+	BROAD_DEVELOPMENT_V2_EXPANSION_NAME,
+	BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256,
+	BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS,
+} from "@/lib/analysis/broad-development-v2-universe";
 import { scanDailySwingSetupBatch, scanDailySwingSetups } from "@/lib/analysis/setup-scan";
 import type { DailySwingAnalysisInput } from "@/lib/analysis/technical-analysis";
 import type {
@@ -75,6 +80,52 @@ function marketData(sourceBars: MarketBar[]): MarketBars {
 		adjusted: true,
 		timeliness: "historical",
 		bars: sourceBars,
+	};
+}
+
+function expansionScanInput(symbol: string) {
+	const startsLate = symbol === "GDXJ" || symbol === "OIH";
+	const firstAt = new Date(
+		startsLate ? "2016-05-02T04:00:00.000Z" : "2016-01-04T05:00:00.000Z",
+	).getTime();
+	const sourceBars = Array.from({ length: 2_500 }, (_, index) => ({
+		startedAt: new Date(firstAt + index * DAY_MS),
+		open: "100",
+		high: "101",
+		low: "99",
+		close: "100",
+		volume: "1000000",
+	}));
+	const instrumentId = `backtest:us-etf:${symbol.toLowerCase()}`;
+	const benchmarkBars: MarketBars = {
+		instrumentId: "backtest:benchmark:spy",
+		provider: "alpaca",
+		providerSymbol: "SPY",
+		currency: "USD",
+		interval: "1d",
+		from: new Date("2016-01-01T00:00:00.000Z"),
+		to: new Date("2026-08-18T23:59:59.999Z"),
+		adjusted: true,
+		timeliness: "historical",
+		bars: sourceBars,
+	};
+	return {
+		instrument: {
+			instrumentId,
+			displaySymbol: symbol,
+			assetClass: "equity" as const,
+			securityType: "etf" as const,
+			etfProfile: "standard" as const,
+			currency: "USD",
+			pricePrecision: 2,
+		},
+		marketData: {
+			...benchmarkBars,
+			instrumentId,
+			providerSymbol: symbol,
+		},
+		benchmarkData: benchmarkBars,
+		startAt: sourceBars.at(-1)!.startedAt,
 	};
 }
 
@@ -250,5 +301,46 @@ describe("exhaustive daily swing setup scan", () => {
 		assert.equal(report.methodology.labelPolicy, "independent_fixed_equity_simulation");
 		assert.equal(report.aggregate.analyses, 5);
 		assert.equal(report.aggregate.liquidityRejected, 0);
+	});
+
+	it("enforces the frozen v2 expansion source and coverage exclusions", () => {
+		const instruments = BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS.map((symbol) =>
+			expansionScanInput(symbol),
+		);
+		assert.throws(
+			() =>
+				scanDailySwingSetupBatch({
+					universeName: BROAD_DEVELOPMENT_V2_EXPANSION_NAME,
+					instruments,
+					researchPolicy: "broad_development_v2_expansion",
+					sourceSha256: "0".repeat(64),
+				}),
+			/exact frozen source SHA-256/,
+		);
+
+		const report = scanDailySwingSetupBatch({
+			universeName: BROAD_DEVELOPMENT_V2_EXPANSION_NAME,
+			instruments,
+			researchPolicy: "broad_development_v2_expansion",
+			sourceSha256: BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256,
+			dependencies: {
+				analyze: (input) => readyResult(input, null),
+			},
+		});
+
+		assert.equal(report.sourceSha256, BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256);
+		assert.equal(report.aggregate.candidatesReceived, 30);
+		assert.equal(report.aggregate.instrumentsScanned, 28);
+		assert.equal(report.aggregate.coverageExcluded, 2);
+		assert.deepEqual(
+			report.reports.map((item) => item.instrument.displaySymbol),
+			BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS.filter(
+				(symbol) => symbol !== "GDXJ" && symbol !== "OIH",
+			),
+		);
+		assert.equal(
+			report.methodology.researchPolicy,
+			"broad_development_v2_expansion",
+		);
 	});
 });

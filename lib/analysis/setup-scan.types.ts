@@ -15,7 +15,8 @@ export const SUPPORTED_DAILY_SWING_SETUP_SCAN_VERSIONS = [
 
 export type DailySwingSetupResearchPolicy =
 	| "none"
-	| "broad_development_v1";
+	| "broad_development_v1"
+	| "broad_development_v2_expansion";
 
 export type DailySwingInstrumentSetupScan = {
 	instrument: TechnicalAnalysisInstrument;
@@ -45,6 +46,7 @@ export type DailySwingSetupScanReport = {
 	scanVersion: typeof DAILY_SWING_SETUP_SCAN_VERSION;
 	generatedAt: string;
 	universeName: string;
+	sourceSha256?: string;
 	methodology: {
 		evaluationPolicy: "every_eligible_completed_bar";
 		labelPolicy: "independent_fixed_equity_simulation";
