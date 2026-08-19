@@ -29,6 +29,22 @@ The sole decision at this checkpoint is whether combined episode-first train row
 
 The exporter may report train source rows, train episode rows, the Boolean coverage result, and walk-forward source/episode counts. It must not summarize actionable-success rates, utility, profitability, returns, exits, symbols, validation data, sealed-test data, or model metrics.
 
+## Materialization and integrity-audit result
+
+The protected train-only materialization completed on 2026-08-19. `analysis-broad-combined-episode-training.json` is 9,734,231 bytes, has SHA-256 `0233cf9961e916e3079694ce0c887ba7f38ca4b5870271e9e769b563abea2a6b`, and records generation at `2026-08-19T10:32:27.030Z`.
+
+The 60,381 train setup rows produced 5,504 episode-first rows across 125 instrument-direction groups. The frozen 5,000-row coverage gate **passes by 504 episodes**.
+
+Walk-forward episode inventories are:
+
+- `evaluate_2020`: 2,757 episodes from 29,969 fit rows and 1,031 episodes from 10,742 evaluation rows.
+- `evaluate_2021`: 3,813 episodes from 41,939 fit rows and 1,197 episodes from 13,212 evaluation rows.
+- `evaluate_2022`: 5,014 episodes from 56,770 fit rows and 468 episodes from 3,140 evaluation rows.
+
+The read-only integrity audit found zero violations: all 5,504 row IDs are unique and chronologically ordered; resolution never precedes signal; no selected signal overlaps the prior selected episode for its instrument and direction; source tags are valid; every feature vector has 50 fields with no provenance leakage; target values are structurally valid and finite; and artifact, coverage, and walk-forward counts reconcile.
+
+Validation contains 25,935 source rows and sealed test contains 25,082 source rows, but their features and labels were not read. No actionable-success rate, utility aggregate, profitability measure, return, exit distribution, symbol ranking, validation metric, sealed-test metric, or model result was calculated.
+
 ## Authorized next step
 
-Run `npm run export:analysis-broad-combined-episodes`. The protected command accepts no overrides or overwrite flag and writes `analysis-broad-combined-episode-training.json`. Then record its SHA-256 and audit row uniqueness, chronological order, non-overlap within instrument-direction groups, 50-field feature structure, finite target values, source provenance, and count reconciliation.
+Freeze a train-only walk-forward model-development protocol against this exact episode artifact hash. Candidate preprocessing, model families, hyperparameters, selection metric, robustness gates, and the single final-validation decision rule must be declared before fitting. Development may use only the three frozen train folds; 2023–2024 validation and 2025+ sealed test remain unopened.
