@@ -10,6 +10,7 @@ import {
 	type BacktestConfiguration,
 	type BacktestExitFill,
 	type BacktestPerformance,
+	type BacktestSignalFeatures,
 	type BacktestSignalQuality,
 	type BacktestTrade,
 	type DailySwingBacktestInput,
@@ -32,7 +33,7 @@ import {
 } from "@/lib/analysis/technical-analysis.types";
 import type { MarketBar, MarketBars } from "@/lib/market-data/types";
 
-const MINIMUM_ANALYSIS_BARS = 300;
+export const MINIMUM_ANALYSIS_BARS = 300;
 const TARGET_ONE_POSITION_FRACTION = 0.5;
 
 export const DEFAULT_BACKTEST_CONFIGURATION: BacktestConfiguration = {
@@ -52,6 +53,7 @@ export type TradeSimulationInput = {
 	trendRegime: AnalysisState;
 	volatilityRegime: VolatilityState;
 	signalQuality?: BacktestSignalQuality;
+	signalFeatures?: BacktestSignalFeatures;
 	futureBars: MarketBar[];
 	equity: number;
 	configuration?: Partial<BacktestConfiguration>;
@@ -80,7 +82,7 @@ function requireFinite(value: number, label: string) {
 	return value;
 }
 
-function resolveConfiguration(
+export function resolveBacktestConfiguration(
 	overrides: Partial<BacktestConfiguration> = {},
 ): BacktestConfiguration {
 	const configuration: BacktestConfiguration = {
@@ -267,7 +269,7 @@ export function simulateTradePlan(input: TradeSimulationInput): TradeSimulationR
 	if (!Number.isFinite(input.equity) || input.equity <= 0) {
 		throw new Error("equity must be greater than zero");
 	}
-	const configuration = resolveConfiguration(input.configuration);
+	const configuration = resolveBacktestConfiguration(input.configuration);
 	const bars = parseBars(input.futureBars, "futureBars");
 	const { entryLow, entryHigh, stopPrice, targetPrices } = validateTradePlan(input.plan);
 	const observableBars = Math.min(input.plan.expiresAfterCompletedBars, bars.length);
@@ -292,7 +294,9 @@ export function simulateTradePlan(input: TradeSimulationInput): TradeSimulationR
 			status: "untriggered",
 			barsConsumed: observableBars,
 			setup: {
+				instrumentId: input.instrumentId,
 				direction: input.plan.direction,
+				setupType: input.plan.entry.type,
 				signalAt: input.signalAt.toISOString(),
 				resolvedAt: (resolvedBar?.startedAt ?? input.signalAt).toISOString(),
 				reason:
@@ -300,6 +304,15 @@ export function simulateTradePlan(input: TradeSimulationInput): TradeSimulationR
 						? "expired"
 						: "end_of_data",
 				barsObserved: observableBars,
+				trendRegime: input.trendRegime,
+				volatilityRegime: input.volatilityRegime,
+				signalQuality: input.signalQuality ?? {
+					evidenceStrength: "unavailable",
+					relativeStrength20Percent: null,
+					volumeZScore20: null,
+					planRiskReward: input.plan.riskReward,
+				},
+				signalFeatures: input.signalFeatures ?? null,
 			},
 		};
 	}
@@ -524,6 +537,7 @@ export function simulateTradePlan(input: TradeSimulationInput): TradeSimulationR
 				volumeZScore20: null,
 				planRiskReward: input.plan.riskReward,
 			},
+			signalFeatures: input.signalFeatures ?? null,
 			positionUnits: round(positionUnits),
 			riskCapital: round(riskCapital),
 			grossPnl: round(grossPnl),
@@ -586,6 +600,56 @@ function marketBarsThrough(source: MarketBars, timestamp: number): MarketBars {
 	};
 }
 
+function percentageDistance(value: string, baseline: string) {
+	const parsedValue = Number(value);
+	const parsedBaseline = Number(baseline);
+	if (!Number.isFinite(parsedValue) || !Number.isFinite(parsedBaseline) || parsedBaseline <= 0) {
+		throw new Error("Signal prices must be positive finite numbers");
+	}
+	return round(((parsedValue / parsedBaseline) - 1) * 100);
+}
+
+export function buildBacktestSignalFeatures(
+	result: Extract<TechnicalAnalysisResult, { status: "ready" }>,
+) {
+	const close = Number(result.indicators.close);
+	const macdHistogram = Number(result.indicators.macdHistogram);
+	if (!Number.isFinite(close) || close <= 0 || !Number.isFinite(macdHistogram)) {
+		throw new Error("Signal indicators must contain a valid close and MACD histogram");
+	}
+	return {
+		momentumRegime: result.assessments.momentum.state,
+		participationRegime: result.assessments.participation.state,
+		sma20DistancePercent: percentageDistance(
+			result.indicators.close,
+			result.indicators.sma20,
+		),
+		sma50DistancePercent: percentageDistance(
+			result.indicators.close,
+			result.indicators.sma50,
+		),
+		sma200DistancePercent: percentageDistance(
+			result.indicators.close,
+			result.indicators.sma200,
+		),
+		sma20SlopePercent: result.indicators.sma20SlopePercent,
+		sma50SlopePercent: result.indicators.sma50SlopePercent,
+		rsi14: result.indicators.rsi14,
+		macdHistogramPercent: round((macdHistogram / close) * 100),
+		atrPercent: result.indicators.atrPercent,
+		return5Percent: result.indicators.return5Percent,
+		return20Percent: result.indicators.return20Percent,
+		return60Percent: result.indicators.return60Percent,
+		realizedVolatility20Percent:
+			result.indicators.realizedVolatility20Percent,
+		realizedVolatility60Percent:
+			result.indicators.realizedVolatility60Percent,
+		volatilityPercentile: result.indicators.volatilityPercentile,
+		relativeStrength60Percent:
+			result.indicators.relativeStrength60Percent,
+	} satisfies BacktestSignalFeatures;
+}
+
 function buyAndHoldReturn(bars: readonly NumericBar[]) {
 	if (bars.length < 2 || bars[0].close <= 0) return null;
 	return round(((bars.at(-1)!.close / bars[0].close) - 1) * 100);
@@ -634,7 +698,7 @@ export function runDailySwingBacktest(
 	input: DailySwingBacktestInput,
 	dependencies: DailySwingBacktestDependencies = {},
 ): DailySwingBacktestReport {
-	const configuration = resolveConfiguration(input.configuration);
+	const configuration = resolveBacktestConfiguration(input.configuration);
 	if (input.marketData.instrumentId !== input.instrument.instrumentId) {
 		throw new Error("marketData.instrumentId must match the analysis instrument");
 	}
@@ -739,6 +803,7 @@ export function runDailySwingBacktest(
 				volumeZScore20: result.indicators.volumeZScore20,
 				planRiskReward: plan.riskReward,
 			},
+			signalFeatures: buildBacktestSignalFeatures(result),
 			futureBars: sourceBars.slice(index + 1),
 			equity,
 			configuration,

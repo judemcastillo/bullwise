@@ -43,6 +43,7 @@ function trade(
 			planRiskReward: 2,
 			...signalQuality,
 		},
+		signalFeatures: null,
 		positionUnits: 500,
 		riskCapital: 1_000,
 		grossPnl: netPnl,
@@ -74,7 +75,7 @@ function mark(
 
 function report(symbol: string, trades: BacktestTrade[]) {
 	return {
-		backtestVersion: "1.2.0",
+		backtestVersion: "1.3.0",
 		instrument: {
 			instrumentId: `instrument-${symbol.toLowerCase()}`,
 			displaySymbol: symbol,

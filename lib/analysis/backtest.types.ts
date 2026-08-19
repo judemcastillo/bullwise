@@ -1,13 +1,14 @@
 import type {
 	AnalysisState,
 	EvidenceStrength,
+	ParticipationState,
 	TechnicalAnalysisInstrument,
 	TradePlan,
 	VolatilityState,
 } from "@/lib/analysis/technical-analysis.types";
 import type { MarketBars } from "@/lib/market-data/types";
 
-export const DAILY_SWING_BACKTEST_VERSION = "1.2.0";
+export const DAILY_SWING_BACKTEST_VERSION = "1.3.0";
 
 export type SameBarPolicy = "stop_first" | "target_first";
 
@@ -59,6 +60,7 @@ export type BacktestTrade = {
 	trendRegime: AnalysisState;
 	volatilityRegime: VolatilityState;
 	signalQuality: BacktestSignalQuality;
+	signalFeatures: BacktestSignalFeatures | null;
 	positionUnits: number;
 	riskCapital: number;
 	grossPnl: number;
@@ -78,6 +80,27 @@ export type BacktestSignalQuality = {
 	planRiskReward: number;
 };
 
+/** Values available at the close of the signal bar, normalized for model training. */
+export type BacktestSignalFeatures = {
+	momentumRegime: AnalysisState;
+	participationRegime: ParticipationState;
+	sma20DistancePercent: number;
+	sma50DistancePercent: number;
+	sma200DistancePercent: number;
+	sma20SlopePercent: number;
+	sma50SlopePercent: number;
+	rsi14: number;
+	macdHistogramPercent: number;
+	atrPercent: number;
+	return5Percent: number;
+	return20Percent: number;
+	return60Percent: number;
+	realizedVolatility20Percent: number;
+	realizedVolatility60Percent: number;
+	volatilityPercentile: number;
+	relativeStrength60Percent: number | null;
+};
+
 export type BacktestTradeMark = {
 	at: string;
 	markPrice: number;
@@ -89,11 +112,17 @@ export type BacktestTradeMark = {
 };
 
 export type UntriggeredSetup = {
+	instrumentId: string;
 	direction: TradePlan["direction"];
+	setupType: TradePlan["entry"]["type"];
 	signalAt: string;
 	resolvedAt: string;
 	reason: "expired" | "end_of_data";
 	barsObserved: number;
+	trendRegime: AnalysisState;
+	volatilityRegime: VolatilityState;
+	signalQuality: BacktestSignalQuality;
+	signalFeatures: BacktestSignalFeatures | null;
 };
 
 export type TradeSimulationResult =

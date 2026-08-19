@@ -141,7 +141,7 @@ function validateCandidate(candidate: Candidate) {
 	const trade = candidate.trade;
 	if (!trade.signalQuality || trade.markToMarket.length === 0) {
 		throw new Error(
-			`${candidate.displaySymbol} trade at ${trade.entryAt} lacks portfolio provenance; regenerate it with backtest version 1.2.0`,
+			`${candidate.displaySymbol} trade at ${trade.entryAt} lacks portfolio provenance; regenerate it with a current backtest`,
 		);
 	}
 	if (!(trade.positionUnits > 0 && trade.riskCapital > 0)) {

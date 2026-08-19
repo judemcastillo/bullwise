@@ -34,6 +34,7 @@ function trade(
 			volumeZScore20: 0,
 			planRiskReward: 2,
 		},
+		signalFeatures: null,
 		positionUnits: 200,
 		riskCapital: 1_000,
 		grossPnl: netPnl,
@@ -57,7 +58,7 @@ function report(
 	const wins = trades.filter((item) => item.netPnl > 0).length;
 	const losses = trades.filter((item) => item.netPnl < 0).length;
 	return {
-		backtestVersion: "1.2.0",
+		backtestVersion: "1.3.0",
 		engineVersion: "1.0.0",
 		strategyVersion: "daily-swing-v1-draft",
 		instrument: {

@@ -143,6 +143,62 @@ At least 300 adjusted daily bars are needed before the first evaluation. Histori
 
 Run broad instrument and market-regime coverage, then evaluate out-of-sample performance separately from parameter selection. Inspect trade count, drawdown, expectancy in R, profit factor, sensitivity to higher friction, and stability across regimes. Add delisted securities and point-in-time index membership before treating portfolio-level results as credible; otherwise survivorship bias can materially overstate performance.
 
+## Exporting an AI research dataset
+
+Backtest version 1.3 records a normalized signal-time feature snapshot for both triggered and untriggered setups. Generate an exhaustive development scan and export it with:
+
+```sh
+npm run scan:analysis-setups -- alpaca-batch-history.json --output=analysis-setup-scan.json
+npm run export:analysis-dataset -- analysis-setup-scan.json
+```
+
+The scanner evaluates every eligible completed bar and labels each emitted setup independently at fixed reference equity. A pending setup or open trade never suppresses later signals. These overlapping labels describe setup quality and must not be summed as portfolio returns.
+
+The exporter writes `analysis-dataset.json` with chronological train, validation, and test assignments. Split boundaries use whole signal sessions, and earlier rows whose outcomes resolve into the next split are purged. The v2 and v3 confirmation symbols are always excluded because their results have already been examined. Use `--exclude=SYMBOL1,SYMBOL2` for additional development exclusions and `--force` only when intentionally replacing an existing dataset.
+
+Features contain only normalized values known through the completed signal bar. Entry fills, exits, realized R, profitability, and excursions are labels. Consecutive signals can describe closely related setups, so later model evaluation must account for clustered and overlapping observations rather than treating every row as statistically independent.
+
+Train the dependency-free development baselines with:
+
+```sh
+npm run train:analysis-baselines
+```
+
+This produces `analysis-baseline-report.json` containing a trigger-probability logistic model, a conditional-profitability logistic model, and a conditional expected-R ridge regression model. Numeric imputation and scaling are fitted on train rows only. Instrument identity is excluded from the features. The command evaluates validation rows against constant train-rate or train-mean baselines and does not access test labels. Test evaluation remains a separate one-shot step after a model specification and acceptance criteria are frozen.
+
+The single fixed nonlinear development experiment is:
+
+```sh
+npm run train:analysis-boosted
+```
+
+It fits 60 gradient-boosted decision stumps per target using a 0.05 learning rate, eight train-only candidate quantiles, and at least 100 training rows per leaf. Before execution, the development gate was frozen at: trigger AUC at least 0.60, profitability AUC at least 0.60, expected-R R² at least 0.02, trigger log-loss improvement at least 0.005, profitability log-loss improvement at least 0.01, and expected-R RMSE improvement at least 0.01. Every criterion must pass before a candidate can be frozen for one-shot test evaluation. The command never reads test features or labels.
+
+The 2026-08-19 fixed experiment failed all six development gates: trigger AUC was 0.5645, profitability AUC was 0.5903, expected-R R² was -0.0114, and the three baseline-improvement criteria also failed. The boosted candidate is rejected. The test split remained sealed and must not be evaluated for this candidate; do not tune and rerun the same experiment against validation.
+
+After rejecting both linear and boosted expected-R models, diagnose repetition and redesign the target using train rows only:
+
+```sh
+npm run diagnose:analysis-training
+```
+
+The diagnostic selects the first signal for an instrument and direction, suppresses later signals through that selected setup's resolution session, and begins a new episode afterward. Suppressed signals do not extend the episode. The proposed `episode-first-actionable-success-v1` primary target is 1 only when that selected setup triggers and produces at least +0.5 net R after costs; every other outcome is 0. Its secondary utility target is net R for triggered setups and 0 for untriggered setups. Validation and test features and labels remain unread during this diagnostic.
+
+The 2026-08-19 train-only diagnostic reduced 10,175 rows to 854 episode-first observations, removing 91.61% of rows. The median episode contained 11 overlapping signals and the maximum contained 29; 791 of 854 episodes contained repeated signals. This confirms that row-level models were dominated by correlated observations. Episode-first actionable success occurred in 28.81% of training episodes, average triggered outcome was 0.0941R, and average setup utility was 0.0728R. The redesigned target is suitable for a separately frozen development experiment, but 854 training episodes remain a limited effective sample.
+
+Freeze the training-only episode artifact and machine-readable experiment preregistration with:
+
+```sh
+npm run export:analysis-episode-training
+npm run preregister:analysis-episode-experiment
+```
+
+The first command applies episode selection only to train rows. Validation and test row counts are recorded, but their features and labels are not read or copied. The same selector is locked to run independently inside each later split so an earlier split's setup can never suppress the first setup in a later split. The second command reads only the frozen episode training artifact and records its checksums, the single fixed logistic model, its training-derived score cutoff, and all validation gates. The human-readable frozen specification is `docs/daily-swing-episode-v1-preregistration.md`.
+
+The frozen train artifact contains 854 episodes and has SHA-256 `43caababc2648f088b9a5958395c230d1f519ee65748d3e5781323034c22600c`. The machine-readable preregistration has SHA-256 `7e12f53eee2aa3c6842770d7d8b11199d91e193eac9d64385b0c3fb69bae6d45`. These checksums are part of the experiment identity; do not replace either artifact after validation is opened.
+
+Do not run a validation evaluator until the episode training artifact and preregistration checksums have been recorded. That future evaluator gets one run: any failed gate rejects the candidate without tuning or rerunning validation. Test remains sealed unless every gate passes.
+
 ## Frozen v2 confirmation
 
 The v2 hypothesis, untouched cross-asset ETF universe, and pass criteria are recorded in `docs/daily-swing-v2-preregistration.md`. Reproduce its data retrieval and one-shot confirmation with:

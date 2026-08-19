@@ -25,6 +25,14 @@
 /v3-holdout-history.json
 /v3-holdout-source-report.json
 /v3-holdout-report.json
+/analysis-dataset.json
+/analysis-source-report.json
+/analysis-setup-scan.json
+/analysis-baseline-report.json
+/analysis-boosted-report.json
+/analysis-training-diagnostic.json
+/analysis-episode-training.json
+/analysis-episode-experiment-preregistration.json
 
 # next.js
 /.next/

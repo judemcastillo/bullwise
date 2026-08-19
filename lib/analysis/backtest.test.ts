@@ -95,6 +95,9 @@ describe("trade-plan simulation", () => {
 		if (result.status === "untriggered") {
 			assert.equal(result.setup.reason, "expired");
 			assert.equal(result.setup.barsObserved, 3);
+			assert.equal(result.setup.setupType, "pullback");
+			assert.equal(result.setup.trendRegime, "bullish");
+			assert.equal(result.setup.signalFeatures, null);
 			assert.equal(result.barsConsumed, 3);
 		}
 	});
@@ -380,6 +383,8 @@ describe("daily swing walk-forward backtest", () => {
 		assert.equal(report.trades[0].signalAt, bars[299].startedAt.toISOString());
 		assert.equal(report.trades[0].entryAt, bars[300].startedAt.toISOString());
 		assert.equal(report.trades[0].exitAt, bars[301].startedAt.toISOString());
+		assert.equal(report.trades[0].signalFeatures?.rsi14, 50);
+		assert.equal(report.trades[0].signalFeatures?.sma200DistancePercent, 0);
 		assert.equal(report.byDirection.long.tradeCount, 1);
 		assert.equal(report.byRegime.length, 1);
 	});

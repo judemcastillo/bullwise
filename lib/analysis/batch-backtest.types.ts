@@ -1,6 +1,6 @@
 import type { DailySwingBacktestReport } from "@/lib/analysis/backtest.types";
 
-export const DAILY_SWING_BATCH_BACKTEST_VERSION = "1.2.0";
+export const DAILY_SWING_BATCH_BACKTEST_VERSION = "1.3.0";
 
 export type BatchInstrumentSummary = {
 	instrumentId: string;
