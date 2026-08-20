@@ -27,3 +27,5 @@ import "./combined-broad-fold-dataset.test";
 import "./combined-broad-model-features.test";
 import "./combined-broad-model-runner.test";
 import "./combined-broad-train-diagnostics.test";
+import "./combined-broad-train-diagnostic-runner.test";
+import "./combined-broad-strategy-target-audit.test";

@@ -48,4 +48,6 @@ Do not change the rejected model, gates, cutoff, target, or preprocessing. Do no
 
 ## Authorized next step
 
-Implement the diagnostic calculations and no-overwrite report writer using synthetic fixtures. Do not run the real diagnostic until the implementation is verified.
+The real train-only diagnostic completed with report SHA-256 `c3afd8fffa6c1f02e26902cfaffdfdec8b12965c8ba7d3990aeca59c5faa67ae`. All five diagnostic flags fired. Only one fold had positive top-decile utility improvement; mean top-decile improvement was `-0.04618927R`, and mean score-to-utility Spearman correlation was `-0.09629828`. The expected-utility protocol criteria failed, so the rejected model cannot advance.
+
+The next step is the separately frozen strategy and target audit in `docs/daily-swing-combined-strategy-target-audit-v1.md`. Validation and test remain sealed.
