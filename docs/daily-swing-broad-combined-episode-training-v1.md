@@ -51,4 +51,4 @@ An implementation audit on 2026-08-20 found that the original exporter used whol
 
 ## Authorized next step
 
-Freeze a train-only walk-forward model-development protocol against this exact episode artifact hash. Candidate preprocessing, model families, hyperparameters, selection metric, robustness gates, and the single final-validation decision rule must be declared before fitting. Development may use only the three frozen train folds; 2023–2024 validation and 2025+ sealed test remain unopened.
+The train-only protocol is now frozen in `docs/daily-swing-combined-model-development-v1.md` and `DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL`. The next step is to implement its preprocessing, walk-forward evaluator, selection gates, and artifact writer using synthetic fixtures before running development once on this exact train artifact. The 2023–2024 validation and 2025+ sealed test remain unopened.
