@@ -59,6 +59,14 @@ The one 2023–2024 validation run must pass every machine-readable criterion in
 
 Even a validation pass does not open the 2025+ test automatically. It permits drafting a separate one-shot test preregistration with the fitted artifact and decision criteria frozen. Neither outcome authorizes customer signals or live trading.
 
+## Train-only development result
+
+The frozen development command completed once on 2026-08-20. `analysis-broad-combined-model-development-report-v1.json` has SHA-256 `02d6944aa433aac2f5a1b7eb75e4308eca130baaceb8bee1a8abeab957018705`. Validation and test features and labels were not read.
+
+All three candidates passed only 2 of 11 gates and are rejected. Their mean fold AUC values were `0.52937807`, `0.5307034`, and `0.53871473` as L2 increased from `0.003` to `0.3`. The strongest candidate, `l2-logistic-0.3`, still had minimum fold AUC `0.47918637`, mean log-loss improvement `-0.00380266`, mean Brier improvement `-0.00153248`, mean selected utility improvement only `+0.00688105R`, and base-source pooled AUC `0.4938379`. It improved selected utility in only one fold. Only complete class coverage and expansion-source pooled AUC passed.
+
+This is development evidence, not validation evidence. No candidate may advance to validation, and the gates, penalties, preprocessing, target, or cutoff must not be changed and rerun as part of this attempt.
+
 ## Authorized next step
 
-The preprocessing, fold evaluator, candidate selection, fail-closed gates, final model artifact builder, and no-overwrite report command are implemented and verified with synthetic fixtures. The next step is to run `npm run develop:analysis-broad-combined-model` once on the frozen train-only fold artifact and preserve its report. This run will inspect train targets and metrics but will not read validation or test features or labels.
+The post-rejection diagnostic questions and decision boundary are frozen in `docs/daily-swing-combined-train-diagnostics-v1.md` and `DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL`. Implement them against synthetic fixtures before running the train-only diagnostics. Validation and test remain sealed.
