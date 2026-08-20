@@ -5,8 +5,8 @@ import {
 	BROAD_DEVELOPMENT_V2_EXPANSION_SOURCE_SHA256,
 } from "@/lib/analysis/broad-development-v2-universe";
 
-const INPUT = "analysis-broad-v2-expansion-history.json";
-const OUTPUT = "analysis-broad-v2-expansion-setup-scan.json";
+const INPUT = "artifacts/analysis/analysis-broad-v2-expansion-history.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-v2-expansion-setup-scan.json";
 const USAGE = `Usage: npm run scan:analysis-broad-development-v2
 
 Scans the frozen ${BROAD_DEVELOPMENT_V2_EXPANSION_NAME} source:

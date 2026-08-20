@@ -5,8 +5,8 @@ import { buildDailySwingBroadEpisodeDataset } from "@/lib/analysis/broad-episode
 import type { DailySwingBroadDataset } from "@/lib/analysis/broad-dataset.types";
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 
-const INPUT = "analysis-broad-dataset-v2.json";
-const OUTPUT = "analysis-broad-episode-training.json";
+const INPUT = "artifacts/analysis/analysis-broad-dataset-v2.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-episode-training.json";
 
 const USAGE = `Usage: npm run export:analysis-broad-episodes [-- --force]
 

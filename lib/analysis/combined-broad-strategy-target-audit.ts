@@ -8,12 +8,12 @@ export const DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL = {
 	auditId: DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID,
 	sources: {
 		foldDataset: {
-			path: "analysis-broad-combined-fold-training-v1.json",
+			path: "artifacts/analysis/analysis-broad-combined-fold-training-v1.json",
 			sha256:
 				"6bc63cb4559b2334708110fcd15719eb52d7f0bb9100b8f0032e4e42a1e0f9c9",
 		},
 		trainDiagnosticReport: {
-			path: "analysis-broad-combined-train-diagnostics-v1.json",
+			path: "artifacts/analysis/analysis-broad-combined-train-diagnostics-v1.json",
 			sha256:
 				"c3afd8fffa6c1f02e26902cfaffdfdec8b12965c8ba7d3990aeca59c5faa67ae",
 			decision: "revisit_strategy_target_or_signal_time_features",
@@ -121,7 +121,7 @@ export const DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL = {
 		"Do not open validation or test features or labels.",
 	] as const,
 	output: {
-		path: "analysis-broad-combined-strategy-target-audit-v1.json",
+		path: "artifacts/analysis/analysis-broad-combined-strategy-target-audit-v1.json",
 		overwrite: false,
 	},
 } as const;

@@ -41,13 +41,13 @@ async function readBundle(path: string) {
 }
 
 async function main() {
-	const referencePath = process.argv[2] ?? "batch-history.json";
-	const candidatePath = process.argv[3] ?? "alpaca-batch-history.json";
+	const referencePath = process.argv[2] ?? "artifacts/backtests/batch-history.json";
+	const candidatePath = process.argv[3] ?? "artifacts/backtests/alpaca-batch-history.json";
 	const outputArgument = process.argv.find((argument) =>
 		argument.startsWith("--output="),
 	);
 	const outputPath = resolve(
-		outputArgument?.slice("--output=".length) ?? "provider-audit.json",
+		outputArgument?.slice("--output=".length) ?? "artifacts/backtests/provider-audit.json",
 	);
 	const [reference, candidate] = await Promise.all([
 		readBundle(referencePath),

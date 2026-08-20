@@ -31,7 +31,7 @@ This operation may count rows and signal sessions to verify inventory. It must n
 
 ## Export and integrity-audit result
 
-The protected export completed on 2026-08-19. `analysis-broad-combined-dataset-v3.json` is 216,121,409 bytes, has SHA-256 `3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030`, and records generation at `2026-08-19T10:25:13.706Z`.
+The protected export completed on 2026-08-19. `artifacts/analysis/analysis-broad-combined-dataset-v3.json` is 216,121,409 bytes, has SHA-256 `3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030`, and records generation at `2026-08-19T10:25:13.706Z`.
 
 The two sources contributed 92,676 base rows and 18,722 expansion rows. They contained 112,020 liquidity-eligible outcomes before the unchanged final-boundary purge removed 622 rows, leaving 111,398 combined rows:
 

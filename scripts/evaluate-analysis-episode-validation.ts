@@ -13,16 +13,16 @@ const CONFIRMATION = "--confirm-one-shot-validation";
 const USAGE = `Usage: npm run evaluate:analysis-episode-validation -- ${CONFIRMATION} [options]
 
 Defaults:
-  source:          analysis-dataset.json
-  training:        analysis-episode-training.json
-  preregistration: analysis-episode-experiment-preregistration.json
-  output:          analysis-episode-validation-report.json
+  source:          artifacts/analysis/analysis-dataset.json
+  training:        artifacts/analysis/analysis-episode-training.json
+  preregistration: artifacts/analysis/analysis-episode-experiment-preregistration.json
+  output:          artifacts/analysis/analysis-episode-validation-report.json
 
 Options:
-  --source=analysis-dataset.json
-  --training=analysis-episode-training.json
-  --preregistration=analysis-episode-experiment-preregistration.json
-  --output=analysis-episode-validation-report.json
+  --source=artifacts/analysis/analysis-dataset.json
+  --training=artifacts/analysis/analysis-episode-training.json
+  --preregistration=artifacts/analysis/analysis-episode-experiment-preregistration.json
+  --output=artifacts/analysis/analysis-episode-validation-report.json
   --help
 
 WARNING: This command consumes the experiment's single authorized validation run.
@@ -59,16 +59,16 @@ async function main() {
 			`Refusing to read validation data without ${CONFIRMATION}. Review the frozen preregistration first.`,
 		);
 	}
-	const sourcePath = resolve(option("source") ?? "analysis-dataset.json");
+	const sourcePath = resolve(option("source") ?? "artifacts/analysis/analysis-dataset.json");
 	const trainingPath = resolve(
-		option("training") ?? "analysis-episode-training.json",
+		option("training") ?? "artifacts/analysis/analysis-episode-training.json",
 	);
 	const preregistrationPath = resolve(
 		option("preregistration") ??
-			"analysis-episode-experiment-preregistration.json",
+			"artifacts/analysis/analysis-episode-experiment-preregistration.json",
 	);
 	const outputPath = resolve(
-		option("output") ?? "analysis-episode-validation-report.json",
+		option("output") ?? "artifacts/analysis/analysis-episode-validation-report.json",
 	);
 	const [sourceRaw, trainingRaw, preregistrationRaw] = await Promise.all([
 		readFile(sourcePath, "utf8"),

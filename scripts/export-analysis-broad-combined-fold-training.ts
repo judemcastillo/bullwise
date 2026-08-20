@@ -4,8 +4,8 @@ import { DAILY_SWING_COMBINED_BROAD_FOLD_SOURCE_SHA256 } from "@/lib/analysis/co
 import { readDailySwingCombinedBroadTrainSource } from "@/lib/analysis/combined-broad-train-source";
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 
-const INPUT = "analysis-broad-combined-dataset-v3.json";
-const OUTPUT = "analysis-broad-combined-fold-training-v1.json";
+const INPUT = "artifacts/analysis/analysis-broad-combined-dataset-v3.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-combined-fold-training-v1.json";
 
 const USAGE = `Usage: npm run export:analysis-broad-combined-fold-training
 

@@ -4,14 +4,14 @@ import { resolve } from "node:path";
 import type { DailySwingAnalysisDataset } from "@/lib/analysis/analysis-dataset.types";
 import { buildDailySwingEpisodeTrainingDataset } from "@/lib/analysis/episode-dataset";
 
-const USAGE = `Usage: npm run export:analysis-episode-training -- [analysis-dataset.json] [options]
+const USAGE = `Usage: npm run export:analysis-episode-training -- [artifacts/analysis/analysis-dataset.json] [options]
 
 Defaults:
-  input:  analysis-dataset.json
-  output: analysis-episode-training.json
+  input:  artifacts/analysis/analysis-dataset.json
+  output: artifacts/analysis/analysis-episode-training.json
 
 Options:
-  --output=analysis-episode-training.json
+  --output=artifacts/analysis/analysis-episode-training.json
   --force                              Replace an existing output file
   --help
 
@@ -32,10 +32,10 @@ async function main() {
 	}
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"analysis-dataset.json",
+			"artifacts/analysis/analysis-dataset.json",
 	);
 	const outputPath = resolve(
-		option("output") ?? "analysis-episode-training.json",
+		option("output") ?? "artifacts/analysis/analysis-episode-training.json",
 	);
 	const raw = await readFile(inputPath, "utf8");
 	const dataset = buildDailySwingEpisodeTrainingDataset({

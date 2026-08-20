@@ -27,14 +27,14 @@ type SerializedBatchInput = {
 	configuration?: Partial<BacktestConfiguration>;
 };
 
-const USAGE = `Usage: npm run scan:analysis-setups -- [batch-history.json] [options]
+const USAGE = `Usage: npm run scan:analysis-setups -- [artifacts/backtests/batch-history.json] [options]
 
 Defaults:
-  input:  alpaca-batch-history.json
-  output: analysis-setup-scan.json
+  input:  artifacts/backtests/alpaca-batch-history.json
+  output: artifacts/analysis/analysis-setup-scan.json
 
 Options:
-  --output=analysis-setup-scan.json
+  --output=artifacts/analysis/analysis-setup-scan.json
   --strategy=v1                 v1 or v2 (default: v1)
   --research-policy=none        none, broad_development_v1, or broad_development_v2_expansion (default: none)
   --force                       Replace an existing output file
@@ -109,9 +109,9 @@ async function main() {
 	}
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"alpaca-batch-history.json",
+			"artifacts/backtests/alpaca-batch-history.json",
 	);
-	const outputPath = resolve(option("output") ?? "analysis-setup-scan.json");
+	const outputPath = resolve(option("output") ?? "artifacts/analysis/analysis-setup-scan.json");
 	const strategy = (option("strategy") ?? "v1").toLowerCase();
 	if (strategy !== "v1" && strategy !== "v2") {
 		throw new Error("strategy must be v1 or v2");

@@ -4,14 +4,14 @@ import { resolve } from "node:path";
 import { trainDailySwingBaselineModels } from "@/lib/analysis/baseline-model";
 import type { DailySwingAnalysisDataset } from "@/lib/analysis/analysis-dataset.types";
 
-const USAGE = `Usage: npm run train:analysis-baselines -- [analysis-dataset.json] [options]
+const USAGE = `Usage: npm run train:analysis-baselines -- [artifacts/analysis/analysis-dataset.json] [options]
 
 Defaults:
-  input:  analysis-dataset.json
-  output: analysis-baseline-report.json
+  input:  artifacts/analysis/analysis-dataset.json
+  output: artifacts/analysis/analysis-baseline-report.json
 
 Options:
-  --output=analysis-baseline-report.json
+  --output=artifacts/analysis/analysis-baseline-report.json
   --force                              Replace an existing output file
   --help
 
@@ -37,10 +37,10 @@ async function main() {
 	}
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"analysis-dataset.json",
+			"artifacts/analysis/analysis-dataset.json",
 	);
 	const outputPath = resolve(
-		option("output") ?? "analysis-baseline-report.json",
+		option("output") ?? "artifacts/analysis/analysis-baseline-report.json",
 	);
 	const raw = await readFile(inputPath, "utf8");
 	const dataset = JSON.parse(raw) as DailySwingAnalysisDataset;

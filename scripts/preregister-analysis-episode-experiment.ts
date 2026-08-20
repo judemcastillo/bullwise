@@ -4,14 +4,14 @@ import { resolve } from "node:path";
 import type { DailySwingEpisodeTrainingDataset } from "@/lib/analysis/episode-dataset.types";
 import { preregisterDailySwingEpisodeExperiment } from "@/lib/analysis/episode-experiment";
 
-const USAGE = `Usage: npm run preregister:analysis-episode-experiment -- [analysis-episode-training.json] [options]
+const USAGE = `Usage: npm run preregister:analysis-episode-experiment -- [artifacts/analysis/analysis-episode-training.json] [options]
 
 Defaults:
-  input:  analysis-episode-training.json
-  output: analysis-episode-experiment-preregistration.json
+  input:  artifacts/analysis/analysis-episode-training.json
+  output: artifacts/analysis/analysis-episode-experiment-preregistration.json
 
 Options:
-  --output=analysis-episode-experiment-preregistration.json
+  --output=artifacts/analysis/analysis-episode-experiment-preregistration.json
   --force                                              Replace an existing output file
   --help
 
@@ -32,10 +32,10 @@ async function main() {
 	}
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"analysis-episode-training.json",
+			"artifacts/analysis/analysis-episode-training.json",
 	);
 	const outputPath = resolve(
-		option("output") ?? "analysis-episode-experiment-preregistration.json",
+		option("output") ?? "artifacts/analysis/analysis-episode-experiment-preregistration.json",
 	);
 	const raw = await readFile(inputPath, "utf8");
 	const report = preregisterDailySwingEpisodeExperiment({

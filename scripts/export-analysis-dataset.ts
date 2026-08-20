@@ -7,11 +7,11 @@ import type { DailySwingSetupScanReport } from "@/lib/analysis/setup-scan.types"
 const USAGE = `Usage: npm run export:analysis-dataset -- [source-report.json] [options]
 
 Defaults:
-  input:  analysis-setup-scan.json
-  output: analysis-dataset.json
+  input:  artifacts/analysis/analysis-setup-scan.json
+  output: artifacts/analysis/analysis-dataset.json
 
 Options:
-  --output=analysis-dataset.json
+  --output=artifacts/analysis/analysis-dataset.json
   --exclude=SYMBOL1,SYMBOL2   Add development exclusions
   --force                     Replace an existing output file
   --help
@@ -33,9 +33,9 @@ async function main() {
 	}
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"analysis-setup-scan.json",
+			"artifacts/analysis/analysis-setup-scan.json",
 	);
-	const outputPath = resolve(option("output") ?? "analysis-dataset.json");
+	const outputPath = resolve(option("output") ?? "artifacts/analysis/analysis-dataset.json");
 	const additionalExcludedSymbols = (option("exclude") ?? "")
 		.split(",")
 		.map((symbol) => symbol.trim())

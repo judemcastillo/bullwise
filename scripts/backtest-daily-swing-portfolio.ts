@@ -3,14 +3,14 @@ import { resolve } from "node:path";
 import type { DailySwingBatchDiagnosticReport } from "@/lib/analysis/batch-diagnostics.types";
 import { runDailySwingPortfolioBacktest } from "@/lib/analysis/portfolio-backtest";
 
-const USAGE = `Usage: npm run backtest:daily-swing-portfolio -- [batch-report.json] [options]
+const USAGE = `Usage: npm run backtest:daily-swing-portfolio -- [artifacts/backtests/batch-report.json] [options]
 
 Defaults:
-  input:  alpaca-batch-report.json
-  output: portfolio-report.json
+  input:  artifacts/backtests/alpaca-batch-report.json
+  output: artifacts/backtests/portfolio-report.json
 
 Options:
-  --output=portfolio-report.json
+  --output=artifacts/backtests/portfolio-report.json
   --initial-equity=100000
   --risk-per-trade=1
   --maximum-open-positions=5
@@ -42,8 +42,8 @@ async function main() {
 	}
 	const inputPath =
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-		"alpaca-batch-report.json";
-	const outputPath = resolve(option("output") ?? "portfolio-report.json");
+		"artifacts/backtests/alpaca-batch-report.json";
+	const outputPath = resolve(option("output") ?? "artifacts/backtests/portfolio-report.json");
 	const source = JSON.parse(
 		await readFile(resolve(inputPath), "utf8"),
 	) as DailySwingBatchDiagnosticReport;

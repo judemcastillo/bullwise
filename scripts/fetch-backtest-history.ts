@@ -16,7 +16,7 @@ Options:
   --from=2018-01-01            First requested date
   --to=YYYY-MM-DD              Last requested date (default: today)
   --security-type=common_stock common_stock or etf
-  --output=history.json        Destination (default: history.json)
+  --output=artifacts/backtests/history.json        Destination (default: artifacts/backtests/history.json)
   --force                      Replace an existing destination file
   --help                       Show this help`;
 
@@ -118,7 +118,7 @@ async function main() {
 	const from = dateArgument(option("from") ?? "2018-01-01", "from");
 	const to = dateArgument(option("to") ?? today, "to", true);
 	if (from >= to) throw new Error("from must be before to");
-	const outputPath = resolve(option("output") ?? "history.json");
+	const outputPath = resolve(option("output") ?? "artifacts/backtests/history.json");
 	const force = process.argv.includes("--force");
 	await ensureWritableDestination(outputPath, force);
 	const instrumentId = `backtest:us-equity:${symbol.toLowerCase()}`;

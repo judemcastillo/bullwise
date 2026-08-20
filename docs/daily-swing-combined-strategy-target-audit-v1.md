@@ -50,4 +50,4 @@ Do not search thresholds, indicators, feature subsets, or model families. Do not
 
 ## Authorized next step
 
-Implement the deterministic audit and no-overwrite report writer with synthetic fixtures. Do not run the real audit until that implementation is verified.
+The deterministic audit and no-overwrite report writer are implemented with synthetic fixtures. Run targeted tests, lint, and type checking before authorizing the real train-only audit. Do not change the frozen inputs, cohorts, gates, or output path.

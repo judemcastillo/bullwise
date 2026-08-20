@@ -53,7 +53,7 @@ No model, performance experiment, customer signal, or test evaluation is authori
 
 ## Retrieval and coverage result
 
-The frozen Alpaca retrieval completed on 2026-08-19. `analysis-broad-history.json` has SHA-256 `a42ea177b110336cb905322370549deefa9a1fd54d620fa94b443757b6414e5f` and contains all 100 candidates through 2026-08-18.
+The frozen Alpaca retrieval completed on 2026-08-19. `artifacts/analysis/analysis-broad-history.json` has SHA-256 `a42ea177b110336cb905322370549deefa9a1fd54d620fa94b443757b6414e5f` and contains all 100 candidates through 2026-08-18.
 
 Ninety-nine candidates passed the frozen coverage gate. JNK is the sole coverage exclusion: Alpaca returned 1,832 bars beginning 2019-05-06 instead of the required 2016 window. Every other candidate returned at least 2,500 bars within the allowed start delay. No candidate history contained a missing or non-positive reported volume, and every history ended on the requested final session. The minimum-50-instrument coverage gate passes. No setup outcomes were inspected for this coverage decision.
 
@@ -61,7 +61,7 @@ Ninety-nine candidates passed the frozen coverage gate. JNK is the sole coverage
 
 The first broad-development setup generation completed on 2026-08-19 using setup-scan version `2.0.0`, objective-feature version `1.0.0`, strategy `daily-swing-v1-draft`, and research policy `broad_development_v1`. The generated-at timestamp is `2026-08-19T07:56:40.626Z`.
 
-`analysis-broad-setup-scan.json` is 433 MB and has SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`. It records:
+`artifacts/analysis/analysis-broad-setup-scan.json` is 433 MB and has SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`. It records:
 
 - 100 candidates received, 99 instruments scanned, and one outcome-blind coverage exclusion (JNK).
 - 234,810 completed-bar analyses.

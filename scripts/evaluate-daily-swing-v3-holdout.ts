@@ -7,13 +7,13 @@ import { evaluateDailySwingV3Confirmation } from "@/lib/analysis/v3-confirmation
 async function main() {
 	const inputPath = resolve(
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-			"v3-holdout-source-report.json",
+			"artifacts/backtests/v3-holdout-source-report.json",
 	);
 	const outputArgument = process.argv.find((argument) =>
 		argument.startsWith("--output="),
 	);
 	const outputPath = resolve(
-		outputArgument?.slice("--output=".length) ?? "v3-holdout-report.json",
+		outputArgument?.slice("--output=".length) ?? "artifacts/backtests/v3-holdout-report.json",
 	);
 	const source = JSON.parse(
 		await readFile(inputPath, "utf8"),

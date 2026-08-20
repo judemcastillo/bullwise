@@ -42,7 +42,7 @@ The frozen broad-universe goal requires at least 5,000 episode-first train rows 
 
 ## Materialization result
 
-The train-only materialization completed on 2026-08-19 with generated-at timestamp `2026-08-19T08:36:46.412Z`. `analysis-broad-episode-training.json` is 7.8 MB and has SHA-256 `0177033023ce7ac11aa1d05d927a0de44324cb250dc01a98d9d8bf1ea1d295f1`.
+The train-only materialization completed on 2026-08-19 with generated-at timestamp `2026-08-19T08:36:46.412Z`. `artifacts/analysis/analysis-broad-episode-training.json` is 7.8 MB and has SHA-256 `0177033023ce7ac11aa1d05d927a0de44324cb250dc01a98d9d8bf1ea1d295f1`.
 
 The 51,038 train setup rows produced 4,620 episode-first rows across 97 instrument-direction groups. The 5,000-row coverage gate **fails by 380 episodes**.
 

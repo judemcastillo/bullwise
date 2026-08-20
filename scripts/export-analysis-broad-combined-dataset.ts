@@ -5,9 +5,9 @@ import { buildDailySwingCombinedBroadDataset } from "@/lib/analysis/combined-bro
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 import type { DailySwingSetupScanReport } from "@/lib/analysis/setup-scan.types";
 
-const BASE_INPUT = "analysis-broad-setup-scan.json";
-const EXPANSION_INPUT = "analysis-broad-v2-expansion-setup-scan.json";
-const OUTPUT = "analysis-broad-combined-dataset-v3.json";
+const BASE_INPUT = "artifacts/analysis/analysis-broad-setup-scan.json";
+const EXPANSION_INPUT = "artifacts/analysis/analysis-broad-v2-expansion-setup-scan.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-combined-dataset-v3.json";
 
 const USAGE = `Usage: npm run export:analysis-broad-combined-dataset
 

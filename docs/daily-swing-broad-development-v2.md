@@ -49,7 +49,7 @@ This static, currently available fund list has survival and present-day-liquidit
 
 ## Retrieval and coverage audit result
 
-The frozen Alpaca retrieval completed on 2026-08-19. `analysis-broad-v2-expansion-history.json` is 24,110,790 bytes, has SHA-256 `7262c1a32e3cac8651c57daee97812c72edd6d39036e310e4259b25b37559505`, and records artifact creation at `2026-08-19T09:21:28.915Z`.
+The frozen Alpaca retrieval completed on 2026-08-19. `artifacts/analysis/analysis-broad-v2-expansion-history.json` is 24,110,790 bytes, has SHA-256 `7262c1a32e3cac8651c57daee97812c72edd6d39036e310e4259b25b37559505`, and records artifact creation at `2026-08-19T09:21:28.915Z`.
 
 The read-only, outcome-blind audit found:
 
@@ -68,7 +68,7 @@ The expansion-specific exhaustive-scan policy was implemented and verified befor
 
 ## Exhaustive expansion scan and integrity audit
 
-The protected expansion scan completed on 2026-08-19. `analysis-broad-v2-expansion-setup-scan.json` is 99,373,971 bytes, has SHA-256 `9a21909cdc21ecc49521630cd873bd74f8711a77d276c99392618ba7fb695305`, and records generation at `2026-08-19T09:30:57.316Z`.
+The protected expansion scan completed on 2026-08-19. `artifacts/analysis/analysis-broad-v2-expansion-setup-scan.json` is 99,373,971 bytes, has SHA-256 `9a21909cdc21ecc49521630cd873bd74f8711a77d276c99392618ba7fb695305`, and records generation at `2026-08-19T09:30:57.316Z`.
 
 It uses setup-scan version `2.0.0`, backtest version `1.3.0`, engine version `1.0.0`, strategy `daily-swing-v1-draft`, objective-feature version `1.0.0`, and research policy `broad_development_v2_expansion`. The scan records:
 

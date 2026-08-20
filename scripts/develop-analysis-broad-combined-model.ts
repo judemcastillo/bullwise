@@ -6,8 +6,8 @@ import { DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_SHA256 } from "@/lib/analysis/c
 import { runDailySwingCombinedBroadModelDevelopment } from "@/lib/analysis/combined-broad-model-runner";
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 
-const INPUT = "analysis-broad-combined-fold-training-v1.json";
-const OUTPUT = "analysis-broad-combined-model-development-report-v1.json";
+const INPUT = "artifacts/analysis/analysis-broad-combined-fold-training-v1.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-combined-model-development-report-v1.json";
 
 const USAGE = `Usage: npm run develop:analysis-broad-combined-model
 

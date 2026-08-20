@@ -6,9 +6,9 @@ Experiment ID: `daily-swing-episode-actionable-logistic-v1`
 
 Frozen artifact checksums:
 
-- Source `analysis-dataset.json`: `83a53bbf638c869d54067596668834d6a921d8c21ba96b78c47798870680cba4`
-- Train-only `analysis-episode-training.json`: `43caababc2648f088b9a5958395c230d1f519ee65748d3e5781323034c22600c`
-- Machine-readable `analysis-episode-experiment-preregistration.json`: `7e12f53eee2aa3c6842770d7d8b11199d91e193eac9d64385b0c3fb69bae6d45`
+- Source `artifacts/analysis/analysis-dataset.json`: `83a53bbf638c869d54067596668834d6a921d8c21ba96b78c47798870680cba4`
+- Train-only `artifacts/analysis/analysis-episode-training.json`: `43caababc2648f088b9a5958395c230d1f519ee65748d3e5781323034c22600c`
+- Machine-readable `artifacts/analysis/analysis-episode-experiment-preregistration.json`: `7e12f53eee2aa3c6842770d7d8b11199d91e193eac9d64385b0c3fb69bae6d45`
 
 The frozen training artifact contains 854 episode-first observations, including 246 actionable successes (28.805621%) and average setup utility of 0.07282877R. Validation contains 3,390 source rows and test contains 3,439 source rows, but their episode counts, features, and labels were not read during artifact creation or preregistration.
 
@@ -59,7 +59,7 @@ Do not run the real command merely to check that it works. Once run against the 
 
 ## Final validation result
 
-The single authorized validation run was consumed on 2026-08-19. Its report, `analysis-episode-validation-report.json`, has SHA-256 `fd8a338745b7c0ae62754ab26c6182b350ba599260ddf802876d3a535bb88aa4`.
+The single authorized validation run was consumed on 2026-08-19. Its report, `artifacts/analysis/analysis-episode-validation-report.json`, has SHA-256 `fd8a338745b7c0ae62754ab26c6182b350ba599260ddf802876d3a535bb88aa4`.
 
 The candidate passed 3 of 9 gates and is rejected. Validation contained 311 episode-first observations and 89 actionable successes. ROC AUC was 0.5220164, log-loss improvement was 0.00092248, and Brier-score improvement was 0.00039461. The frozen cutoff selected 110 episodes with a 0.02291728 actionable-success-rate lift, 0.08263291R average utility, and only 0.00415117R utility improvement. The coverage, success-count, and selected-row-count gates passed; all six predictive and economic-quality gates failed.
 

@@ -7,12 +7,12 @@ export const DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL = {
 	diagnosticId: DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID,
 	sources: {
 		foldDataset: {
-			path: "analysis-broad-combined-fold-training-v1.json",
+			path: "artifacts/analysis/analysis-broad-combined-fold-training-v1.json",
 			sha256:
 				"6bc63cb4559b2334708110fcd15719eb52d7f0bb9100b8f0032e4e42a1e0f9c9",
 		},
 		rejectedDevelopmentReport: {
-			path: "analysis-broad-combined-model-development-report-v1.json",
+			path: "artifacts/analysis/analysis-broad-combined-model-development-report-v1.json",
 			sha256:
 				"02d6944aa433aac2f5a1b7eb75e4308eca130baaceb8bee1a8abeab957018705",
 			decision: "reject_development",
@@ -132,7 +132,7 @@ export const DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL = {
 		"Do not open validation or test features or labels.",
 	] as const,
 	output: {
-		path: "analysis-broad-combined-train-diagnostics-v1.json",
+		path: "artifacts/analysis/analysis-broad-combined-train-diagnostics-v1.json",
 		overwrite: false,
 	},
 } as const;

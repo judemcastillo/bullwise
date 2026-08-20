@@ -48,7 +48,7 @@ After export and checksum recording, only train rows may be used to materialize 
 
 ## Export result
 
-The frozen export completed on 2026-08-19 with generated-at timestamp `2026-08-19T08:27:22.526Z`. `analysis-broad-dataset-v2.json` is 170 MB and has SHA-256 `bcb6870affcaed823d188703776a30ffed9d571e60440a7257c5742bd94ed23e`. Its source checksum is the preregistered setup-scan SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`.
+The frozen export completed on 2026-08-19 with generated-at timestamp `2026-08-19T08:27:22.526Z`. `artifacts/analysis/analysis-broad-dataset-v2.json` is 170 MB and has SHA-256 `bcb6870affcaed823d188703776a30ffed9d571e60440a7257c5742bd94ed23e`. Its source checksum is the preregistered setup-scan SHA-256 `142b4477f302abbb4f3dd8d38a9efb7265e861271a51549d3bf442296cb16217`.
 
 The source contained 93,130 liquidity-eligible outcomes and 14,897 liquidity rejections. Exact outcome-resolution purging removed 454 rows at the final split boundaries, leaving 92,676 dataset rows:
 

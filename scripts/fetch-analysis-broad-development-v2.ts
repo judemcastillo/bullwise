@@ -7,7 +7,7 @@ import {
 	BROAD_DEVELOPMENT_V2_EXPANSION_VERSION,
 } from "@/lib/analysis/broad-development-v2-universe";
 
-const OUTPUT = "analysis-broad-v2-expansion-history.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-v2-expansion-history.json";
 const USAGE = `Usage: npm run fetch:analysis-broad-development-v2
 
 Fetches the frozen ${BROAD_DEVELOPMENT_V2_EXPANSION_NAME} universe:

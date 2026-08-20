@@ -12,39 +12,8 @@
 
 # testing
 /coverage
-/history.json
-/report.json
-/batch-history.json
-/batch-report.json
-/alpaca-batch-history.json
-/alpaca-batch-report.json
-/provider-audit.json
-/v2-holdout-history.json
-/v2-holdout-report.json
-/portfolio-report.json
-/v3-holdout-history.json
-/v3-holdout-source-report.json
-/v3-holdout-report.json
-/analysis-dataset.json
-/analysis-source-report.json
-/analysis-setup-scan.json
-/analysis-baseline-report.json
-/analysis-boosted-report.json
-/analysis-training-diagnostic.json
-/analysis-episode-training.json
-/analysis-episode-experiment-preregistration.json
-/analysis-episode-validation-report.json
-/analysis-broad-history.json
-/analysis-broad-v2-expansion-history.json
-/analysis-broad-v2-expansion-setup-scan.json
-/analysis-broad-setup-scan.json
-/analysis-broad-dataset-v2.json
-/analysis-broad-combined-dataset-v3.json
-/analysis-broad-combined-episode-training.json
-/analysis-broad-combined-fold-training-v1.json
-/analysis-broad-combined-model-development-report-v1.json
-/analysis-broad-combined-train-diagnostics-v1.json
-/analysis-broad-episode-training.json
+/artifacts/backtests/*.json
+/artifacts/analysis/*.json
 
 # next.js
 /.next/

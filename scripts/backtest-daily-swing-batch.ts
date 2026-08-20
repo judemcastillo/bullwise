@@ -29,11 +29,11 @@ type SerializedBatchInput = {
 const USAGE = `Usage: npm run backtest:daily-swing-batch -- [input.json] [options]
 
 Defaults:
-  input:  batch-history.json
-  output: batch-report.json
+  input:  artifacts/backtests/batch-history.json
+  output: artifacts/backtests/batch-report.json
 
 Options:
-  --output=batch-report.json
+  --output=artifacts/backtests/batch-report.json
   --strategy=v1              v1 or v2 (default: v1)
   --help`;
 
@@ -116,8 +116,8 @@ async function main() {
 	}
 	const inputPath =
 		process.argv.slice(2).find((argument) => !argument.startsWith("-")) ??
-		"batch-history.json";
-	const outputPath = resolve(option("output") ?? "batch-report.json");
+		"artifacts/backtests/batch-history.json";
+	const outputPath = resolve(option("output") ?? "artifacts/backtests/batch-report.json");
 	const strategy = (option("strategy") ?? "v1").toLowerCase();
 	if (strategy !== "v1" && strategy !== "v2") {
 		throw new Error("strategy must be v1 or v2");

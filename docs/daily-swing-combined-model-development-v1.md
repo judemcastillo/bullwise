@@ -6,7 +6,7 @@ Development ID: `daily-swing-combined-episode-logistic-development-v1`
 
 Protocol version: `1.1.0`
 
-Train-only episode artifact: `analysis-broad-combined-episode-training.json`
+Train-only episode artifact: `artifacts/analysis/analysis-broad-combined-episode-training.json`
 
 Train-only episode SHA-256: `0233cf9961e916e3079694ce0c887ba7f38ca4b5870271e9e769b563abea2a6b`
 
@@ -24,7 +24,7 @@ For nullable numeric fields, fit the median and add a missingness indicator. Cli
 
 An implementation review on 2026-08-20 found that the 5,504-row final episode artifact cannot reconstruct the independently selected fold rows. A signal selected before a fold boundary can suppress a signal after that boundary in the final train selection, while the evaluation partition must restart episode selection. Counts alone are therefore insufficient.
 
-Protocol version `1.1.0` requires `analysis-broad-combined-fold-training-v1.json`, built from the checksum-frozen combined source by deserializing train rows only. It materializes final train, fit, and evaluation episodes independently as seven tagged partitions and must reproduce every previously recorded inventory. Its SHA-256 must be recorded in this protocol before any model fitting. This correction occurred before target-rate inspection or model fitting.
+Protocol version `1.1.0` requires `artifacts/analysis/analysis-broad-combined-fold-training-v1.json`, built from the checksum-frozen combined source by deserializing train rows only. It materializes final train, fit, and evaluation episodes independently as seven tagged partitions and must reproduce every previously recorded inventory. Its SHA-256 must be recorded in this protocol before any model fitting. This correction occurred before target-rate inspection or model fitting.
 
 The protected materialization completed on 2026-08-20. The 35,630,575-byte artifact has SHA-256 `6bc63cb4559b2334708110fcd15719eb52d7f0bb9100b8f0032e4e42a1e0f9c9`. All seven final, fit, and evaluation episode counts exactly match the frozen inventories. Validation/test features and labels were not deserialized. No target rate, utility aggregate, predictive metric, or model result was calculated.
 
@@ -61,7 +61,7 @@ Even a validation pass does not open the 2025+ test automatically. It permits dr
 
 ## Train-only development result
 
-The frozen development command completed once on 2026-08-20. `analysis-broad-combined-model-development-report-v1.json` has SHA-256 `02d6944aa433aac2f5a1b7eb75e4308eca130baaceb8bee1a8abeab957018705`. Validation and test features and labels were not read.
+The frozen development command completed once on 2026-08-20. `artifacts/analysis/analysis-broad-combined-model-development-report-v1.json` has SHA-256 `02d6944aa433aac2f5a1b7eb75e4308eca130baaceb8bee1a8abeab957018705`. Validation and test features and labels were not read.
 
 All three candidates passed only 2 of 11 gates and are rejected. Their mean fold AUC values were `0.52937807`, `0.5307034`, and `0.53871473` as L2 increased from `0.003` to `0.3`. The strongest candidate, `l2-logistic-0.3`, still had minimum fold AUC `0.47918637`, mean log-loss improvement `-0.00380266`, mean Brier improvement `-0.00153248`, mean selected utility improvement only `+0.00688105R`, and base-source pooled AUC `0.4938379`. It improved selected utility in only one fold. Only complete class coverage and expansion-source pooled AUC passed.
 

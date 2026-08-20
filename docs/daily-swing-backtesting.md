@@ -27,14 +27,14 @@ Fetch a default AAPL history with SPY as the benchmark, then run it:
 
 ```sh
 npm run fetch:backtest-history
-npm run backtest:daily-swing -- history.json --output=report.json
+npm run backtest:daily-swing -- artifacts/backtests/history.json --output=artifacts/backtests/report.json
 ```
 
 Choose another common stock or a standard ETF with exporter options:
 
 ```sh
-npm run fetch:backtest-history -- --symbol=MSFT --from=2018-01-01 --output=msft-history.json
-npm run fetch:backtest-history -- --symbol=QQQ --security-type=etf --benchmark=SPY --output=qqq-history.json
+npm run fetch:backtest-history -- --symbol=MSFT --from=2018-01-01 --output=artifacts/backtests/msft-history.json
+npm run fetch:backtest-history -- --symbol=QQQ --security-type=etf --benchmark=SPY --output=artifacts/backtests/qqq-history.json
 ```
 
 Run `npm run fetch:backtest-history -- --help` for every available option. The exporter refuses to replace an existing file unless `--force` is supplied.
@@ -59,7 +59,7 @@ The aliases `ALPACA_API_KEY` and `ALPACA_API_SECRET` are also accepted. Then fet
 
 ```sh
 npm run fetch:backtest-batch -- --provider=alpaca --force
-npm run backtest:daily-swing-batch -- alpaca-batch-history.json --output=alpaca-batch-report.json
+npm run backtest:daily-swing-batch -- artifacts/backtests/alpaca-batch-history.json --output=artifacts/backtests/alpaca-batch-report.json
 ```
 
 If both provider bundles exist, compare their overlapping dates, adjusted returns, closing price, and volume:
@@ -68,9 +68,9 @@ If both provider bundles exist, compare their overlapping dates, adjusted return
 npm run audit:backtest-providers
 ```
 
-The audit writes `provider-audit.json` and exits unsuccessfully when its coverage or divergence thresholds fail.
+The audit writes `artifacts/backtests/provider-audit.json` and exits unsuccessfully when its coverage or divergence thresholds fail.
 
-The second command writes `batch-report.json` and prints the aggregate result directly. Its `diagnostics` section breaks performance down by setup, direction, trend, volatility, combined regime, terminal exit, and holding period. It also compares configured execution friction with frictionless and stressed scenarios. To refresh an existing history bundle, pass `--force`. A custom universe can be supplied as a comma-separated list:
+The second command writes `artifacts/backtests/batch-report.json` and prints the aggregate result directly. Its `diagnostics` section breaks performance down by setup, direction, trend, volatility, combined regime, terminal exit, and holding period. It also compares configured execution friction with frictionless and stressed scenarios. To refresh an existing history bundle, pass `--force`. A custom universe can be supplied as a comma-separated list:
 
 ```sh
 npm run fetch:backtest-batch -- --symbols=SPY,QQQ,IWM,DIA --force
@@ -81,7 +81,7 @@ Every ETF receives an independent account with equal starting equity. The aggreg
 After generating a batch report with backtest version 1.2 or later, replay its candidate trades through one shared account:
 
 ```sh
-npm run backtest:daily-swing-portfolio -- alpaca-batch-report.json --output=portfolio-report.json
+npm run backtest:daily-swing-portfolio -- artifacts/backtests/alpaca-batch-report.json --output=artifacts/backtests/portfolio-report.json
 ```
 
 The default portfolio starts with $100,000, risks 1% per accepted trade, allows at most five opening positions and 5% aggregate committed risk, and caps gross exposure at 100% when accepting a trade. All limits can be changed explicitly; run `npm run backtest:daily-swing-portfolio -- --help` for the options.
@@ -148,13 +148,13 @@ Run broad instrument and market-regime coverage, then evaluate out-of-sample per
 Backtest version 1.3 records a normalized signal-time feature snapshot for both triggered and untriggered setups. Generate an exhaustive development scan and export it with:
 
 ```sh
-npm run scan:analysis-setups -- alpaca-batch-history.json --output=analysis-setup-scan.json
-npm run export:analysis-dataset -- analysis-setup-scan.json
+npm run scan:analysis-setups -- artifacts/backtests/alpaca-batch-history.json --output=artifacts/analysis/analysis-setup-scan.json
+npm run export:analysis-dataset -- artifacts/analysis/analysis-setup-scan.json
 ```
 
 The scanner evaluates every eligible completed bar and labels each emitted setup independently at fixed reference equity. A pending setup or open trade never suppresses later signals. These overlapping labels describe setup quality and must not be summed as portfolio returns.
 
-The exporter writes `analysis-dataset.json` with chronological train, validation, and test assignments. Split boundaries use whole signal sessions, and earlier rows whose outcomes resolve into the next split are purged. The v2 and v3 confirmation symbols are always excluded because their results have already been examined. Use `--exclude=SYMBOL1,SYMBOL2` for additional development exclusions and `--force` only when intentionally replacing an existing dataset.
+The exporter writes `artifacts/analysis/analysis-dataset.json` with chronological train, validation, and test assignments. Split boundaries use whole signal sessions, and earlier rows whose outcomes resolve into the next split are purged. The v2 and v3 confirmation symbols are always excluded because their results have already been examined. Use `--exclude=SYMBOL1,SYMBOL2` for additional development exclusions and `--force` only when intentionally replacing an existing dataset.
 
 Features contain only normalized values known through the completed signal bar. Entry fills, exits, realized R, profitability, and excursions are labels. Consecutive signals can describe closely related setups, so later model evaluation must account for clustered and overlapping observations rather than treating every row as statistically independent.
 
@@ -164,7 +164,7 @@ Train the dependency-free development baselines with:
 npm run train:analysis-baselines
 ```
 
-This produces `analysis-baseline-report.json` containing a trigger-probability logistic model, a conditional-profitability logistic model, and a conditional expected-R ridge regression model. Numeric imputation and scaling are fitted on train rows only. Instrument identity is excluded from the features. The command evaluates validation rows against constant train-rate or train-mean baselines and does not access test labels. Test evaluation remains a separate one-shot step after a model specification and acceptance criteria are frozen.
+This produces `artifacts/analysis/analysis-baseline-report.json` containing a trigger-probability logistic model, a conditional-profitability logistic model, and a conditional expected-R ridge regression model. Numeric imputation and scaling are fitted on train rows only. Instrument identity is excluded from the features. The command evaluates validation rows against constant train-rate or train-mean baselines and does not access test labels. Test evaluation remains a separate one-shot step after a model specification and acceptance criteria are frozen.
 
 The single fixed nonlinear development experiment is:
 
@@ -212,7 +212,7 @@ npm run fetch:backtest-v2-holdout -- --force
 npm run backtest:daily-swing-v2-holdout
 ```
 
-The result is written to `v2-holdout-report.json`, including a machine-readable `confirmation` section. The 2026-08-19 confirmation failed two frozen criteria: average R multiple and stressed-cost profit factor. V2 is therefore rejected and must not be exposed as a customer signal or tuned and re-run on that holdout universe.
+The result is written to `artifacts/backtests/v2-holdout-report.json`, including a machine-readable `confirmation` section. The 2026-08-19 confirmation failed two frozen criteria: average R multiple and stressed-cost profit factor. V2 is therefore rejected and must not be exposed as a customer signal or tuned and re-run on that holdout universe.
 
 ## Frozen v3 portfolio confirmation
 
@@ -222,4 +222,4 @@ The v3 hypothesis, untouched 20-ETF universe, deterministic candidate-ranking po
 npm run evaluate:daily-swing-v3-holdout
 ```
 
-The result is written to `v3-holdout-report.json`. The 2026-08-19 confirmation failed six of seven criteria. The ranked policy accepted 379 trades, produced a 0.0752 average R multiple, 1.1651 profit factor, 2.6922% annualized return, and 20.4076% maximum drawdown. It also underperformed the deterministic symbol-order baseline by 0.1762 percentage points annualized and 0.0050 R per trade. V3 is rejected and must not be exposed as a customer signal or tuned and re-run on this holdout universe.
+The result is written to `artifacts/backtests/v3-holdout-report.json`. The 2026-08-19 confirmation failed six of seven criteria. The ranked policy accepted 379 trades, produced a 0.0752 average R multiple, 1.1651 profit factor, 2.6922% annualized return, and 20.4076% maximum drawdown. It also underperformed the deterministic symbol-order baseline by 0.1762 percentage points annualized and 0.0050 R per trade. V3 is rejected and must not be exposed as a customer signal or tuned and re-run on this holdout universe.

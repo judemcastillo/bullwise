@@ -31,7 +31,7 @@ The exporter may report train source rows, train episode rows, the Boolean cover
 
 ## Materialization and integrity-audit result
 
-The protected train-only materialization completed on 2026-08-19. `analysis-broad-combined-episode-training.json` is 9,734,231 bytes, has SHA-256 `0233cf9961e916e3079694ce0c887ba7f38ca4b5870271e9e769b563abea2a6b`, and records generation at `2026-08-19T10:32:27.030Z`.
+The protected train-only materialization completed on 2026-08-19. `artifacts/analysis/analysis-broad-combined-episode-training.json` is 9,734,231 bytes, has SHA-256 `0233cf9961e916e3079694ce0c887ba7f38ca4b5870271e9e769b563abea2a6b`, and records generation at `2026-08-19T10:32:27.030Z`.
 
 The 60,381 train setup rows produced 5,504 episode-first rows across 125 instrument-direction groups. The frozen 5,000-row coverage gate **passes by 504 episodes**.
 

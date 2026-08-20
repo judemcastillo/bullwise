@@ -21,7 +21,7 @@ export const DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL = {
 	},
 	foldDataset: {
 		version: "1.0.0",
-		output: "analysis-broad-combined-fold-training-v1.json",
+		output: "artifacts/analysis/analysis-broad-combined-fold-training-v1.json",
 		sourceCombinedDatasetSha256:
 			"3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030",
 		sha256: DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_SHA256,

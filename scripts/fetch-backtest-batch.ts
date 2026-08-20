@@ -40,7 +40,7 @@ Options:
   --universe-name=NAME  Label stored in the history bundle
   --from=YYYY-MM-DD     Default: 2016-01-01 for Alpaca, 2018-01-01 for Massive
   --to=YYYY-MM-DD       Last requested date (default: yesterday)
-  --output=FILE         Default: alpaca-batch-history.json or batch-history.json
+  --output=FILE         Default: artifacts/backtests/alpaca-batch-history.json or artifacts/backtests/batch-history.json
   --force               Replace an existing destination file
   --help                Show this help`;
 
@@ -232,8 +232,8 @@ async function main() {
 	const outputPath = resolve(
 		option("output") ??
 			(providerName === "alpaca"
-				? "alpaca-batch-history.json"
-				: "batch-history.json"),
+				? "artifacts/backtests/alpaca-batch-history.json"
+				: "artifacts/backtests/batch-history.json"),
 	);
 	const force = process.argv.includes("--force");
 	await ensureWritableDestination(outputPath, force);

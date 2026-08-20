@@ -23,7 +23,7 @@ type SerializedInput = {
 	configuration?: Partial<BacktestConfiguration>;
 };
 
-const USAGE = `Usage: npm run backtest:daily-swing -- <input.json> [--output=report.json]
+const USAGE = `Usage: npm run backtest:daily-swing -- <input.json> [--output=artifacts/backtests/report.json]
 
 The JSON object must contain instrument and marketData. Dates in marketData.from,
 marketData.to, every bar.startedAt, startAt, and endAt must be ISO-8601 strings.

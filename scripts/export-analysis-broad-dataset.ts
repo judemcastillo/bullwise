@@ -5,8 +5,8 @@ import { buildDailySwingBroadDataset } from "@/lib/analysis/broad-dataset";
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 import type { DailySwingSetupScanReport } from "@/lib/analysis/setup-scan.types";
 
-const INPUT = "analysis-broad-setup-scan.json";
-const OUTPUT = "analysis-broad-dataset-v2.json";
+const INPUT = "artifacts/analysis/analysis-broad-setup-scan.json";
+const OUTPUT = "artifacts/analysis/analysis-broad-dataset-v2.json";
 
 const USAGE = `Usage: npm run export:analysis-broad-dataset [-- --force]
 
