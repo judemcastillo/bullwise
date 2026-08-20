@@ -4,7 +4,7 @@ Frozen on 2026-08-20 before fitting a model or inspecting any target rate, model
 
 Development ID: `daily-swing-combined-episode-logistic-development-v1`
 
-Protocol version: `1.0.0`
+Protocol version: `1.1.0`
 
 Train-only episode artifact: `analysis-broad-combined-episode-training.json`
 
@@ -18,7 +18,15 @@ Development may use only the three frozen train folds evaluating 2020, 2021, and
 
 Use all 50 frozen signal-time feature fields. Exclude row ID, instrument ID, display symbol, source scan, signal timestamp, and resolution timestamp from model input. Source scan may be used only for robustness reporting. Validation remains 2023–2024; sealed test begins in 2025.
 
-For nullable numeric fields, fit the median and add a missingness indicator. Clip numeric values to fit-partition 1st and 99th percentiles, then standardize using the clipped fit mean and population standard deviation; use scale 1 for a zero-variance field. Use fixed reference-level one-hot encoding for categorical fields and reject unknown categories.
+For nullable numeric fields, fit the median and add a missingness indicator. Clip numeric values to fit-partition nearest-rank 1st and 99th percentiles, then standardize using the clipped fit mean and population standard deviation; use scale 1 for a zero-variance field. Use fixed reference-level one-hot encoding for categorical fields and reject unknown categories.
+
+## Pre-fit fold-materialization correction
+
+An implementation review on 2026-08-20 found that the 5,504-row final episode artifact cannot reconstruct the independently selected fold rows. A signal selected before a fold boundary can suppress a signal after that boundary in the final train selection, while the evaluation partition must restart episode selection. Counts alone are therefore insufficient.
+
+Protocol version `1.1.0` requires `analysis-broad-combined-fold-training-v1.json`, built from the checksum-frozen combined source by deserializing train rows only. It materializes final train, fit, and evaluation episodes independently as seven tagged partitions and must reproduce every previously recorded inventory. Its SHA-256 must be recorded in this protocol before any model fitting. This correction occurred before target-rate inspection or model fitting.
+
+The protected materialization completed on 2026-08-20. The 35,630,575-byte artifact has SHA-256 `6bc63cb4559b2334708110fcd15719eb52d7f0bb9100b8f0032e4e42a1e0f9c9`. All seven final, fit, and evaluation episode counts exactly match the frozen inventories. Validation/test features and labels were not deserialized. No target rate, utility aggregate, predictive metric, or model result was calculated.
 
 ## Candidate models
 
@@ -53,4 +61,4 @@ Even a validation pass does not open the 2025+ test automatically. It permits dr
 
 ## Authorized next step
 
-Implement the preprocessing, fold evaluator, candidate selection, and artifact writer against synthetic fixtures first. Then run the development command once on the train-only episode artifact and preserve its report. Do not read validation or test features or labels.
+The preprocessing, fold evaluator, candidate selection, fail-closed gates, final model artifact builder, and no-overwrite report command are implemented and verified with synthetic fixtures. The next step is to run `npm run develop:analysis-broad-combined-model` once on the frozen train-only fold artifact and preserve its report. This run will inspect train targets and metrics but will not read validation or test features or labels.

@@ -13,6 +13,14 @@ describe("combined broad model development protocol", () => {
 			"0233cf9961e916e3079694ce0c887ba7f38ca4b5870271e9e769b563abea2a6b",
 		);
 		assert.equal(DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL.trainingDataset.rows, 5_504);
+		assert.equal(
+			DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL.foldDataset.sha256,
+			"6bc63cb4559b2334708110fcd15719eb52d7f0bb9100b8f0032e4e42a1e0f9c9",
+		);
+		assert.equal(
+			DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL.foldDataset.status,
+			"frozen_for_model_development",
+		);
 		assert.deepEqual(
 			DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL.walkForwardFolds,
 			DAILY_SWING_BROAD_WALK_FORWARD_FOLDS,

@@ -51,4 +51,4 @@ An implementation audit on 2026-08-20 found that the original exporter used whol
 
 ## Authorized next step
 
-The train-only protocol is now frozen in `docs/daily-swing-combined-model-development-v1.md` and `DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL`. The next step is to implement its preprocessing, walk-forward evaluator, selection gates, and artifact writer using synthetic fixtures before running development once on this exact train artifact. The 2023–2024 validation and 2025+ sealed test remain unopened.
+The train-only protocol is recorded in `docs/daily-swing-combined-model-development-v1.md` and `DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL`. A pre-fit review found that this final episode artifact cannot reconstruct independently selected fold rows from counts alone, so the required train-only fold artifact was materialized and frozen separately. The next step is to implement the walk-forward development engine against synthetic fixtures. The 2023–2024 validation and 2025+ sealed test remain unopened.

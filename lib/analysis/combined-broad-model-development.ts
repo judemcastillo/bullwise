@@ -1,6 +1,7 @@
 import { DAILY_SWING_BROAD_WALK_FORWARD_FOLDS } from "@/lib/analysis/broad-dataset.types";
+import { DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_SHA256 } from "@/lib/analysis/combined-broad-fold-dataset.types";
 
-export const DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL_VERSION = "1.0.0";
+export const DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL_VERSION = "1.1.0";
 export const DAILY_SWING_COMBINED_BROAD_MODEL_DEVELOPMENT_ID =
 	"daily-swing-combined-episode-logistic-development-v1";
 export const DAILY_SWING_COMBINED_BROAD_EPISODE_SHA256 =
@@ -17,6 +18,14 @@ export const DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL = {
 		rows: 5_504,
 		target: "actionable_success",
 		utility: "setup_utility_r",
+	},
+	foldDataset: {
+		version: "1.0.0",
+		output: "analysis-broad-combined-fold-training-v1.json",
+		sourceCombinedDatasetSha256:
+			"3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030",
+		sha256: DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_SHA256,
+		status: "frozen_for_model_development",
 	},
 	dataAccess: {
 		developmentSplit: "train",
@@ -43,7 +52,7 @@ export const DAILY_SWING_COMBINED_BROAD_MODEL_PROTOCOL = {
 	preprocessing: {
 		fitScope: "each_walk_forward_fit_partition_only",
 		nullableNumeric: "fit_median_imputation_plus_missing_indicator",
-		numericClipping: "fit_1st_and_99th_percentiles",
+		numericClipping: "fit_nearest_rank_1st_and_99th_percentiles",
 		numericScaling: "fit_mean_and_population_standard_deviation_after_clipping",
 		zeroVarianceScale: 1,
 		application: "apply_fit_parameters_unchanged_to_evaluation",

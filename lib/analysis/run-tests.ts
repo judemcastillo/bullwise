@@ -23,3 +23,6 @@ import "./broad-episode-dataset.test";
 import "./combined-broad-train-source.test";
 import "./combined-broad-episode-dataset.test";
 import "./combined-broad-model-development.test";
+import "./combined-broad-fold-dataset.test";
+import "./combined-broad-model-features.test";
+import "./combined-broad-model-runner.test";

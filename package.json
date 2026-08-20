@@ -33,6 +33,8 @@
 		"export:analysis-broad-combined-dataset": "node --max-old-space-size=4096 --import tsx scripts/export-analysis-broad-combined-dataset.ts",
 		"export:analysis-broad-episodes": "node --max-old-space-size=4096 --import tsx scripts/export-analysis-broad-episode-training.ts",
 		"export:analysis-broad-combined-episodes": "node --max-old-space-size=4096 --import tsx scripts/export-analysis-broad-combined-episode-training.ts",
+		"export:analysis-broad-combined-fold-training": "node --max-old-space-size=4096 --import tsx scripts/export-analysis-broad-combined-fold-training.ts",
+		"develop:analysis-broad-combined-model": "node --max-old-space-size=4096 --import tsx scripts/develop-analysis-broad-combined-model.ts",
 		"export:analysis-dataset": "node --import tsx scripts/export-analysis-dataset.ts",
 		"train:analysis-baselines": "node --import tsx scripts/train-analysis-baselines.ts",
 		"train:analysis-boosted": "node --import tsx scripts/train-analysis-boosted.ts",
