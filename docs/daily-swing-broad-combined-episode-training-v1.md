@@ -14,7 +14,7 @@ Source universe: `daily-swing-broad-development-v2-combined`
 
 - Iterate source rows only to select rows whose split is `train`.
 - Require exactly 60,381 train source rows from the audited dataset inventory.
-- Do not access validation or test features or labels. Copy their row counts only from dataset metadata.
+- Verify the complete source checksum first, then structurally scan the rows array and deserialize only train rows. Read only the top-level split field for validation/test rows and reconcile their counts against dataset metadata; do not deserialize or inspect their features or labels.
 - Group train rows by instrument ID and direction.
 - Select the first chronological signal, suppress later signals through that selected setup's resolution session, and then begin the next episode.
 - Treat a signal on the same session as the selected resolution as suppressed.
@@ -43,7 +43,11 @@ Walk-forward episode inventories are:
 
 The read-only integrity audit found zero violations: all 5,504 row IDs are unique and chronologically ordered; resolution never precedes signal; no selected signal overlaps the prior selected episode for its instrument and direction; source tags are valid; every feature vector has 50 fields with no provenance leakage; target values are structurally valid and finite; and artifact, coverage, and walk-forward counts reconcile.
 
-Validation contains 25,935 source rows and sealed test contains 25,082 source rows, but their features and labels were not read. No actionable-success rate, utility aggregate, profitability measure, return, exit distribution, symbol ranking, validation metric, sealed-test metric, or model result was calculated.
+Validation contains 25,935 source rows and sealed test contains 25,082 source rows. No actionable-success rate, utility aggregate, profitability measure, return, exit distribution, symbol ranking, validation metric, sealed-test metric, or model result was calculated.
+
+## Post-materialization safeguard correction
+
+An implementation audit on 2026-08-20 found that the original exporter used whole-file `JSON.parse`, which deserialized validation/test fields into memory even though no code inspected or summarized their values. The exporter is now hardened to verify the complete checksum first, deserialize train rows only, read only the top-level split field for non-train rows, reconcile all split counts, and require exactly 60,381 train rows. Synthetic tests prove that validation/test feature and label payloads are not passed to `JSON.parse`. The existing episode artifact was not replaced, and its recorded checksum remains unchanged.
 
 ## Authorized next step
 

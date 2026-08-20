@@ -5,6 +5,7 @@ import type { DAILY_SWING_TARGET_DESIGN_VERSION } from "@/lib/analysis/training-
 export const DAILY_SWING_COMBINED_BROAD_EPISODE_DATASET_VERSION = "1.0.0";
 export const DAILY_SWING_COMBINED_BROAD_DATASET_SHA256 =
 	"3ce82ae982ef3ac39df72fc3205788536e907cb187db061995c53730ab9b2030";
+export const DAILY_SWING_COMBINED_BROAD_TRAIN_SOURCE_ROWS = 60_381;
 
 export type DailySwingCombinedBroadEpisodeRow = {
 	rowId: string;

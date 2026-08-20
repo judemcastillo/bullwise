@@ -7,6 +7,7 @@ import { BROAD_DEVELOPMENT_DATA_POLICY } from "@/lib/analysis/broad-development-
 import {
 	DAILY_SWING_COMBINED_BROAD_DATASET_SHA256,
 	DAILY_SWING_COMBINED_BROAD_EPISODE_DATASET_VERSION,
+	DAILY_SWING_COMBINED_BROAD_TRAIN_SOURCE_ROWS,
 	type DailySwingCombinedBroadEpisodeDataset,
 } from "@/lib/analysis/combined-broad-episode-dataset.types";
 import {
@@ -103,8 +104,14 @@ export function buildDailySwingCombinedBroadEpisodeDataset(input: {
 	for (const row of input.dataset.rows) {
 		if (row.split === "train") trainRows.push(row);
 	}
-	if (trainRows.length !== input.dataset.splits.train.rows) {
-		throw new Error("Combined broad train row count does not match its inventory");
+	if (
+		input.dataset.splits.train.rows !==
+			DAILY_SWING_COMBINED_BROAD_TRAIN_SOURCE_ROWS ||
+		trainRows.length !== DAILY_SWING_COMBINED_BROAD_TRAIN_SOURCE_ROWS
+	) {
+		throw new Error(
+			`Combined broad train source must contain exactly ${DAILY_SWING_COMBINED_BROAD_TRAIN_SOURCE_ROWS} rows`,
+		);
 	}
 	const selectedRows = selectEpisodeFirstBroadRows(trainRows);
 	const walkForwardInventory = DAILY_SWING_BROAD_WALK_FORWARD_FOLDS.map(

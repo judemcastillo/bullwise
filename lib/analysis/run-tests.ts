@@ -20,4 +20,5 @@ import "./setup-scan-report.test";
 import "./broad-dataset.test";
 import "./combined-broad-dataset.test";
 import "./broad-episode-dataset.test";
+import "./combined-broad-train-source.test";
 import "./combined-broad-episode-dataset.test";

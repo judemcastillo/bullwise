@@ -1,8 +1,7 @@
-import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { buildDailySwingCombinedBroadEpisodeDataset } from "@/lib/analysis/combined-broad-episode-dataset";
-import type { DailySwingCombinedBroadDataset } from "@/lib/analysis/combined-broad-dataset.types";
+import { DAILY_SWING_COMBINED_BROAD_DATASET_SHA256 } from "@/lib/analysis/combined-broad-episode-dataset.types";
+import { readDailySwingCombinedBroadTrainSource } from "@/lib/analysis/combined-broad-train-source";
 import { writeLargeJsonObjectWithArray } from "@/lib/analysis/setup-scan-report";
 
 const INPUT = "analysis-broad-combined-dataset-v3.json";
@@ -25,10 +24,13 @@ async function main() {
 	if (process.argv.length > 2) {
 		throw new Error("The frozen combined episode exporter accepts no overrides");
 	}
-	const raw = await readFile(resolve(INPUT), "utf8");
+	const source = await readDailySwingCombinedBroadTrainSource({
+		path: resolve(INPUT),
+		expectedSha256: DAILY_SWING_COMBINED_BROAD_DATASET_SHA256,
+	});
 	const dataset = buildDailySwingCombinedBroadEpisodeDataset({
-		dataset: JSON.parse(raw) as DailySwingCombinedBroadDataset,
-		datasetSha256: createHash("sha256").update(raw).digest("hex"),
+		dataset: source.dataset,
+		datasetSha256: source.sha256,
 	});
 	await writeLargeJsonObjectWithArray(
 		resolve(OUTPUT),
@@ -47,7 +49,7 @@ async function main() {
 			`${fold.foldId}: ${fold.fitEpisodeRows}/${fold.fitSourceRows} fit episodes | ${fold.evaluationEpisodeRows}/${fold.evaluationSourceRows} evaluation episodes`,
 		);
 	}
-	console.log("Validation/test features and labels read: false");
+	console.log("Validation/test features and labels deserialized: false");
 	console.log("No target rates, utility aggregates, profitability, or model metrics were summarized.");
 }
 

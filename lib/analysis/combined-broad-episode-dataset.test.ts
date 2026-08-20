@@ -61,7 +61,7 @@ function sealedRow(
 }
 
 function dataset(): DailySwingCombinedBroadDataset {
-	const rows = [
+	const earlyRows = [
 		row({
 			id: "a",
 			signalAt: "2019-01-02T05:00:00.000Z",
@@ -90,6 +90,17 @@ function dataset(): DailySwingCombinedBroadDataset {
 			resolvedAt: "2019-01-08T05:00:00.000Z",
 			sourceScan: "expansion",
 		}),
+	];
+	const fillerTemplate = row({
+		id: "filler",
+		signalAt: "2019-12-02T05:00:00.000Z",
+		resolvedAt: "2019-12-02T05:00:00.000Z",
+	});
+	const fillerRows = Array.from({ length: 60_373 }, (_, index) => ({
+		...fillerTemplate,
+		rowId: `filler-${index}`,
+	}));
+	const yearlyRows = [
 		row({
 			id: "f",
 			signalAt: "2020-06-01T04:00:00.000Z",
@@ -106,9 +117,12 @@ function dataset(): DailySwingCombinedBroadDataset {
 			resolvedAt: "2022-06-03T04:00:00.000Z",
 			sourceScan: "expansion",
 		}),
+	];
+	const sealedRows = [
 		sealedRow("v", "validation", "2023-06-01T04:00:00.000Z"),
 		sealedRow("t", "test", "2025-06-02T04:00:00.000Z"),
 	];
+	const rows = [...earlyRows, ...fillerRows, ...yearlyRows, ...sealedRows];
 	return {
 		datasetVersion: "3.0.0",
 		generatedAt: "2026-08-19T10:25:13.706Z",
@@ -155,33 +169,33 @@ function dataset(): DailySwingCombinedBroadDataset {
 		walkForwardFolds: [
 			{
 				foldId: "evaluate_2020",
-				fit: { startsAt: rows[0].signalAt, endsAt: rows[4].signalAt, rows: 5, signalSessions: 4 },
-				evaluation: { startsAt: rows[5].signalAt, endsAt: rows[5].signalAt, rows: 1, signalSessions: 1 },
+				fit: { startsAt: earlyRows[0].signalAt, endsAt: fillerTemplate.signalAt, rows: 60_378, signalSessions: 5 },
+				evaluation: { startsAt: yearlyRows[0].signalAt, endsAt: yearlyRows[0].signalAt, rows: 1, signalSessions: 1 },
 				boundaries: { evaluationStartsAt: "2020-01-01T00:00:00.000Z", evaluationEndsBefore: "2021-01-01T00:00:00.000Z" },
 				purgedFitBoundaryRows: 0,
 				purgedEvaluationBoundaryRows: 0,
 			},
 			{
 				foldId: "evaluate_2021",
-				fit: { startsAt: rows[0].signalAt, endsAt: rows[5].signalAt, rows: 6, signalSessions: 5 },
-				evaluation: { startsAt: rows[6].signalAt, endsAt: rows[6].signalAt, rows: 1, signalSessions: 1 },
+				fit: { startsAt: earlyRows[0].signalAt, endsAt: yearlyRows[0].signalAt, rows: 60_379, signalSessions: 6 },
+				evaluation: { startsAt: yearlyRows[1].signalAt, endsAt: yearlyRows[1].signalAt, rows: 1, signalSessions: 1 },
 				boundaries: { evaluationStartsAt: "2021-01-01T00:00:00.000Z", evaluationEndsBefore: "2022-01-01T00:00:00.000Z" },
 				purgedFitBoundaryRows: 0,
 				purgedEvaluationBoundaryRows: 0,
 			},
 			{
 				foldId: "evaluate_2022",
-				fit: { startsAt: rows[0].signalAt, endsAt: rows[6].signalAt, rows: 7, signalSessions: 6 },
-				evaluation: { startsAt: rows[7].signalAt, endsAt: rows[7].signalAt, rows: 1, signalSessions: 1 },
+				fit: { startsAt: earlyRows[0].signalAt, endsAt: yearlyRows[1].signalAt, rows: 60_380, signalSessions: 7 },
+				evaluation: { startsAt: yearlyRows[2].signalAt, endsAt: yearlyRows[2].signalAt, rows: 1, signalSessions: 1 },
 				boundaries: { evaluationStartsAt: "2022-01-01T00:00:00.000Z", evaluationEndsBefore: "2023-01-01T00:00:00.000Z" },
 				purgedFitBoundaryRows: 0,
 				purgedEvaluationBoundaryRows: 0,
 			},
 		],
 		splits: {
-			train: { startsAt: rows[0].signalAt, endsAt: rows[7].signalAt, rows: 8, signalSessions: 7 },
-			validation: { startsAt: rows[8].signalAt, endsAt: rows[8].signalAt, rows: 1, signalSessions: 1 },
-			test: { startsAt: rows[9].signalAt, endsAt: rows[9].signalAt, rows: 1, signalSessions: 1 },
+			train: { startsAt: earlyRows[0].signalAt, endsAt: yearlyRows[2].signalAt, rows: 60_381, signalSessions: 8 },
+			validation: { startsAt: sealedRows[0].signalAt, endsAt: sealedRows[0].signalAt, rows: 1, signalSessions: 1 },
+			test: { startsAt: sealedRows[1].signalAt, endsAt: sealedRows[1].signalAt, rows: 1, signalSessions: 1 },
 		},
 		rows,
 		warnings: [],
@@ -195,9 +209,9 @@ describe("daily swing combined broad train episode dataset", () => {
 			datasetSha256: DAILY_SWING_COMBINED_BROAD_DATASET_SHA256,
 			generatedAt: new Date("2026-08-19T11:00:00.000Z"),
 		});
-		assert.deepEqual(result.rows.map((item) => item.rowId), ["a", "e", "d", "f", "g", "h"]);
-		assert.deepEqual(result.rows.map((item) => item.sourceScan), ["base", "base", "expansion", "base", "base", "expansion"]);
-		assert.equal(result.coverage.trainEpisodeRows, 6);
+		assert.deepEqual(result.rows.map((item) => item.rowId), ["a", "e", "d", "filler-0", "f", "g", "h"]);
+		assert.deepEqual(result.rows.map((item) => item.sourceScan), ["base", "base", "expansion", "base", "base", "base", "expansion"]);
+		assert.equal(result.coverage.trainEpisodeRows, 7);
 		assert.equal(result.coverage.passes, false);
 		assert.equal(result.materializationPolicy.validationLabelsRead, false);
 		assert.equal(result.materializationPolicy.testLabelsRead, false);
@@ -233,6 +247,19 @@ describe("daily swing combined broad train episode dataset", () => {
 					datasetSha256: "0".repeat(64),
 				}),
 			/checksum/,
+		);
+	});
+
+	it("requires the exact frozen train source inventory", () => {
+		const source = dataset();
+		source.splits.train.rows -= 1;
+		assert.throws(
+			() =>
+				buildDailySwingCombinedBroadEpisodeDataset({
+					dataset: source,
+					datasetSha256: DAILY_SWING_COMBINED_BROAD_DATASET_SHA256,
+				}),
+			/exactly 60381 rows/,
 		);
 	});
 });
