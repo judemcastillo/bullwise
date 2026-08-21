@@ -148,4 +148,6 @@ Every gate must pass. A failure rejects the exact v2 candidate. Do not tune and 
 
 ## Authorized next step
 
-Commit the metadata-only manifest before retrieving any history. Then implement a guarded, no-overwrite fetch command for the exact symbols and dates, with synthetic argument, checksum, and serialization tests. Do not run that command or calculate outcomes until the fetch implementation and the executable v2 preregistration are separately reviewed.
+The metadata manifest was committed in Git checkpoint `4c35ed5`. The guarded history fetcher is now implemented in `scripts/fetch-analysis-risk-controlled-momentum-v2.ts` with its checksum-bound serialization contract in `lib/analysis/risk-controlled-momentum-v2-history.ts`. Synthetic tests cover argument rejection, exact inventory, manifest integrity, deterministic serialization, and no-overwrite writing. A help-only command check passed; the real history artifact does not exist and no OHLCV request was made.
+
+The executable contract is now frozen in `RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL` and `docs/etf-risk-controlled-momentum-v2-preregistration.md`, including final coverage rules, 19 numeric gates, report schema, source contract, and synthetic evaluator requirements. Review the preregistration and guarded fetcher together and commit them before running `npm run fetch:analysis-risk-controlled-momentum-v2`. Fetching does not authorize outcome calculation; its checksum must be registered first.

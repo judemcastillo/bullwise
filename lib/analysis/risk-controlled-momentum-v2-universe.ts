@@ -149,3 +149,12 @@ export const RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256 = sha256({
 
 export const RISK_CONTROLLED_MOMENTUM_V2_MANIFEST_SHA256 =
 	"2a8fd2e03aab94002edf3e0b4db0ea034f4b328312db46cfb6393cd2cc315464";
+
+export function assertRiskControlledMomentumV2ManifestIntegrity() {
+	if (
+		RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256 !==
+		RISK_CONTROLLED_MOMENTUM_V2_MANIFEST_SHA256
+	) {
+		throw new Error("Risk-controlled momentum v2 manifest checksum drifted");
+	}
+}

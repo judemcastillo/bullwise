@@ -20,6 +20,7 @@
 		"fetch:backtest-v3-holdout": "npm run fetch:backtest-batch -- --provider=alpaca --symbols=ACWI,VEA,VWO,SCHD,RSP,IJH,IJR,VGK,EWJ,EWZ,MBB,TIP,SHY,BND,EMB,PDBC,DBC,IAU,GDX,KRE --benchmark=SPY --from=2016-01-01 --universe-name=daily-swing-v3-ranked-portfolio-holdout --output=artifacts/backtests/v3-holdout-history.json",
 		"fetch:analysis-broad-development": "node --import tsx scripts/fetch-analysis-broad-development.ts",
 		"fetch:analysis-broad-development-v2": "node --import tsx scripts/fetch-analysis-broad-development-v2.ts",
+		"fetch:analysis-risk-controlled-momentum-v2": "node --import tsx scripts/fetch-analysis-risk-controlled-momentum-v2.ts",
     "audit:backtest-providers": "node --import tsx scripts/audit-backtest-providers.ts",
     "backtest:daily-swing": "node --import tsx scripts/backtest-daily-swing.ts",
     "backtest:daily-swing-batch": "node --import tsx scripts/backtest-daily-swing-batch.ts",
