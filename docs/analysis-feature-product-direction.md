@@ -27,7 +27,7 @@ Deterministic code should calculate indicators, levels, provenance, and risk fac
 
 The existing engine, market-data path, API surface, and placeholder UI were audited. The implementation contract for the smallest transparent panel is `docs/transparent-analysis-panel-v1-contract.md`. It freezes the initial eligibility, deterministic output, evidence labels, availability and data-quality states, AI boundary, user-facing language, and required tests.
 
-The next step is contract item 1: implement product DTO types and a pure allow-listing adapter around the existing deterministic engine. That adapter must exclude all strategy signals and trade-plan fields.
+Contract item 1 is implemented in `lib/analysis/transparent-analysis-panel.types.ts` and `lib/analysis/transparent-analysis-panel.ts`, with focused boundary tests. The next step is contract item 2: add and test the deterministic U.S.-equity completed-session resolver before any server orchestration or market-data request is connected to the panel.
 
 This document does not authorize another strategy experiment or access to sealed validation or holdout data.
 

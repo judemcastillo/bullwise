@@ -245,4 +245,6 @@ AI may improve wording; it may not change `context`, factor states, levels, warn
 5. Replace the disabled preview with the specified UI states.
 6. Review telemetry and data-quality failures before considering a separately contracted AI explanation.
 
+Implementation progress: item 1 is complete. The product DTO and pure allow-listing adapter are implemented in `lib/analysis/transparent-analysis-panel.types.ts` and `lib/analysis/transparent-analysis-panel.ts`. Their tests prove that research strategy fields and arbitrary engine prose do not cross the product boundary. Item 2 is next.
+
 This contract authorizes ordinary product implementation and synthetic tests only. It does not authorize market-data research retrieval, backtests, model training, strategy validation, holdout access, customer trading signals, or order execution.
