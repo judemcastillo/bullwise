@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import env from "@next/env";
+import { loadEnvConfig } from "@next/env";
 import {
 	buildRiskControlledMomentumV2HistoryArtifact,
 	RISK_CONTROLLED_MOMENTUM_V2_HISTORY_POLICY,
@@ -35,7 +35,7 @@ async function main() {
 		console.log(USAGE);
 		return;
 	}
-	env.loadEnvConfig(process.cwd());
+	loadEnvConfig(process.cwd());
 	const apiKeyId =
 		process.env.ALPACA_API_KEY_ID?.trim() ?? process.env.ALPACA_API_KEY?.trim();
 	const apiSecretKey =
