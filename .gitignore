@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/artifacts/backtests/*.json
+/artifacts/analysis/*.json
 
 # next.js
 /.next/
