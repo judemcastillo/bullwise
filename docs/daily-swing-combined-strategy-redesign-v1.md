@@ -63,4 +63,14 @@ Do not test another benchmark, moving average, return window, threshold, feature
 
 ## Authorized next step
 
-The fixed SPY-filtered evaluator and no-overwrite report command are implemented with synthetic fixtures. Run targeted tests, lint, and type checking before authorizing the real train-only development evaluation. Do not change the benchmark conditions, mechanics, gates, inputs, or output path.
+The fixed evaluator was run on train-only evidence and rejected the benchmark risk filter:
+
+- Report: `artifacts/analysis/analysis-broad-strategy-redesign-development-v1.json`
+- SHA-256: `2b82ed55f49bb3b0ff52146a2914bf306ae1f542a1c50db0ba3e7c0e88a698c8`
+- Decision: `reject_benchmark_risk_filter`
+- Gates passed: `2/9`
+- Episodes: `2,223`
+- Average utility: `-0.02027695R`
+- Profit factor: `0.94238951`
+
+This exact SPY filter must not be tuned or reused. The next materially different train-only hypothesis is frozen in `docs/daily-swing-symmetric-regime-development-v1.md`.
