@@ -30,3 +30,4 @@ import "./combined-broad-train-diagnostics.test";
 import "./combined-broad-train-diagnostic-runner.test";
 import "./combined-broad-strategy-target-audit.test";
 import "./combined-broad-strategy-target-audit-runner.test";
+import "./combined-broad-strategy-redesign.test";

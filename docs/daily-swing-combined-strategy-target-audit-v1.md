@@ -50,4 +50,6 @@ Do not search thresholds, indicators, feature subsets, or model families. Do not
 
 ## Authorized next step
 
-The deterministic audit and no-overwrite report writer are implemented with synthetic fixtures. Run targeted tests, lint, and type checking before authorizing the real train-only audit. Do not change the frozen inputs, cohorts, gates, or output path.
+The real train-only audit completed with report SHA-256 `dc0b9d9c45352bc941f8402b2a17a9b764823f41a076b838806393676f659e27`. Overall utility was `-0.02364269R`, profit factor was `0.93482115`, no direction-by-setup cohort passed, and target compression was not flagged. The strategy mechanics require redesign; the current strategy and rejected model cannot advance.
+
+The next step is the separately frozen benchmark-risk-filter development protocol in `docs/daily-swing-combined-strategy-redesign-v1.md`. Validation and test remain sealed.
