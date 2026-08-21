@@ -43,3 +43,5 @@ import "./cross-sectional-momentum-source.test";
 import "./risk-controlled-momentum-v2-universe.test";
 import "./risk-controlled-momentum-v2-history.test";
 import "./risk-controlled-momentum-v2-development.test";
+import "./risk-controlled-momentum-v3-history.test";
+import "./risk-controlled-momentum-v3-development.test";

@@ -21,6 +21,7 @@
 		"fetch:analysis-broad-development": "node --import tsx scripts/fetch-analysis-broad-development.ts",
 		"fetch:analysis-broad-development-v2": "node --import tsx scripts/fetch-analysis-broad-development-v2.ts",
 		"fetch:analysis-risk-controlled-momentum-v2": "node --import tsx scripts/fetch-analysis-risk-controlled-momentum-v2.ts",
+		"fetch:analysis-risk-controlled-momentum-v3": "node --import tsx scripts/fetch-analysis-risk-controlled-momentum-v3.ts",
     "audit:backtest-providers": "node --import tsx scripts/audit-backtest-providers.ts",
     "backtest:daily-swing": "node --import tsx scripts/backtest-daily-swing.ts",
     "backtest:daily-swing-batch": "node --import tsx scripts/backtest-daily-swing-batch.ts",

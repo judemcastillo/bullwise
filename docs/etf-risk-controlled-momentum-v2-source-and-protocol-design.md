@@ -146,8 +146,10 @@ Every gate must pass. A failure rejects the exact v2 candidate. Do not tune and 
 - No-overwrite artifact writing.
 - Explicit `false` declarations for all existing validation/test feature and label access.
 
-## Authorized next step
+## Source-feasibility result
 
-The metadata manifest was committed in Git checkpoint `4c35ed5`. The guarded history fetcher is now implemented in `scripts/fetch-analysis-risk-controlled-momentum-v2.ts` with its checksum-bound serialization contract in `lib/analysis/risk-controlled-momentum-v2-history.ts`. Synthetic tests cover argument rejection, exact inventory, manifest integrity, deterministic serialization, and no-overwrite writing. A help-only command check passed; the real history artifact does not exist and no OHLCV request was made.
+The metadata manifest was committed in Git checkpoint `4c35ed5`, and the executable Alpaca contract and guarded fetcher were committed before retrieval. On 2026-08-21 the exact command requested the frozen range, but the first artifact-validation failure was `SPY returned no daily bars`. No history artifact was written and no strategy outcome was calculated.
 
-The executable contract is now frozen in `RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL` and `docs/etf-risk-controlled-momentum-v2-preregistration.md`, including final coverage rules, 19 numeric gates, report schema, source contract, and synthetic evaluator requirements. Review the preregistration and guarded fetcher together and commit them before running `npm run fetch:analysis-risk-controlled-momentum-v2`. Fetching does not authorize outcome calculation; its checksum must be registered first.
+Alpaca documents that its Data API has no equity data before 2016, making the frozen 2007–2015 source infeasible. The v2 contract cannot substitute a provider, so it is closed as `source_infeasible_without_strategy_outcomes`. See `docs/etf-risk-controlled-momentum-v2-source-feasibility-result.md`.
+
+A separately preregistered v3 preserves the exact universe, period, mechanics, costs, comparators, and gates while naming Tiingo EOD as the historical provider. This source-only successor does not reinterpret v2 as a strategy failure.
