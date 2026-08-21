@@ -48,3 +48,4 @@ import "./risk-controlled-momentum-v3-development.test";
 import "./risk-controlled-momentum-v3-source.test";
 import "./risk-controlled-momentum-v3-runner.test";
 import "./risk-controlled-momentum-v3-report.test";
+import "./risk-controlled-momentum-v3-closure.test";

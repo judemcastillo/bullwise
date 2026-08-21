@@ -46,8 +46,25 @@ All 19 existing gates must pass. A failure permanently rejects this exact v3 can
 
 This source substitution does not authorize customer signals, live trading, existing 2016-plus data, or any validation/test access.
 
-## Authorized next step
+## Execution result and closure
 
-The exact history checksum was committed before evaluator implementation. The evaluator, registered-source reader, aggregate-only report writer, and no-override command are implemented with synthetic fixtures. They must be reviewed, verified, and committed without opening the real artifact.
+The user authorized the one real development run on 2026-08-21. The command verified the registered artifact and began evaluation, then failed before report writing because a held instrument lacked a valuation bar.
 
-Only after that checkpoint may the user explicitly authorize the one real command `npm run develop:etf-risk-controlled-momentum-v3`. It must verify the registered byte size and SHA-256 before parsing, refuse overwrite, emit no selected symbols or instrument-level outcomes, and leave all 2016-plus validation/test sources unread.
+A limited, aggregate-only source diagnostic found:
+
+- 1,762 benchmark sessions in the portfolio period;
+- 1,761 sessions common to the complete manifest;
+- one incomplete benchmark session, `2010-05-06T00:00:00.000Z`;
+- two affected instruments, each missing no more than one session.
+
+The incomplete session is the Flash Crash session. Maximum drawdown is a primary gate, so deleting that date, forward-filling it, excluding an affected instrument, or mixing another provider's bars would change the frozen experiment after observing a consequential source defect. None of those repairs is authorized.
+
+Closure decision: `source_infeasible_without_complete_valuation_data`.
+
+No development report was written, no aggregate performance evaluation or gate decision was completed, and no 2016-plus, validation, or test features or labels were read. The failed execution does not establish that v3 passed or failed its performance gates.
+
+## Closed next step
+
+Do not rerun or repair exact v3, and do not create a v4 that merely retries the same strategy family on the same incomplete source. The registered history remains preserved as ignored research evidence, while the evaluator and synthetic tests remain available for audit. The standard development command now reports the closure and exits before reading the history.
+
+This closes the current strategy-search family. It authorizes no validation, holdout evaluation, customer signal, live trading, or new strategy experiment. Product work should instead proceed toward transparent market analysis and risk context as described in `docs/analysis-feature-product-direction.md`.
