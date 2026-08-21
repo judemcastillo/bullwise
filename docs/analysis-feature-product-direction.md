@@ -30,3 +30,5 @@ The existing engine, market-data path, API surface, and placeholder UI were audi
 The next step is contract item 1: implement product DTO types and a pure allow-listing adapter around the existing deterministic engine. That adapter must exclude all strategy signals and trade-plan fields.
 
 This document does not authorize another strategy experiment or access to sealed validation or holdout data.
+
+Future strategy research is parked, not abandoned. If it resumes, follow `docs/future-strategy-research-resumption.md` rather than modifying or rerunning the closed candidates.

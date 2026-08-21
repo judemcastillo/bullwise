@@ -68,3 +68,5 @@ No development report was written, no aggregate performance evaluation or gate d
 Do not rerun or repair exact v3, and do not create a v4 that merely retries the same strategy family on the same incomplete source. The registered history remains preserved as ignored research evidence, while the evaluator and synthetic tests remain available for audit. The standard development command now reports the closure and exits before reading the history.
 
 This closes the current strategy-search family. It authorizes no validation, holdout evaluation, customer signal, live trading, or new strategy experiment. Product work should instead proceed toward transparent market analysis and risk context as described in `docs/analysis-feature-product-direction.md`.
+
+Instructions for a future, materially different research family are parked in `docs/future-strategy-research-resumption.md`. That guide does not reopen v3.
