@@ -48,4 +48,6 @@ This source substitution does not authorize customer signals, live trading, exis
 
 ## Authorized next step
 
-Commit the exact history checksum registration before implementing or invoking the evaluator. Evaluator development must use synthetic fixtures. Running the real development evaluation remains a separate explicit action and must verify this checksum before reading the artifact.
+The exact history checksum was committed before evaluator implementation. The evaluator, registered-source reader, aggregate-only report writer, and no-override command are implemented with synthetic fixtures. They must be reviewed, verified, and committed without opening the real artifact.
+
+Only after that checkpoint may the user explicitly authorize the one real command `npm run develop:etf-risk-controlled-momentum-v3`. It must verify the registered byte size and SHA-256 before parsing, refuse overwrite, emit no selected symbols or instrument-level outcomes, and leave all 2016-plus validation/test sources unread.
