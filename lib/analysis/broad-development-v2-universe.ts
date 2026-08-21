@@ -3,6 +3,7 @@ import {
 	BROAD_DEVELOPMENT_LIQUIDITY_POLICY,
 	BROAD_DEVELOPMENT_SYMBOLS,
 	PREVIOUSLY_CONSUMED_RESEARCH_SYMBOLS,
+	type BroadDevelopmentCoverageSnapshot,
 } from "@/lib/analysis/broad-development-universe";
 import type { MarketBars } from "@/lib/market-data/types";
 
@@ -137,19 +138,24 @@ export type BroadDevelopmentV2ExpansionCoverageEvaluation = {
 export function evaluateBroadDevelopmentV2ExpansionCoverage(input: {
 	symbol: string;
 	marketData: Pick<MarketBars, "bars">;
+	coverageSnapshot?: BroadDevelopmentCoverageSnapshot;
 }): BroadDevelopmentV2ExpansionCoverageEvaluation {
 	const reasons: BroadDevelopmentV2ExpansionCoverageEvaluation["reasons"] = [];
 	const symbol = input.symbol.trim().toUpperCase();
 	if (!(BROAD_DEVELOPMENT_V2_EXPANSION_SYMBOLS as readonly string[]).includes(symbol)) {
 		reasons.push("symbol_not_in_frozen_expansion");
 	}
+	const barsAvailable =
+		input.coverageSnapshot?.barsAvailable ?? input.marketData.bars.length;
 	if (
-		input.marketData.bars.length <
+		barsAvailable <
 		BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.minimumBarsPerInstrument
 	) {
 		reasons.push("insufficient_bars");
 	}
-	const firstAt = input.marketData.bars[0]?.startedAt.getTime();
+	const firstAt =
+		input.coverageSnapshot?.firstBarAt.getTime() ??
+		input.marketData.bars[0]?.startedAt.getTime();
 	const latestAllowedFirstAt =
 		Date.parse(
 			`${BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY.requestedFrom}T00:00:00.000Z`,

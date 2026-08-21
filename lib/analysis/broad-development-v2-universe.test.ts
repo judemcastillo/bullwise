@@ -142,5 +142,16 @@ describe("frozen broad development v2 expansion", () => {
 			"symbol_not_in_frozen_expansion",
 			"insufficient_bars",
 		]);
+		assert.equal(
+			evaluateBroadDevelopmentV2ExpansionCoverage({
+				symbol: "VGT",
+				marketData: { bars: bars.slice(0, 1_750) },
+				coverageSnapshot: {
+					barsAvailable: bars.length,
+					firstBarAt: bars[0].startedAt,
+				},
+			}).eligible,
+			true,
+		);
 	});
 });

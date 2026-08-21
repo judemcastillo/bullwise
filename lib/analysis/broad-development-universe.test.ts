@@ -79,5 +79,14 @@ describe("frozen broad development universe", () => {
 		});
 		assert.equal(shortened.eligible, false);
 		assert.ok(shortened.reasons.includes("insufficient_bars"));
+		const trainSliceWithFrozenCoverage = evaluateBroadDevelopmentCoverage({
+			symbol: "IVV",
+			marketData: { bars: bars.slice(0, 1_750) },
+			coverageSnapshot: {
+				barsAvailable: bars.length,
+				firstBarAt: bars[0].startedAt,
+			},
+		});
+		assert.equal(trainSliceWithFrozenCoverage.eligible, true);
 	});
 });

@@ -200,23 +200,30 @@ export type BroadDevelopmentCoverageEvaluation = {
 	>;
 };
 
+export type BroadDevelopmentCoverageSnapshot = {
+	barsAvailable: number;
+	firstBarAt: Date;
+};
+
 /** Applies only the outcome-blind coverage rules frozen in the v1 manifest. */
 export function evaluateBroadDevelopmentCoverage(input: {
 	symbol: string;
 	marketData: Pick<MarketBars, "bars">;
+	coverageSnapshot?: BroadDevelopmentCoverageSnapshot;
 }): BroadDevelopmentCoverageEvaluation {
 	const reasons: BroadDevelopmentCoverageEvaluation["reasons"] = [];
 	const symbol = input.symbol.trim().toUpperCase();
 	if (!(BROAD_DEVELOPMENT_SYMBOLS as readonly string[]).includes(symbol)) {
 		reasons.push("symbol_not_in_frozen_universe");
 	}
-	if (
-		input.marketData.bars.length <
-		BROAD_DEVELOPMENT_DATA_POLICY.minimumBarsPerInstrument
-	) {
+	const barsAvailable =
+		input.coverageSnapshot?.barsAvailable ?? input.marketData.bars.length;
+	if (barsAvailable < BROAD_DEVELOPMENT_DATA_POLICY.minimumBarsPerInstrument) {
 		reasons.push("insufficient_bars");
 	}
-	const firstAt = input.marketData.bars[0]?.startedAt.getTime();
+	const firstAt =
+		input.coverageSnapshot?.firstBarAt.getTime() ??
+		input.marketData.bars[0]?.startedAt.getTime();
 	const latestAllowedFirstAt =
 		Date.parse(`${BROAD_DEVELOPMENT_DATA_POLICY.requestedFrom}T00:00:00.000Z`) +
 		BROAD_DEVELOPMENT_DATA_POLICY.maximumFirstBarDelayDays * 86_400_000;

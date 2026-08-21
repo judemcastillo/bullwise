@@ -1,5 +1,9 @@
 # Daily swing next research plan
 
+> Status update, 2026-08-21: this broader-data and model program completed but did not produce a profitable daily-setup strategy or useful setup-ranking model. The later ETF cross-sectional momentum experiment produced strong train-only returns but was formally rejected after failing both absolute drawdown gates. Its preserved result and the clean-data requirements for any risk-controlled successor are recorded in `docs/etf-cross-sectional-momentum-development-v1-result.md`.
+
+> The risk-controlled successor's source and protocol direction is recorded in `docs/etf-risk-controlled-momentum-v2-source-and-protocol-design.md`: 48 new pre-2008 ETFs, a non-overlapping 2009–2015 development window, and one capped 10% portfolio-volatility overlay. The metadata-only universe is frozen with SHA-256 `2a8fd2e03aab94002edf3e0b4db0ea034f4b328312db46cfb6393cd2cc315464`; no prices were retrieved.
+
 Recorded on 2026-08-19 after rejecting `daily-swing-episode-actionable-logistic-v1`. This is a research plan, not a preregistered model experiment and not authorization to open the sealed test split.
 
 ## Decision

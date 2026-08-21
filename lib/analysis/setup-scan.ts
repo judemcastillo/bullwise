@@ -14,6 +14,7 @@ import {
 	BROAD_DEVELOPMENT_SYMBOLS,
 	BROAD_DEVELOPMENT_UNIVERSE_NAME,
 	evaluateBroadDevelopmentCoverage,
+	type BroadDevelopmentCoverageSnapshot,
 } from "@/lib/analysis/broad-development-universe";
 import {
 	BROAD_DEVELOPMENT_V2_EXPANSION_DATA_POLICY,
@@ -211,7 +212,11 @@ export function scanDailySwingSetups(
 
 export function scanDailySwingSetupBatch(input: {
 	universeName: string;
-	instruments: DailySwingBacktestInput[];
+	instruments: Array<
+		DailySwingBacktestInput & {
+			coverageSnapshot?: BroadDevelopmentCoverageSnapshot;
+		}
+	>;
 	dependencies?: DailySwingBacktestDependencies;
 	generatedAt?: Date;
 	researchPolicy?: DailySwingSetupResearchPolicy;
@@ -277,6 +282,7 @@ export function scanDailySwingSetupBatch(input: {
 			evaluateBroadDevelopmentCoverage({
 				symbol: instrument.instrument.displaySymbol,
 				marketData: instrument.marketData,
+				coverageSnapshot: instrument.coverageSnapshot,
 			}).eligible,
 		);
 		if (
@@ -342,6 +348,7 @@ export function scanDailySwingSetupBatch(input: {
 			evaluateBroadDevelopmentV2ExpansionCoverage({
 				symbol: instrument.instrument.displaySymbol,
 				marketData: instrument.marketData,
+				coverageSnapshot: instrument.coverageSnapshot,
 			}).eligible,
 		);
 		if (

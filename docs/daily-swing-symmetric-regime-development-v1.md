@@ -61,6 +61,25 @@ A pass only permits freezing the implementation for a separately preregistered o
 
 Do not reuse or tune the rejected SPY filter. Do not tune indicators, lookbacks, thresholds, setup geometry, or direction mechanics. Do not change the short-borrow stress after seeing outcomes. Do not add a model, rank symbols, remove weak symbols, or report instrument-level results. Do not open validation or test features or labels.
 
-## Authorized next step
+## Train-only result
 
-Implement the train-only exhaustive symmetric setup builder and evaluator with synthetic fixtures. The implementation must verify source hashes, refuse overwrite, include the frozen short-borrow charge, and emit only aggregate cohorts. Do not run the real train scan until those guards pass targeted tests, lint, and type checking.
+The frozen experiment completed on 2026-08-21:
+
+- Report: `artifacts/analysis/analysis-broad-symmetric-regime-development-v1.json`
+- SHA-256: `e9b28bf7e7c72cf985783eff23559a87a21d505730db082ad63693006a120fa8`
+- Decision: `reject_symmetric_regime_strategy`
+- Gates passed: `5/12`
+- Episodes: `4,647`, including `1,951` short episodes
+- Combined average utility: `-0.04862554R`
+- Combined profit factor: `0.87656265`
+- Long average utility: `-0.02364269R`
+- Short average utility after borrow: `-0.08314822R`
+- Average borrow drag per triggered short: `0.07785518R`
+
+All three folds had negative average utility. The strategy improved over long-only in 2022 but remained unprofitable in that fold. The short leg is also negative before the aggregate borrow drag is applied, so lowering the frozen borrow assumption would not rescue the hypothesis.
+
+Validation and test features and labels remained sealed. This candidate must not be tuned, rerun, or advanced to validation, product signals, paper execution, or live trading.
+
+## Research stop
+
+The fixed daily breakout, pullback, and breakdown trade-plan family is closed for this research cycle. Do not add another market filter, indicator threshold, direction rule, model, or cost change to these labels. The materially different research direction is recorded in `docs/daily-swing-strategy-research-reset-v1.md`.
