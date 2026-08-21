@@ -63,4 +63,4 @@ Do not test another benchmark, moving average, return window, threshold, feature
 
 ## Authorized next step
 
-Implement the fixed SPY-filtered train-only evaluator with synthetic fixtures. Do not run the real development evaluation until the implementation is verified.
+The fixed SPY-filtered evaluator and no-overwrite report command are implemented with synthetic fixtures. Run targeted tests, lint, and type checking before authorizing the real train-only development evaluation. Do not change the benchmark conditions, mechanics, gates, inputs, or output path.

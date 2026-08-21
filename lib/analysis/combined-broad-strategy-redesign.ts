@@ -44,6 +44,23 @@ export const DAILY_SWING_COMBINED_BROAD_STRATEGY_REDESIGN_PROTOCOL = {
 		averageUtilityR: -0.02364269,
 		profitFactor: 0.93482115,
 		evaluationRows: 2_696,
+		folds: [
+			{
+				foldId: "evaluate_2020",
+				evaluationRows: 1_031,
+				averageUtilityR: 0.08775738,
+			},
+			{
+				foldId: "evaluate_2021",
+				evaluationRows: 1_197,
+				averageUtilityR: 0.02075084,
+			},
+			{
+				foldId: "evaluate_2022",
+				evaluationRows: 468,
+				averageUtilityR: -0.38260108,
+			},
+		] as const,
 	},
 	candidate: {
 		candidateId: "daily-swing-v1-plus-spy-risk-filter",

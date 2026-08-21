@@ -31,3 +31,5 @@ import "./combined-broad-train-diagnostic-runner.test";
 import "./combined-broad-strategy-target-audit.test";
 import "./combined-broad-strategy-target-audit-runner.test";
 import "./combined-broad-strategy-redesign.test";
+import "./frozen-batch-benchmark-source.test";
+import "./combined-broad-strategy-redesign-runner.test";
