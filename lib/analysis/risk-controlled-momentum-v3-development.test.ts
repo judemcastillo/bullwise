@@ -10,7 +10,12 @@ describe("risk-controlled momentum v3 Tiingo preregistration", () => {
 		assert.equal(protocol.sources.universeManifestSha256, RISK_CONTROLLED_MOMENTUM_V2_MANIFEST_SHA256);
 		assert.equal(protocol.sources.history.provider, "tiingo");
 		assert.equal(protocol.sources.history.feed, "eod_composite");
-		assert.equal(protocol.sources.history.sha256, null);
+		assert.equal(protocol.sources.history.sha256Status, "registered_before_outcomes");
+		assert.equal(
+			protocol.sources.history.sha256,
+			"4d128a2e7782f6554f1f274aa92485064df97cda495ea5566c73b734206000f2",
+		);
+		assert.equal(protocol.sources.history.bytes, 27_239_858);
 		assert.equal(protocol.sources.infeasiblePredecessorSource.decision, "source_infeasible_without_strategy_outcomes");
 		assert.deepEqual(protocol.signal, RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL.signal);
 		assert.deepEqual(protocol.portfolio, RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL.portfolio);
@@ -24,7 +29,7 @@ describe("risk-controlled momentum v3 Tiingo preregistration", () => {
 		const protocol = RISK_CONTROLLED_MOMENTUM_V3_PROTOCOL;
 		assert.equal(protocol.dataAccess.expectedMonthlyHoldingPeriods, 84);
 		assert.equal(protocol.dataAccess.protected2016PlusDataRead, false);
-		assert.equal(protocol.dataAccess.tiingoHistoryRead, false);
+		assert.equal(protocol.dataAccess.tiingoHistoryRead, true);
 		assert.equal(protocol.coverage.manifestCandidates, 48);
 		assert.equal(protocol.coverage.minimumEligibleInstruments, 40);
 		assert.equal(protocol.coverage.minimumEligibleInstrumentsPerSleeve, 10);

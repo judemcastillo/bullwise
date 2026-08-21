@@ -26,7 +26,19 @@ No Alpaca and Tiingo bars may be mixed. The present-day surviving-fund limitatio
 
 The guarded command requests one adjusted daily Tiingo EOD series for SPY and each exact manifest member from 2007-01-01 through 2015-12-31. It accepts no symbols, dates, provider, adjustment, output, or overwrite overrides. Empty, malformed, wrongly attributed, unordered, out-of-range, or incomplete-inventory inputs fail before artifact writing.
 
-The history artifact is `artifacts/analysis/analysis-risk-controlled-momentum-v3-history.json` and must be created once. Its SHA-256 is intentionally null until retrieval. That checksum must be registered in a separate committed checkpoint before any coverage or performance outcome is calculated.
+The history artifact is `artifacts/analysis/analysis-risk-controlled-momentum-v3-history.json` and must be created once. Its SHA-256 was intentionally null until retrieval and had to be registered in a separate committed checkpoint before any coverage or performance outcome could be calculated.
+
+## Registered history
+
+The guarded retrieval completed on 2026-08-21 before any coverage or strategy outcome was calculated:
+
+- SHA-256: `4d128a2e7782f6554f1f274aa92485064df97cda495ea5566c73b734206000f2`
+- Bytes: `27,239,858`
+- Provider/feed: Tiingo EOD composite
+- Adjustment: split-and-cash-dividend-adjusted OHLCV
+- Existing 2016-plus, validation, or test data accessed: no
+
+This registration changes no symbol, period, strategy mechanic, cost, comparator, report field, or gate.
 
 ## Decision
 
@@ -36,4 +48,4 @@ This source substitution does not authorize customer signals, live trading, exis
 
 ## Authorized next step
 
-Review and commit this preregistration, the Tiingo provider, and the guarded fetcher together. Only then may `npm run fetch:analysis-risk-controlled-momentum-v3` retrieve the frozen history. Retrieval does not authorize strategy evaluation.
+Commit the exact history checksum registration before implementing or invoking the evaluator. Evaluator development must use synthetic fixtures. Running the real development evaluation remains a separate explicit action and must verify this checksum before reading the artifact.

@@ -25,8 +25,11 @@ export const RISK_CONTROLLED_MOMENTUM_V3_PROTOCOL = {
 			provider: RISK_CONTROLLED_MOMENTUM_V3_HISTORY_POLICY.provider,
 			feed: RISK_CONTROLLED_MOMENTUM_V3_HISTORY_POLICY.feed,
 			adjustment: RISK_CONTROLLED_MOMENTUM_V3_HISTORY_POLICY.adjustment,
-			sha256Status: "must_be_registered_after_fetch_before_outcomes",
-			sha256: null,
+			sha256Status: "registered_before_outcomes",
+			sha256:
+				"4d128a2e7782f6554f1f274aa92485064df97cda495ea5566c73b734206000f2",
+			bytes: 27_239_858,
+			registeredAt: "2026-08-21",
 		},
 	},
 	dataAccess: {
@@ -34,7 +37,7 @@ export const RISK_CONTROLLED_MOMENTUM_V3_PROTOCOL = {
 		formationHistoryStartsAt: RISK_CONTROLLED_MOMENTUM_V3_HISTORY_POLICY.requestedFrom,
 		alpacaPre2016ResponsesRead: true,
 		alpacaPre2016NonemptyBarsRead: false,
-		tiingoHistoryRead: false,
+		tiingoHistoryRead: true,
 	},
 	report: {
 		...RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL.report,
