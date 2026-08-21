@@ -23,8 +23,10 @@ Use language such as “bullish evidence,” “bearish evidence,” “risk is 
 
 Deterministic code should calculate indicators, levels, provenance, and risk facts. AI may explain those facts in plain language, organize competing evidence, summarize uncertainty, and help users compare scenarios. It must not invent market data, hide missing inputs, claim certainty, or place orders.
 
-## Next implementation checkpoint
+## Completed specification checkpoint
 
-Audit the existing analysis API and UI, then write a product contract for the smallest transparent analysis panel. Define its inputs, deterministic outputs, evidence labels, uncertainty and data-quality states, user-facing disclaimers, and tests before implementation.
+The existing engine, market-data path, API surface, and placeholder UI were audited. The implementation contract for the smallest transparent panel is `docs/transparent-analysis-panel-v1-contract.md`. It freezes the initial eligibility, deterministic output, evidence labels, availability and data-quality states, AI boundary, user-facing language, and required tests.
+
+The next step is contract item 1: implement product DTO types and a pure allow-listing adapter around the existing deterministic engine. That adapter must exclude all strategy signals and trade-plan fields.
 
 This document does not authorize another strategy experiment or access to sealed validation or holdout data.
