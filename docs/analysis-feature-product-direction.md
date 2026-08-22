@@ -27,7 +27,7 @@ Deterministic code should calculate indicators, levels, provenance, and risk fac
 
 The existing engine, market-data path, API surface, and placeholder UI were audited. The implementation contract for the smallest transparent panel is `docs/transparent-analysis-panel-v1-contract.md`. It freezes the initial eligibility, deterministic output, evidence labels, availability and data-quality states, AI boundary, user-facing language, and required tests.
 
-Contract item 1 is implemented in `lib/analysis/transparent-analysis-panel.types.ts` and `lib/analysis/transparent-analysis-panel.ts`, with focused boundary tests. The next step is contract item 2: add and test the deterministic U.S.-equity completed-session resolver before any server orchestration or market-data request is connected to the panel.
+Contract items 1 and 2 are implemented: the product DTO and pure allow-listing adapter are in `lib/analysis/transparent-analysis-panel.types.ts` and `lib/analysis/transparent-analysis-panel.ts`, and the bounded NYSE completed-session resolver is in `lib/market-data/us-equity-session.ts`. The next step is contract item 3: add a server-only orchestration service using synthetic provider fixtures before connecting a route or UI.
 
 This document does not authorize another strategy experiment or access to sealed validation or holdout data.
 
