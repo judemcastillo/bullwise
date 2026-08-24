@@ -16,7 +16,7 @@ It does not measure strategy profitability, user behavior outside this endpoint,
 
 ## Sink and event schema
 
-V1 emits one structured server log per handled request and a separate structured event for an internal operational failure. The logger is server-only and vendor-neutral.
+V1 emits one structured event per handled request and a separate structured event for an internal operational failure. During local development, the server-only logger appends JSON Lines to `artifacts/telemetry/transparent-analysis-v1.jsonl`. The directory is ignored by Git and the file is created with owner-only permissions. In other environments, events go to the deployment's server log sink because serverless local files may be ephemeral.
 
 `transparent_analysis_request` contains only:
 
@@ -50,7 +50,7 @@ Telemetry must never contain:
 
 Unknown warning text collapses to `other_data_quality_warning`. Unknown failures collapse to `unknown`. Telemetry failures must never change the API response.
 
-The application does not persist these events in MongoDB. If the deployment log sink supports retention controls, retain this stream for no more than 30 days and restrict access to operators.
+The application does not persist these events in MongoDB. Retain the local file or deployment log stream for no more than 30 days and restrict access to operators. A local file-write failure falls back to the server console and never changes the analysis response.
 
 ## First operational review
 

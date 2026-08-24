@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 import type { AnalysisPanelAvailableResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 import {
@@ -7,6 +9,10 @@ import {
 	buildTransparentAnalysisRequestTelemetry,
 	transparentAnalysisDurationBucket,
 } from "@/lib/analysis/transparent-analysis-telemetry";
+import {
+	appendTransparentAnalysisLocalTelemetry,
+	transparentAnalysisLocalTelemetryPath,
+} from "@/lib/analysis/transparent-analysis-telemetry-file";
 
 function partialResponse(): AnalysisPanelAvailableResponse {
 	return {
@@ -180,6 +186,29 @@ describe("transparent analysis telemetry", () => {
 			"utf8",
 		);
 		assert.match(source, /^import "server-only";/);
-		assert.doesNotMatch(source, /process\.env|canonicalKey|providerSymbol|userId/);
+		assert.deepEqual(
+			[...source.matchAll(/process\.env\.([A-Z0-9_]+)/g)].map((match) => match[1]),
+			["NODE_ENV"],
+		);
+		assert.doesNotMatch(source, /canonicalKey|providerSymbol|userId/);
+	});
+
+	it("appends privacy-safe local events as permission-restricted JSON lines", () => {
+		const rootDirectory = mkdtempSync(join(tmpdir(), "bullwise-telemetry-"));
+		try {
+			const event = buildTransparentAnalysisOperationalFailureTelemetry({
+				stage: "target_bars",
+				category: "timeout_or_network",
+			});
+			appendTransparentAnalysisLocalTelemetry(event, rootDirectory);
+			appendTransparentAnalysisLocalTelemetry(event, rootDirectory);
+			const path = transparentAnalysisLocalTelemetryPath(rootDirectory);
+			const lines = readFileSync(path, "utf8").trim().split("\n");
+
+			assert.deepEqual(lines.map((line) => JSON.parse(line)), [event, event]);
+			assert.equal(statSync(path).mode & 0o777, 0o600);
+		} finally {
+			rmSync(rootDirectory, { recursive: true, force: true });
+		}
 	});
 });
