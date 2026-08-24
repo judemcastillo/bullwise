@@ -72,7 +72,7 @@ function response(
 	};
 }
 
-function failureCategory(
+export function classifyTransparentAnalysisOperationalFailure(
 	error: unknown,
 ): TransparentAnalysisOperationalFailure["category"] {
 	const name = error instanceof Error ? error.name.toLowerCase() : "";
@@ -101,7 +101,7 @@ function reportFailure(
 	try {
 		dependencies.reportOperationalFailure?.({
 			stage,
-			category: failureCategory(error),
+			category: classifyTransparentAnalysisOperationalFailure(error),
 		});
 	} catch {
 		// Diagnostics must never change the user-facing analysis outcome.
@@ -135,7 +135,7 @@ function isEligibleBenchmark(instrument: AnalysisCatalogInstrument | null) {
 	);
 }
 
-function historyQuery(completedThrough: Date) {
+export function transparentAnalysisHistoryQuery(completedThrough: Date) {
 	return {
 		interval: "1d" as const,
 		from: new Date(completedThrough.getTime() - HISTORY_LOOKBACK_DAYS * DAY_MS),
@@ -146,7 +146,7 @@ function historyQuery(completedThrough: Date) {
 
 async function loadBenchmarkBars(
 	dependencies: TransparentAnalysisDependencies,
-	query: ReturnType<typeof historyQuery>,
+	query: ReturnType<typeof transparentAnalysisHistoryQuery>,
 ) {
 	const benchmark = await dependencies.resolveBenchmark();
 	if (!isEligibleBenchmark(benchmark)) return undefined;
@@ -178,7 +178,7 @@ export async function orchestrateTransparentAnalysis(
 			buildUnavailableAnalysisPanelResponse("completed_session_unavailable"),
 		);
 	}
-	const query = historyQuery(completedSession.completedThrough);
+	const query = transparentAnalysisHistoryQuery(completedSession.completedThrough);
 	const [instrumentBars, benchmarkBars] = await Promise.allSettled([
 		dependencies.getBars(instrument, query),
 		loadBenchmarkBars(dependencies, query),

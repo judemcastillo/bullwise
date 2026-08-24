@@ -65,3 +65,9 @@ Investigate before considering a separate AI contract when any of these are true
 - participation or relative-strength unavailability is recurrent rather than isolated.
 
 The review must document observation dates, request count, aggregate outcome counts, duration-bucket counts, partial-reason counts, warning-code counts, and operational-failure counts. It must not add dimensions or inspect individual requests after seeing the results.
+
+## Local operational smoke
+
+Run `npm run smoke:transparent-analysis` for a one-shot check of the current live AAPL and SPY daily-bar path plus the deterministic panel adapter. The command uses the same frozen history window as the application, accepts no symbol, date, or provider overrides, writes no artifact, and emits only status, completed-session time, bar counts, warning count, and a closed failure reason or category.
+
+This command deliberately bypasses authentication and telemetry. It therefore does not test the authenticated route and does not count toward the 50 genuine requests or seven calendar days required by the first operational review. Do not loop it as a substitute for that observation period.

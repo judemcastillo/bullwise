@@ -3,6 +3,7 @@ import "./transparent-analysis-panel.test";
 import "./transparent-analysis-orchestrator.test";
 import "./transparent-analysis-route.test";
 import "./transparent-analysis-telemetry.test";
+import "./transparent-analysis-smoke.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";
