@@ -11,7 +11,7 @@ import type {
 	InstrumentStatus,
 } from "@/types/instruments";
 
-const HISTORY_LOOKBACK_DAYS = 730;
+const HISTORY_LOOKBACK_DAYS = 690;
 const HISTORY_LIMIT = 500;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -36,6 +36,20 @@ export type TransparentAnalysisDependencies = {
 		},
 	): Promise<MarketBars>;
 	now(): Date;
+	reportOperationalFailure?(failure: TransparentAnalysisOperationalFailure): void;
+};
+
+export type TransparentAnalysisOperationalFailure = {
+	stage: "instrument_lookup" | "target_bars" | "benchmark_bars" | "analysis";
+	category:
+		| "configuration"
+		| "authorization"
+		| "rate_limited"
+		| "timeout_or_network"
+		| "result_limit"
+		| "provider_response"
+		| "unknown";
+	canonicalKey: string;
 };
 
 export type TransparentAnalysisOrchestrationResult =
@@ -57,6 +71,44 @@ function response(
 		transportStatus,
 		response: panelResponse,
 	};
+}
+
+function failureCategory(
+	error: unknown,
+): TransparentAnalysisOperationalFailure["category"] {
+	const name = error instanceof Error ? error.name.toLowerCase() : "";
+	const message = error instanceof Error ? error.message.toLowerCase() : "";
+	if (/not configured|missing configuration/.test(message)) return "configuration";
+	if (/unauthorized|forbidden|not authorized|api key|permission|entitlement|401|403/.test(message)) {
+		return "authorization";
+	}
+	if (/rate limit|too many requests|429/.test(message)) return "rate_limited";
+	if (/exceeded the requested limit|pagination/.test(message)) return "result_limit";
+	if (
+		/timeout|fetch failed|econn|enotfound|eai_again|network/.test(message) ||
+		name.includes("timeout")
+	) {
+		return "timeout_or_network";
+	}
+	if (/request failed|provider|massive/.test(message)) return "provider_response";
+	return "unknown";
+}
+
+function reportFailure(
+	dependencies: TransparentAnalysisDependencies,
+	canonicalKey: string,
+	stage: TransparentAnalysisOperationalFailure["stage"],
+	error: unknown,
+) {
+	try {
+		dependencies.reportOperationalFailure?.({
+			stage,
+			category: failureCategory(error),
+			canonicalKey,
+		});
+	} catch {
+		// Diagnostics must never change the user-facing analysis outcome.
+	}
 }
 
 function hasEnabledBarsBinding(instrument: AnalysisCatalogInstrument) {
@@ -111,7 +163,8 @@ export async function orchestrateTransparentAnalysis(
 	let instrument: AnalysisCatalogInstrument | null;
 	try {
 		instrument = await dependencies.resolveInstrument(canonicalKey);
-	} catch {
+	} catch (error) {
+		reportFailure(dependencies, canonicalKey, "instrument_lookup", error);
 		return response(buildUnavailableAnalysisPanelResponse("analysis_failed"), 503);
 	}
 	if (!instrument) return { kind: "not_found" };
@@ -134,9 +187,23 @@ export async function orchestrateTransparentAnalysis(
 		loadBenchmarkBars(dependencies, query),
 	]);
 	if (instrumentBars.status === "rejected") {
+		reportFailure(
+			dependencies,
+			instrument.canonicalKey,
+			"target_bars",
+			instrumentBars.reason,
+		);
 		return response(
 			buildUnavailableAnalysisPanelResponse("bars_provider_unavailable"),
 			503,
+		);
+	}
+	if (benchmarkBars.status === "rejected") {
+		reportFailure(
+			dependencies,
+			instrument.canonicalKey,
+			"benchmark_bars",
+			benchmarkBars.reason,
 		);
 	}
 
@@ -164,7 +231,8 @@ export async function orchestrateTransparentAnalysis(
 				result: analysis,
 			}),
 		);
-	} catch {
+	} catch (error) {
+		reportFailure(dependencies, instrument.canonicalKey, "analysis", error);
 		return response(buildUnavailableAnalysisPanelResponse("analysis_failed"));
 	}
 }

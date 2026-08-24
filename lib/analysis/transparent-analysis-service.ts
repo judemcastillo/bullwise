@@ -56,5 +56,11 @@ export async function getTransparentAnalysisPanel(canonicalKey: string) {
 		getBars: (instrument, query) =>
 			getMarketDataService().getBars(instrument, query),
 		now: () => new Date(),
+		reportOperationalFailure: (failure) => {
+			console.error("Transparent analysis operational failure", {
+				...failure,
+				provider: "massive",
+			});
+		},
 	});
 }

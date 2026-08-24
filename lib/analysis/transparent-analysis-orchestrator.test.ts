@@ -5,6 +5,7 @@ import {
 	orchestrateTransparentAnalysis,
 	type AnalysisCatalogInstrument,
 	type TransparentAnalysisDependencies,
+	type TransparentAnalysisOperationalFailure,
 } from "@/lib/analysis/transparent-analysis-orchestrator";
 import type { MarketBar, MarketBars } from "@/lib/market-data/types";
 import type { ProviderBinding } from "@/types/instruments";
@@ -93,6 +94,7 @@ type DependencyOptions = {
 	failTargetBars?: boolean;
 	failBenchmarkBars?: boolean;
 	failInstrumentResolution?: boolean;
+	targetFailureMessage?: string;
 	unadjustedTarget?: boolean;
 };
 
@@ -126,7 +128,11 @@ function dependencies(options: DependencyOptions = {}) {
 				(!isBenchmark && options.failTargetBars) ||
 				(isBenchmark && options.failBenchmarkBars)
 			) {
-				throw new Error("SECRET provider response must not cross the boundary");
+				throw new Error(
+					!isBenchmark && options.targetFailureMessage
+						? options.targetFailureMessage
+						: "SECRET provider response must not cross the boundary",
+				);
 			}
 			const bars = syntheticBars(
 				isBenchmark ? "flat" : "up",
@@ -175,10 +181,16 @@ describe("transparent analysis orchestration", () => {
 			assert.equal(request.query.interval, "1d");
 			assert.equal(request.query.limit, 500);
 			assert.equal(request.query.to.toISOString(), "2026-08-21T20:00:00.000Z");
-			assert.equal(
-				request.query.from.toISOString(),
-				"2024-08-21T20:00:00.000Z",
-			);
+			assert.equal(request.query.from.toISOString(), "2024-09-30T20:00:00.000Z");
+			let weekdays = 0;
+			for (
+				const day = new Date(request.query.from);
+				day <= request.query.to;
+				day.setUTCDate(day.getUTCDate() + 1)
+			) {
+				if (day.getUTCDay() !== 0 && day.getUTCDay() !== 6) weekdays += 1;
+			}
+			assert.ok(weekdays <= 500);
 		}
 	});
 
@@ -305,6 +317,27 @@ describe("transparent analysis orchestration", () => {
 			assert.equal(providerResult.response.status, "unavailable");
 			assert.doesNotMatch(JSON.stringify(providerResult), /SECRET provider response/);
 		}
+	});
+
+	it("reports only structured failure diagnostics without raw provider details", async () => {
+		const failures: TransparentAnalysisOperationalFailure[] = [];
+		const fixture = dependencies({
+			failTargetBars: true,
+			targetFailureMessage:
+				"Massive historical range exceeded the requested limit SECRET_API_KEY",
+		});
+		fixture.value.reportOperationalFailure = (failure) => failures.push(failure);
+
+		await orchestrateTransparentAnalysis("equity:xnas:aapl", fixture.value);
+
+		assert.deepEqual(failures, [
+			{
+				stage: "target_bars",
+				category: "result_limit",
+				canonicalKey: "equity:xnas:aapl",
+			},
+		]);
+		assert.doesNotMatch(JSON.stringify(failures), /SECRET_API_KEY|requested limit/);
 	});
 
 	it("preserves engine validation without leaking internal market-data details", async () => {
