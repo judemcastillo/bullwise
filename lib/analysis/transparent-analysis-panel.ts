@@ -316,7 +316,7 @@ export function buildAnalysisPanelResponse({
 			name,
 			currency: result.instrument.currency,
 		},
-		asOf: dataQuality.lastBarAt,
+		asOf: dataQuality.completedThrough,
 		timeframe: {
 			interval: "1d",
 			description: "Daily context",

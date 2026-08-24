@@ -41,10 +41,14 @@ export default async function InstrumentPage({
 			console.error(`Unable to load watchlist for ${user.id}:`, error);
 			return [] as string[];
 		});
-		const hasMassiveAnalysis = instrument.providerBindings.some(
-			(binding) =>
-				binding.provider === "massive" && binding.enabled !== false,
-		);
+		const analysisEligible =
+			instrument.assetClass === "equity" &&
+			instrument.securityType === "common_stock" &&
+			instrument.calendarId === "us-equities" &&
+			instrument.providerBindings.some(
+				(binding) =>
+					binding.enabled === true && binding.capabilities.includes("bars"),
+			);
 
 		return (
 			<InstrumentDashboard
@@ -61,7 +65,8 @@ export default async function InstrumentPage({
 							}
 						: null
 				}
-				analysisProvider={hasMassiveAnalysis ? "Massive · planned" : "—"}
+				analysisEligible={analysisEligible}
+				canonicalKey={instrument.canonicalKey}
 				displaySymbol={instrument.displaySymbol}
 				instrumentId={instrumentId}
 				isInWatchlist={watchlistInstrumentIds.includes(instrumentId)}

@@ -201,7 +201,7 @@ describe("transparent analysis panel adapter", () => {
 		}
 		assert.equal(panel.status, "ready");
 		assert.equal(panel.context, "constructive");
-		assert.equal(panel.asOf, LAST_BAR);
+		assert.equal(panel.asOf, COMPLETED_THROUGH);
 		assert.equal(panel.dataQuality.provider, "massive");
 		assert.deepEqual(panel.levels.support, source.marketStructure.support);
 		assert.deepEqual(source, before);

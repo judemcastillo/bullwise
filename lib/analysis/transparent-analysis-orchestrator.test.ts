@@ -11,6 +11,7 @@ import type { ProviderBinding } from "@/types/instruments";
 
 const NOW_BEFORE_MONDAY_CLOSE = new Date("2026-08-24T15:00:00.000Z");
 const LAST_COMPLETED_SESSION = new Date("2026-08-21T00:00:00.000Z");
+const LAST_COMPLETED_SESSION_CLOSE = "2026-08-21T20:00:00.000Z";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function binding(symbol: string): ProviderBinding {
@@ -168,7 +169,7 @@ describe("transparent analysis orchestration", () => {
 		}
 		assert.equal(result.response.status, "ready");
 		assert.equal(result.response.instrument.canonicalKey, "equity:xnas:aapl");
-		assert.equal(result.response.asOf, LAST_COMPLETED_SESSION.toISOString());
+		assert.equal(result.response.asOf, LAST_COMPLETED_SESSION_CLOSE);
 		assert.equal(fixture.requests.length, 2);
 		for (const request of fixture.requests) {
 			assert.equal(request.query.interval, "1d");
@@ -192,7 +193,7 @@ describe("transparent analysis orchestration", () => {
 			return;
 		}
 		assert.equal(result.response.status, "partial");
-		assert.equal(result.response.asOf, LAST_COMPLETED_SESSION.toISOString());
+		assert.equal(result.response.asOf, LAST_COMPLETED_SESSION_CLOSE);
 		assert.deepEqual(result.response.dataQuality.warnings, [
 			"An incomplete or future-dated daily bar was excluded.",
 		]);

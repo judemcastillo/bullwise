@@ -1,5 +1,5 @@
 import StockAlertButton from "@/components/alerts/StockAlertButton";
-import AiTechnicalAnalysisCard from "@/components/instruments/AiTechnicalAnalysisCard";
+import DailyMarketAnalysisCard from "@/components/instruments/DailyMarketAnalysisCard";
 import TradingViewWidget from "@/components/TradingViewWidget";
 import WatchlistButton from "@/components/watchlist/WatchlistButton";
 import {
@@ -12,7 +12,8 @@ import type { AlertInstrumentOption } from "@/types/alerts";
 
 type InstrumentDashboardProps = {
 	alertInstrument: AlertInstrumentOption | null;
-	analysisProvider: string;
+	analysisEligible: boolean;
+	canonicalKey: string;
 	displaySymbol: string;
 	instrumentId: string;
 	isInWatchlist: boolean;
@@ -22,7 +23,8 @@ type InstrumentDashboardProps = {
 
 export default function InstrumentDashboard({
 	alertInstrument,
-	analysisProvider,
+	analysisEligible,
+	canonicalKey,
 	displaySymbol,
 	instrumentId,
 	isInWatchlist,
@@ -86,9 +88,10 @@ export default function InstrumentDashboard({
 				</aside>
 			</div>
 
-			<AiTechnicalAnalysisCard
-				displaySymbol={displaySymbol}
-				provider={analysisProvider}
+			<DailyMarketAnalysisCard
+				key={canonicalKey}
+				canonicalKey={canonicalKey}
+				eligible={analysisEligible}
 			/>
 
 			<p className="px-1 text-xs leading-5 text-gray-500">
@@ -96,7 +99,7 @@ export default function InstrumentDashboard({
 				{alertInstrument
 					? ` Price alerts are monitored with ${alertInstrument.provider}.`
 					: " They are not used for alerts."}{" "}
-				TradingView display data are not used for AI analysis.
+				TradingView display data are not used for daily market analysis.
 			</p>
 		</div>
 	);
