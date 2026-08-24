@@ -49,7 +49,6 @@ export type TransparentAnalysisOperationalFailure = {
 		| "result_limit"
 		| "provider_response"
 		| "unknown";
-	canonicalKey: string;
 };
 
 export type TransparentAnalysisOrchestrationResult =
@@ -96,7 +95,6 @@ function failureCategory(
 
 function reportFailure(
 	dependencies: TransparentAnalysisDependencies,
-	canonicalKey: string,
 	stage: TransparentAnalysisOperationalFailure["stage"],
 	error: unknown,
 ) {
@@ -104,7 +102,6 @@ function reportFailure(
 		dependencies.reportOperationalFailure?.({
 			stage,
 			category: failureCategory(error),
-			canonicalKey,
 		});
 	} catch {
 		// Diagnostics must never change the user-facing analysis outcome.
@@ -164,7 +161,7 @@ export async function orchestrateTransparentAnalysis(
 	try {
 		instrument = await dependencies.resolveInstrument(canonicalKey);
 	} catch (error) {
-		reportFailure(dependencies, canonicalKey, "instrument_lookup", error);
+		reportFailure(dependencies, "instrument_lookup", error);
 		return response(buildUnavailableAnalysisPanelResponse("analysis_failed"), 503);
 	}
 	if (!instrument) return { kind: "not_found" };
@@ -189,7 +186,6 @@ export async function orchestrateTransparentAnalysis(
 	if (instrumentBars.status === "rejected") {
 		reportFailure(
 			dependencies,
-			instrument.canonicalKey,
 			"target_bars",
 			instrumentBars.reason,
 		);
@@ -201,7 +197,6 @@ export async function orchestrateTransparentAnalysis(
 	if (benchmarkBars.status === "rejected") {
 		reportFailure(
 			dependencies,
-			instrument.canonicalKey,
 			"benchmark_bars",
 			benchmarkBars.reason,
 		);
@@ -232,7 +227,7 @@ export async function orchestrateTransparentAnalysis(
 			}),
 		);
 	} catch (error) {
-		reportFailure(dependencies, instrument.canonicalKey, "analysis", error);
+		reportFailure(dependencies, "analysis", error);
 		return response(buildUnavailableAnalysisPanelResponse("analysis_failed"));
 	}
 }

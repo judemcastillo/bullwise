@@ -1,5 +1,6 @@
 import { handleTransparentAnalysisRequest } from "@/lib/analysis/transparent-analysis-route";
 import { getTransparentAnalysisPanel } from "@/lib/analysis/transparent-analysis-service";
+import { recordTransparentAnalysisTelemetry } from "@/lib/analysis/transparent-analysis-telemetry-logger";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const dynamic = "force-dynamic";
@@ -13,5 +14,7 @@ export async function GET(
 	return handleTransparentAnalysisRequest(canonicalKey, {
 		authenticate: requireUser,
 		getAnalysis: getTransparentAnalysisPanel,
+		monotonicNow: () => performance.now(),
+		recordTelemetry: recordTransparentAnalysisTelemetry,
 	});
 }

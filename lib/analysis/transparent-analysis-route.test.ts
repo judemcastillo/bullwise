@@ -7,6 +7,7 @@ import {
 	type TransparentAnalysisRouteDependencies,
 } from "@/lib/analysis/transparent-analysis-route";
 import type { TransparentAnalysisOrchestrationResult } from "@/lib/analysis/transparent-analysis-orchestrator";
+import type { TransparentAnalysisTelemetryEvent } from "@/lib/analysis/transparent-analysis-telemetry";
 import { AuthenticationError } from "@/lib/auth/access-policy";
 
 const unavailableResponse: AnalysisPanelResponse = {
@@ -110,6 +111,46 @@ describe("transparent analysis API boundary", () => {
 			assert.deepEqual(await response.json(), unavailableResponse);
 			assert.equal(response.headers.get("cache-control"), "private, no-store");
 		}
+	});
+
+	it("records one anonymous request outcome without changing the response", async () => {
+		const events: TransparentAnalysisTelemetryEvent[] = [];
+		const ticks = [100, 1_350];
+		const response = await handleTransparentAnalysisRequest(
+			"equity:xnas:aapl",
+			dependencies({
+				monotonicNow: () => ticks.shift()!,
+				recordTelemetry: (event) => events.push(event),
+			}),
+		);
+
+		assert.equal(response.status, 200);
+		assert.deepEqual(events, [
+			{
+				version: "1.0.0",
+				event: "transparent_analysis_request",
+				outcome: "unavailable",
+				httpStatus: 200,
+				duration: "1s_to_2_99s",
+				unavailableReason: "insufficient_history",
+			},
+		]);
+	});
+
+	it("does not let a telemetry sink failure change an API result", async () => {
+		const response = await handleTransparentAnalysisRequest(
+			"not a canonical key",
+			dependencies({
+				recordTelemetry: () => {
+					throw new Error("telemetry unavailable");
+				},
+			}),
+		);
+
+		assert.equal(response.status, 400);
+		assert.deepEqual(await body(response), {
+			error: "Invalid instrument identifier.",
+		});
 	});
 
 	it("does not swallow unexpected authentication infrastructure failures", async () => {

@@ -334,7 +334,6 @@ describe("transparent analysis orchestration", () => {
 			{
 				stage: "target_bars",
 				category: "result_limit",
-				canonicalKey: "equity:xnas:aapl",
 			},
 		]);
 		assert.doesNotMatch(JSON.stringify(failures), /SECRET_API_KEY|requested limit/);

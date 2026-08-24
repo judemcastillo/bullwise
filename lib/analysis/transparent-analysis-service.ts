@@ -4,6 +4,8 @@ import {
 	orchestrateTransparentAnalysis,
 	type AnalysisCatalogInstrument,
 } from "@/lib/analysis/transparent-analysis-orchestrator";
+import { buildTransparentAnalysisOperationalFailureTelemetry } from "@/lib/analysis/transparent-analysis-telemetry";
+import { recordTransparentAnalysisTelemetry } from "@/lib/analysis/transparent-analysis-telemetry-logger";
 import {
 	getInstrumentByCanonicalKey,
 	getSpyAnalysisBenchmark,
@@ -57,10 +59,9 @@ export async function getTransparentAnalysisPanel(canonicalKey: string) {
 			getMarketDataService().getBars(instrument, query),
 		now: () => new Date(),
 		reportOperationalFailure: (failure) => {
-			console.error("Transparent analysis operational failure", {
-				...failure,
-				provider: "massive",
-			});
+			recordTransparentAnalysisTelemetry(
+				buildTransparentAnalysisOperationalFailureTelemetry(failure),
+			);
 		},
 	});
 }
