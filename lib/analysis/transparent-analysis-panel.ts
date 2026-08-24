@@ -16,6 +16,7 @@ import {
 	type AnalysisPanelLevel,
 	type AnalysisPanelResponse,
 	type AnalysisPanelUnavailableReason,
+	type AnalysisPanelUnavailableResponse,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 
 export type BuildAnalysisPanelInput = {
@@ -50,42 +51,30 @@ const APPROVED_WARNING_MAP = new Map<string, string>([
 const UNRECOGNIZED_WARNING =
 	"Additional market-data quality checks require review.";
 
-const UNAVAILABLE_REASON_MAP: Record<
+const ENGINE_UNAVAILABLE_REASON_MAP: Record<
 	TechnicalAnalysisUnavailableReason,
-	{
-		reason: AnalysisPanelUnavailableReason;
-		message: string;
-	}
+	AnalysisPanelUnavailableReason
 > = {
-	ineligible_instrument: {
-		reason: "unsupported_instrument",
-		message:
-			"Daily market analysis is currently available only for eligible U.S. common stocks.",
-	},
-	unsupported_interval: {
-		reason: "invalid_market_data",
-		message: "Daily market data could not be validated for analysis.",
-	},
-	unadjusted_data: {
-		reason: "invalid_market_data",
-		message: "Adjusted daily market data are required for analysis.",
-	},
-	instrument_mismatch: {
-		reason: "invalid_market_data",
-		message: "Market data could not be validated for this instrument.",
-	},
-	invalid_data: {
-		reason: "invalid_market_data",
-		message: "Market data could not be validated for analysis.",
-	},
-	insufficient_data: {
-		reason: "insufficient_history",
-		message: "At least 300 completed daily bars are required for analysis.",
-	},
-	stale_data: {
-		reason: "stale_market_data",
-		message: "The latest completed daily market data are stale.",
-	},
+	ineligible_instrument: "unsupported_instrument",
+	unsupported_interval: "invalid_market_data",
+	unadjusted_data: "invalid_market_data",
+	instrument_mismatch: "invalid_market_data",
+	invalid_data: "invalid_market_data",
+	insufficient_data: "insufficient_history",
+	stale_data: "stale_market_data",
+};
+
+const PRODUCT_UNAVAILABLE_MESSAGES: Record<AnalysisPanelUnavailableReason, string> = {
+	unsupported_instrument:
+		"Daily market analysis is currently available only for eligible U.S. common stocks.",
+	bars_provider_unavailable:
+		"Daily market data are temporarily unavailable. Please try again later.",
+	completed_session_unavailable:
+		"A completed U.S. market session could not be determined.",
+	invalid_market_data: "Daily market data could not be validated for analysis.",
+	insufficient_history: "At least 300 completed daily bars are required for analysis.",
+	stale_market_data: "The latest completed daily market data are stale.",
+	analysis_failed: "Daily market analysis could not be prepared.",
 };
 
 function panelBase() {
@@ -93,6 +82,17 @@ function panelBase() {
 		version: TRANSPARENT_ANALYSIS_PANEL_VERSION,
 		disclaimer: TRANSPARENT_ANALYSIS_PANEL_DISCLAIMER,
 	} as const;
+}
+
+export function buildUnavailableAnalysisPanelResponse(
+	reason: AnalysisPanelUnavailableReason,
+): AnalysisPanelUnavailableResponse {
+	return {
+		...panelBase(),
+		status: "unavailable",
+		reason,
+		message: PRODUCT_UNAVAILABLE_MESSAGES[reason],
+	};
 }
 
 export function analysisPanelContext(
@@ -290,34 +290,22 @@ export function buildAnalysisPanelResponse({
 		result.instrument.assetClass !== "equity" ||
 		result.instrument.securityType !== "common_stock"
 	) {
-		return {
-			...panelBase(),
-			status: "unavailable",
-			reason: "unsupported_instrument",
-			message:
-				"Daily market analysis is currently available only for eligible U.S. common stocks.",
-		};
+		return buildUnavailableAnalysisPanelResponse("unsupported_instrument");
 	}
 	if (result.status === "unavailable") {
-		const unavailable = UNAVAILABLE_REASON_MAP[result.reason];
+		const unavailable = buildUnavailableAnalysisPanelResponse(
+			ENGINE_UNAVAILABLE_REASON_MAP[result.reason],
+		);
 		const dataQuality = mapDataQuality(result.dataQuality);
 		return {
-			...panelBase(),
-			status: "unavailable",
-			reason: unavailable.reason,
-			message: unavailable.message,
+			...unavailable,
 			...(dataQuality ? { dataQuality } : {}),
 		};
 	}
 
 	const dataQuality = mapDataQuality(result.dataQuality);
 	if (!dataQuality) {
-		return {
-			...panelBase(),
-			status: "unavailable",
-			reason: "analysis_failed",
-			message: "Daily market analysis could not be prepared.",
-		};
+		return buildUnavailableAnalysisPanelResponse("analysis_failed");
 	}
 	return {
 		...panelBase(),

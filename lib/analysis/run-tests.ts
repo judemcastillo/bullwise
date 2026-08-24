@@ -1,5 +1,6 @@
 import "./technical-analysis.test";
 import "./transparent-analysis-panel.test";
+import "./transparent-analysis-orchestrator.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";
 import "./batch-backtest.test";

@@ -201,3 +201,22 @@ export async function getInstrumentByCanonicalKey(canonicalKey: string) {
 		status: "active",
 	}).lean();
 }
+
+export async function getSpyAnalysisBenchmark() {
+	await connectToDatabase();
+	return Instrument.findOne({
+		status: "active",
+		assetClass: "equity",
+		securityType: "etf",
+		displaySymbol: "SPY",
+		calendarId: "us-equities",
+		providerBindings: {
+			$elemMatch: {
+				enabled: true,
+				capabilities: "bars",
+			},
+		},
+	})
+		.sort({ canonicalKey: 1 })
+		.lean();
+}
