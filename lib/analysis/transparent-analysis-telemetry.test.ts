@@ -200,12 +200,23 @@ describe("transparent analysis telemetry", () => {
 				stage: "target_bars",
 				category: "timeout_or_network",
 			});
-			appendTransparentAnalysisLocalTelemetry(event, rootDirectory);
-			appendTransparentAnalysisLocalTelemetry(event, rootDirectory);
+			appendTransparentAnalysisLocalTelemetry(
+				event,
+				rootDirectory,
+				new Date("2026-08-24T09:16:00.000Z"),
+			);
+			appendTransparentAnalysisLocalTelemetry(
+				event,
+				rootDirectory,
+				new Date("2026-08-25T23:59:59.000Z"),
+			);
 			const path = transparentAnalysisLocalTelemetryPath(rootDirectory);
 			const lines = readFileSync(path, "utf8").trim().split("\n");
 
-			assert.deepEqual(lines.map((line) => JSON.parse(line)), [event, event]);
+			assert.deepEqual(lines.map((line) => JSON.parse(line)), [
+				{ recordedDate: "2026-08-24", ...event },
+				{ recordedDate: "2026-08-25", ...event },
+			]);
 			assert.equal(statSync(path).mode & 0o777, 0o600);
 		} finally {
 			rmSync(rootDirectory, { recursive: true, force: true });

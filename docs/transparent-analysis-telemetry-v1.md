@@ -16,7 +16,7 @@ It does not measure strategy profitability, user behavior outside this endpoint,
 
 ## Sink and event schema
 
-V1 emits one structured event per handled request and a separate structured event for an internal operational failure. During local development, the server-only logger appends JSON Lines to `artifacts/telemetry/transparent-analysis-v1.jsonl`. The directory is ignored by Git and the file is created with owner-only permissions. In other environments, events go to the deployment's server log sink because serverless local files may be ephemeral.
+V1 emits one structured event per handled request and a separate structured event for an internal operational failure. During local development, the server-only logger appends JSON Lines to `artifacts/telemetry/transparent-analysis-v1.jsonl`. Each local line includes a UTC `recordedDate` (`YYYY-MM-DD`) so the review can verify calendar-day coverage without storing a precise request timestamp. The directory is ignored by Git and the file is created with owner-only permissions. In other environments, events go to the deployment's server log sink because serverless local files may be ephemeral.
 
 `transparent_analysis_request` contains only:
 

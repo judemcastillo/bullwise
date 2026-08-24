@@ -12,12 +12,17 @@ export function transparentAnalysisLocalTelemetryPath(rootDirectory: string) {
 export function appendTransparentAnalysisLocalTelemetry(
 	event: TransparentAnalysisTelemetryEvent,
 	rootDirectory = process.cwd(),
+	recordedAt = new Date(),
 ) {
 	const path = transparentAnalysisLocalTelemetryPath(rootDirectory);
 	mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-	appendFileSync(path, `${JSON.stringify(event)}\n`, {
+	appendFileSync(
+		path,
+		`${JSON.stringify({ recordedDate: recordedAt.toISOString().slice(0, 10), ...event })}\n`,
+		{
 		encoding: "utf8",
 		flag: "a",
 		mode: 0o600,
-	});
+		},
+	);
 }
