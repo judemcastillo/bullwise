@@ -76,7 +76,9 @@ The server, not the browser, resolves the provider symbol and provider. The endp
 
 The server requests enough history to obtain at least 300 completed sessions, capped at 500 returned bars for v1. It separately loads SPY from the catalog as the fixed U.S.-equity benchmark. A missing or unusable benchmark makes relative strength unavailable; it must not make absolute price analysis appear unavailable.
 
-Before product implementation, add a deterministic U.S.-equity completed-session resolver. It must account for the exchange timezone, weekends, holidays, early closes, and whether the current daily bar is still forming. Do not use the server's calendar date alone as `completedThrough`.
+Before product orchestration, add a deterministic U.S.-equity completed-session resolver. It must account for the exchange timezone, weekends, holidays, early closes, and whether the current daily bar is still forming. Do not use the server's calendar date alone as `completedThrough`.
+
+The initial calendar is versioned as `nyse-2026-2028-v1` from the official [NYSE holidays and trading-hours schedule](https://www.nyse.com/markets/hours-calendars). It must fail closed outside those published years rather than infer future holidays. A reviewed calendar update is required before 2029, and an exceptional unscheduled closure requires an explicit versioned update.
 
 ## Product response
 
@@ -244,5 +246,7 @@ AI may improve wording; it may not change `context`, factor states, levels, warn
 4. Add the authenticated, no-override API route.
 5. Replace the disabled preview with the specified UI states.
 6. Review telemetry and data-quality failures before considering a separately contracted AI explanation.
+
+Implementation progress: items 1 through 5 are complete. Item 6 is instrumented and awaiting production observation under `docs/transparent-analysis-telemetry-v1.md`. The product DTO and pure allow-listing adapter are implemented in `lib/analysis/transparent-analysis-panel.types.ts` and `lib/analysis/transparent-analysis-panel.ts`. The bounded U.S.-equity completed-session resolver is implemented in `lib/market-data/us-equity-session.ts`. The synthetic-tested orchestration and production server-only composition are implemented in `lib/analysis/transparent-analysis-orchestrator.ts` and `lib/analysis/transparent-analysis-service.ts`. The authenticated, no-override endpoint is implemented at `GET /api/instruments/[canonicalKey]/analysis`, and the accessible deterministic panel is in `components/instruments/DailyMarketAnalysisCard.tsx`. No AI explanation is authorized until the frozen operational review is completed and a separate contract is approved.
 
 This contract authorizes ordinary product implementation and synthetic tests only. It does not authorize market-data research retrieval, backtests, model training, strategy validation, holdout access, customer trading signals, or order execution.

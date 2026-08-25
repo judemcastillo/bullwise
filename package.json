@@ -43,6 +43,7 @@
 		"develop:analysis-broad-symmetric-regime": "node --max-old-space-size=4096 --import tsx scripts/develop-analysis-broad-symmetric-regime.ts",
 		"develop:etf-cross-sectional-momentum": "node --max-old-space-size=4096 --import tsx scripts/develop-etf-cross-sectional-momentum.ts",
 		"develop:etf-risk-controlled-momentum-v3": "node --max-old-space-size=4096 --import tsx scripts/develop-etf-risk-controlled-momentum-v3.ts",
+		"smoke:transparent-analysis": "node --import tsx scripts/smoke-transparent-analysis.ts",
 		"export:analysis-dataset": "node --import tsx scripts/export-analysis-dataset.ts",
 		"train:analysis-baselines": "node --import tsx scripts/train-analysis-baselines.ts",
 		"train:analysis-boosted": "node --import tsx scripts/train-analysis-boosted.ts",
