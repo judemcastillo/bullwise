@@ -4,6 +4,7 @@ import "./transparent-analysis-orchestrator.test";
 import "./transparent-analysis-route.test";
 import "./transparent-analysis-telemetry.test";
 import "./transparent-analysis-smoke.test";
+import "./transparent-analysis-daily-observation.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";

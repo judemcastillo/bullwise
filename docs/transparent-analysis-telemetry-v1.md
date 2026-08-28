@@ -71,3 +71,9 @@ The review must document observation dates, request count, aggregate outcome cou
 Run `npm run smoke:transparent-analysis` for a one-shot check of the current live AAPL and SPY daily-bar path plus the deterministic panel adapter. The command uses the same frozen history window as the application, accepts no symbol, date, or provider overrides, writes no artifact, and emits only status, completed-session time, bar counts, warning count, and a closed failure reason or category.
 
 This command deliberately bypasses authentication and telemetry. It therefore does not test the authenticated route and does not count toward the 50 genuine requests or seven calendar days required by the first operational review. Do not loop it as a substitute for that observation period.
+
+## Daily observation helper
+
+Run `npm run observe:transparent-analysis` once per testing day. It reports aggregate progress from the ignored local JSONL file and prints a rotating checklist of eight representative U.S. common stocks. Visit those stocks through the authenticated UI and allow each analysis panel to finish.
+
+The helper never calls the API or creates telemetry itself. This preserves the requirement that the sample consist of genuine UI requests rather than automated traffic. Unsupported instruments, authentication failures, malformed requests, not-found results, undated legacy lines, and invalid JSON lines do not count toward the 50 valid-instrument request minimum.
