@@ -3220,6 +3220,19 @@
       "source_location": "L76"
     },
     {
+      "id": "lib_email_communication_policy_emailsuppressionreason",
+      "label": "EmailSuppressionReason",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "email-suppression.ts",
+      "file_type": "code",
+      "norm_label": "emailsuppressionreason",
+      "source_file": "lib/email/communication-policy.ts",
+      "source_location": "L43"
+    },
+    {
       "id": "lib_email_email_suppression_betterauthuser",
       "label": "BetterAuthUser",
       "_callable": true,
@@ -3244,6 +3257,19 @@
       "norm_label": "emailsuppressionrecordresult",
       "source_file": "lib/email/email-suppression.ts",
       "source_location": "L23"
+    },
+    {
+      "id": "lib_email_suppression_policy_emailsuppressionevent",
+      "label": "EmailSuppressionEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "email-suppression.ts",
+      "file_type": "code",
+      "norm_label": "emailsuppressionevent",
+      "source_file": "lib/email/suppression-policy.ts",
+      "source_location": "L15"
     },
     {
       "id": "lib_email_suppression_policy_smtpdeliveryerror",
@@ -5014,30 +5040,43 @@
       "source_location": "L25"
     },
     {
-      "id": "lib_instruments_crypto_catalog_cryptocatalogentry",
-      "label": "CryptoCatalogEntry",
+      "id": "lib_instruments_forex_catalog_forexcatalogentry",
+      "label": "ForexCatalogEntry",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "cryptocatalogentry",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L11"
+      "norm_label": "forexcatalogentry",
+      "source_file": "lib/instruments/forex-catalog.ts",
+      "source_location": "L5"
     },
     {
-      "id": "lib_market_data_providers_finnhub_forex_client_finnhubcryptosymbol",
-      "label": "FinnhubCryptoSymbol",
+      "id": "lib_market_data_providers_finnhub_forex_client_finnhubforexsymbol",
+      "label": "FinnhubForexSymbol",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "finnhubcryptosymbol",
+      "norm_label": "finnhubforexsymbol",
       "source_file": "lib/market-data/providers/finnhub-forex-client.ts",
-      "source_location": "L18"
+      "source_location": "L4"
+    },
+    {
+      "id": "lib_market_data_providers_massive_client_massivereferenceticker",
+      "label": "MassiveReferenceTicker",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "massivereferenceticker",
+      "source_file": "lib/market-data/providers/massive-client.ts",
+      "source_location": "L9"
     },
     {
       "id": "lib_market_data_us_equity_session_localdate",
@@ -5534,43 +5573,30 @@
       "source_location": "L48"
     },
     {
-      "id": "lib_instruments_forex_catalog_forexcatalogentry",
-      "label": "ForexCatalogEntry",
+      "id": "lib_instruments_crypto_catalog_cryptocatalogentry",
+      "label": "CryptoCatalogEntry",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "forexcatalogentry",
-      "source_file": "lib/instruments/forex-catalog.ts",
-      "source_location": "L5"
+      "norm_label": "cryptocatalogentry",
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L11"
     },
     {
-      "id": "lib_market_data_providers_finnhub_forex_client_finnhubforexsymbol",
-      "label": "FinnhubForexSymbol",
+      "id": "lib_market_data_providers_finnhub_forex_client_finnhubcryptosymbol",
+      "label": "FinnhubCryptoSymbol",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "finnhubforexsymbol",
+      "norm_label": "finnhubcryptosymbol",
       "source_file": "lib/market-data/providers/finnhub-forex-client.ts",
-      "source_location": "L4"
-    },
-    {
-      "id": "lib_market_data_providers_massive_client_massivereferenceticker",
-      "label": "MassiveReferenceTicker",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 74,
-      "community_name": "sync-instrument-catalog.ts",
-      "file_type": "code",
-      "norm_label": "massivereferenceticker",
-      "source_file": "lib/market-data/providers/massive-client.ts",
-      "source_location": "L9"
+      "source_location": "L18"
     },
     {
       "id": "lib_market_data_providers_massive_client_massivetickerresponse",
@@ -5623,58 +5649,6 @@
       "norm_label": "tradingviewwidgetprops",
       "source_file": "components/TradingViewWidget.tsx",
       "source_location": "L6"
-    },
-    {
-      "id": "database_migrations_migrate_communication_preferences_migrationsummary",
-      "label": "MigrationSummary",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "migrationsummary",
-      "source_file": "database/migrations/migrate-communication-preferences.ts",
-      "source_location": "L14"
-    },
-    {
-      "id": "lib_email_communication_policy_communicationpreferencesnapshot",
-      "label": "CommunicationPreferenceSnapshot",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "communicationpreferencesnapshot",
-      "source_file": "lib/email/communication-policy.ts",
-      "source_location": "L77"
-    },
-    {
-      "id": "lib_email_communication_preference_migration_legacycommunicationpreferenceseed",
-      "label": "LegacyCommunicationPreferenceSeed",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "legacycommunicationpreferenceseed",
-      "source_file": "lib/email/communication-preference-migration.ts",
-      "source_location": "L14"
-    },
-    {
-      "id": "lib_email_communication_preference_migration_legacyuserprofileemailpreference",
-      "label": "LegacyUserProfileEmailPreference",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "legacyuserprofileemailpreference",
-      "source_file": "lib/email/communication-preference-migration.ts",
-      "source_location": "L7"
     },
     {
       "id": "lib_analysis_portfolio_backtest_candidate",
@@ -6002,6 +5976,19 @@
       "source_location": "L32"
     },
     {
+      "id": "database_migrations_migrate_communication_preferences_migrationsummary",
+      "label": "MigrationSummary",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "migrationsummary",
+      "source_file": "database/migrations/migrate-communication-preferences.ts",
+      "source_location": "L14"
+    },
+    {
       "id": "database_models_communication_preference_model_communicationpreferencedocument",
       "label": "CommunicationPreferenceDocument",
       "_callable": true,
@@ -6013,6 +6000,19 @@
       "norm_label": "communicationpreferencedocument",
       "source_file": "database/models/communication-preference.model.ts",
       "source_location": "L20"
+    },
+    {
+      "id": "lib_email_communication_policy_communicationpreferencesnapshot",
+      "label": "CommunicationPreferenceSnapshot",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "communicationpreferencesnapshot",
+      "source_file": "lib/email/communication-policy.ts",
+      "source_location": "L77"
     },
     {
       "id": "lib_email_communication_policy_emailconsentsource",
@@ -6106,19 +6106,6 @@
       "source_location": "L66"
     },
     {
-      "id": "lib_email_communication_policy_emailsuppressionreason",
-      "label": "EmailSuppressionReason",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "communication-policy.ts",
-      "file_type": "code",
-      "norm_label": "emailsuppressionreason",
-      "source_file": "lib/email/communication-policy.ts",
-      "source_location": "L43"
-    },
-    {
       "id": "lib_email_communication_policy_emailsuppressionsource",
       "label": "EmailSuppressionSource",
       "_callable": true,
@@ -6171,6 +6158,32 @@
       "source_location": "L126"
     },
     {
+      "id": "lib_email_communication_preference_migration_legacycommunicationpreferenceseed",
+      "label": "LegacyCommunicationPreferenceSeed",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "legacycommunicationpreferenceseed",
+      "source_file": "lib/email/communication-preference-migration.ts",
+      "source_location": "L14"
+    },
+    {
+      "id": "lib_email_communication_preference_migration_legacyuserprofileemailpreference",
+      "label": "LegacyUserProfileEmailPreference",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "legacyuserprofileemailpreference",
+      "source_file": "lib/email/communication-preference-migration.ts",
+      "source_location": "L7"
+    },
+    {
       "id": "lib_email_market_news_preference_workflow_marketnewspreferencewriterepository",
       "label": "MarketNewsPreferenceWriteRepository",
       "_callable": true,
@@ -6182,19 +6195,6 @@
       "norm_label": "marketnewspreferencewriterepository",
       "source_file": "lib/email/market-news-preference-workflow.ts",
       "source_location": "L9"
-    },
-    {
-      "id": "lib_email_suppression_policy_emailsuppressionevent",
-      "label": "EmailSuppressionEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "communication-policy.ts",
-      "file_type": "code",
-      "norm_label": "emailsuppressionevent",
-      "source_file": "lib/email/suppression-policy.ts",
-      "source_location": "L15"
     },
     {
       "id": "types_react_select_country_list_d_countrylist",
@@ -6940,7 +6940,7 @@
       "file_type": "code",
       "norm_label": "privacypage()",
       "source_file": "app/(legal)/privacy/page.tsx",
-      "source_location": "L62"
+      "source_location": "L68"
     },
     {
       "id": "app_legal_terms_page_termspage",
@@ -6952,7 +6952,7 @@
       "file_type": "code",
       "norm_label": "termspage()",
       "source_file": "app/(legal)/terms/page.tsx",
-      "source_location": "L57"
+      "source_location": "L64"
     },
     {
       "id": "components_legal_legaldocument_legaldocument",
@@ -10159,6 +10159,18 @@
       "source_location": "L346"
     },
     {
+      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test_features",
+      "label": "features()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "combined-broad-strategy-target-audit-runner.ts",
+      "file_type": "code",
+      "norm_label": "features()",
+      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
+      "source_location": "L12"
+    },
+    {
       "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test_run",
       "label": "run()",
       "_callable": true,
@@ -10169,6 +10181,18 @@
       "norm_label": "run()",
       "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
       "source_location": "L91"
+    },
+    {
+      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test_syntheticdataset",
+      "label": "syntheticDataset()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "combined-broad-strategy-target-audit-runner.ts",
+      "file_type": "code",
+      "norm_label": "syntheticdataset()",
+      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
+      "source_location": "L26"
     },
     {
       "id": "lib_analysis_combined_broad_strategy_target_audit_runner_utility",
@@ -17527,64 +17551,76 @@
       "source_location": "L31"
     },
     {
-      "id": "lib_instruments_crypto_catalog_currency",
-      "label": "currency()",
+      "id": "lib_instruments_finnhub_forex_normalizefinnhuboandacatalogentry",
+      "label": "normalizeFinnhubOandaCatalogEntry()",
       "_callable": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "currency()",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L18"
+      "norm_label": "normalizefinnhuboandacatalogentry()",
+      "source_file": "lib/instruments/finnhub-forex.ts",
+      "source_location": "L6"
     },
     {
-      "id": "lib_instruments_crypto_catalog_normalizefinnhubcoinbasecatalogentry",
-      "label": "normalizeFinnhubCoinbaseCatalogEntry()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "crypto-catalog.ts",
-      "file_type": "code",
-      "norm_label": "normalizefinnhubcoinbasecatalogentry()",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L26"
-    },
-    {
-      "id": "lib_instruments_crypto_catalog_normalizemassivecryptocatalogentry",
-      "label": "normalizeMassiveCryptoCatalogEntry()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "crypto-catalog.ts",
-      "file_type": "code",
-      "norm_label": "normalizemassivecryptocatalogentry()",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L60"
-    },
-    {
-      "id": "lib_instruments_crypto_catalog_pairkey",
+      "id": "lib_instruments_forex_catalog_pairkey",
       "label": "pairKey()",
       "_callable": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
       "norm_label": "pairkey()",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L91"
+      "source_file": "lib/instruments/forex-catalog.ts",
+      "source_location": "L12"
     },
     {
-      "id": "lib_instruments_crypto_catalog_reconcilecoinbasecryptocatalogs",
-      "label": "reconcileCoinbaseCryptoCatalogs()",
+      "id": "lib_instruments_forex_catalog_reconcileforexcatalogs",
+      "label": "reconcileForexCatalogs()",
       "_callable": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "reconcilecoinbasecryptocatalogs()",
-      "source_file": "lib/instruments/crypto-catalog.ts",
-      "source_location": "L95"
+      "norm_label": "reconcileforexcatalogs()",
+      "source_file": "lib/instruments/forex-catalog.ts",
+      "source_location": "L28"
+    },
+    {
+      "id": "lib_instruments_forex_catalog_tradingviewbinding",
+      "label": "tradingViewBinding()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "tradingviewbinding()",
+      "source_file": "lib/instruments/forex-catalog.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "lib_instruments_massive_forex_normalizemassiveforexcatalogentry",
+      "label": "normalizeMassiveForexCatalogEntry()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "normalizemassiveforexcatalogentry()",
+      "source_file": "lib/instruments/massive-forex.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "lib_instruments_massive_forex_parsemassiveforexticker",
+      "label": "parseMassiveForexTicker()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "parsemassiveforexticker()",
+      "source_file": "lib/instruments/massive-forex.ts",
+      "source_location": "L6"
     },
     {
       "id": "lib_instruments_pair_policy_usesusd",
@@ -17592,23 +17628,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
       "norm_label": "usesusd()",
       "source_file": "lib/instruments/pair-policy.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "lib_instruments_tradingview_availability_istradingviewcoinbasespotsymbolavailable",
-      "label": "isTradingViewCoinbaseSpotSymbolAvailable()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "crypto-catalog.ts",
-      "file_type": "code",
-      "norm_label": "istradingviewcoinbasespotsymbolavailable()",
-      "source_file": "lib/instruments/tradingview-availability.ts",
-      "source_location": "L92"
     },
     {
       "id": "lib_market_data_us_equity_session_datekey",
@@ -18415,36 +18439,12 @@
       "source_location": "L77"
     },
     {
-      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test_run",
-      "label": "run()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
-      "file_type": "code",
-      "norm_label": "run()",
-      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
-      "source_location": "L101"
-    },
-    {
-      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test_syntheticdataset",
-      "label": "syntheticDataset()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
-      "file_type": "code",
-      "norm_label": "syntheticdataset()",
-      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
-      "source_location": "L12"
-    },
-    {
       "id": "scripts_diagnose_analysis_broad_combined_train_main",
       "label": "main()",
       "_callable": true,
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "main()",
       "source_file": "scripts/diagnose-analysis-broad-combined-train.ts",
@@ -18456,7 +18456,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "readfrozen()",
       "source_file": "scripts/diagnose-analysis-broad-combined-train.ts",
@@ -18763,19 +18763,43 @@
       "source_location": "L274"
     },
     {
-      "id": "lib_instruments_finnhub_forex_normalizefinnhuboandacatalogentry",
-      "label": "normalizeFinnhubOandaCatalogEntry()",
+      "id": "lib_instruments_crypto_catalog_currency",
+      "label": "currency()",
       "_callable": true,
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "normalizefinnhuboandacatalogentry()",
-      "source_file": "lib/instruments/finnhub-forex.ts",
-      "source_location": "L6"
+      "norm_label": "currency()",
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L18"
     },
     {
-      "id": "lib_instruments_forex_catalog_pairkey",
+      "id": "lib_instruments_crypto_catalog_normalizefinnhubcoinbasecatalogentry",
+      "label": "normalizeFinnhubCoinbaseCatalogEntry()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "sync-instrument-catalog.ts",
+      "file_type": "code",
+      "norm_label": "normalizefinnhubcoinbasecatalogentry()",
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "lib_instruments_crypto_catalog_normalizemassivecryptocatalogentry",
+      "label": "normalizeMassiveCryptoCatalogEntry()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "sync-instrument-catalog.ts",
+      "file_type": "code",
+      "norm_label": "normalizemassivecryptocatalogentry()",
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L60"
+    },
+    {
+      "id": "lib_instruments_crypto_catalog_pairkey",
       "label": "pairKey()",
       "_callable": true,
       "_origin": "ast",
@@ -18783,32 +18807,20 @@
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
       "norm_label": "pairkey()",
-      "source_file": "lib/instruments/forex-catalog.ts",
-      "source_location": "L12"
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L91"
     },
     {
-      "id": "lib_instruments_forex_catalog_reconcileforexcatalogs",
-      "label": "reconcileForexCatalogs()",
+      "id": "lib_instruments_crypto_catalog_reconcilecoinbasecryptocatalogs",
+      "label": "reconcileCoinbaseCryptoCatalogs()",
       "_callable": true,
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "reconcileforexcatalogs()",
-      "source_file": "lib/instruments/forex-catalog.ts",
-      "source_location": "L28"
-    },
-    {
-      "id": "lib_instruments_forex_catalog_tradingviewbinding",
-      "label": "tradingViewBinding()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 74,
-      "community_name": "sync-instrument-catalog.ts",
-      "file_type": "code",
-      "norm_label": "tradingviewbinding()",
-      "source_file": "lib/instruments/forex-catalog.ts",
-      "source_location": "L16"
+      "norm_label": "reconcilecoinbasecryptocatalogs()",
+      "source_file": "lib/instruments/crypto-catalog.ts",
+      "source_location": "L95"
     },
     {
       "id": "lib_instruments_forex_provider_clients_test_jsonresponse",
@@ -18823,28 +18835,16 @@
       "source_location": "L14"
     },
     {
-      "id": "lib_instruments_massive_forex_normalizemassiveforexcatalogentry",
-      "label": "normalizeMassiveForexCatalogEntry()",
+      "id": "lib_instruments_tradingview_availability_istradingviewcoinbasespotsymbolavailable",
+      "label": "isTradingViewCoinbaseSpotSymbolAvailable()",
       "_callable": true,
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "normalizemassiveforexcatalogentry()",
-      "source_file": "lib/instruments/massive-forex.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "lib_instruments_massive_forex_parsemassiveforexticker",
-      "label": "parseMassiveForexTicker()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 74,
-      "community_name": "sync-instrument-catalog.ts",
-      "file_type": "code",
-      "norm_label": "parsemassiveforexticker()",
-      "source_file": "lib/instruments/massive-forex.ts",
-      "source_location": "L6"
+      "norm_label": "istradingviewcoinbasespotsymbolavailable()",
+      "source_file": "lib/instruments/tradingview-availability.ts",
+      "source_location": "L92"
     },
     {
       "id": "lib_market_data_providers_finnhub_forex_client_listfinnhubcryptosymbols",
@@ -19109,30 +19109,6 @@
       "norm_label": "usetradingviewwidget()",
       "source_file": "hooks/useTradingViewWidget.tsx",
       "source_location": "L5"
-    },
-    {
-      "id": "database_migrations_migrate_communication_preferences_runmigration",
-      "label": "runMigration()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "runmigration()",
-      "source_file": "database/migrations/migrate-communication-preferences.ts",
-      "source_location": "L22"
-    },
-    {
-      "id": "lib_email_communication_preference_migration_createlegacycommunicationpreferenceseed",
-      "label": "createLegacyCommunicationPreferenceSeed()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "createlegacycommunicationpreferenceseed()",
-      "source_file": "lib/email/communication-preference-migration.ts",
-      "source_location": "L22"
     },
     {
       "id": "lib_analysis_portfolio_backtest_activeatopen",
@@ -20095,19 +20071,19 @@
       "source_location": "L123"
     },
     {
-      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test_features",
-      "label": "features()",
+      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test_run",
+      "label": "run()",
       "_callable": true,
       "_origin": "ast",
       "community": 86,
       "community_name": "combined-broad-model-features.ts",
       "file_type": "code",
-      "norm_label": "features()",
-      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
-      "source_location": "L12"
+      "norm_label": "run()",
+      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
+      "source_location": "L101"
     },
     {
-      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test_syntheticdataset",
+      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test_syntheticdataset",
       "label": "syntheticDataset()",
       "_callable": true,
       "_origin": "ast",
@@ -20115,8 +20091,8 @@
       "community_name": "combined-broad-model-features.ts",
       "file_type": "code",
       "norm_label": "syntheticdataset()",
-      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
-      "source_location": "L26"
+      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
+      "source_location": "L12"
     },
     {
       "id": "database_migrations_migrate_precious_metals_to_commodities_runmigration",
@@ -20431,6 +20407,18 @@
       "source_location": "L63"
     },
     {
+      "id": "database_migrations_migrate_communication_preferences_runmigration",
+      "label": "runMigration()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "runmigration()",
+      "source_file": "database/migrations/migrate-communication-preferences.ts",
+      "source_location": "L22"
+    },
+    {
       "id": "database_models_communication_preference_model_subscriptionsvalidationerror",
       "label": "subscriptionsValidationError()",
       "_callable": true,
@@ -20525,6 +20513,18 @@
       "norm_label": "validatemarketnewspreferenceinput()",
       "source_file": "lib/email/communication-policy.ts",
       "source_location": "L132"
+    },
+    {
+      "id": "lib_email_communication_preference_migration_createlegacycommunicationpreferenceseed",
+      "label": "createLegacyCommunicationPreferenceSeed()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "createlegacycommunicationpreferenceseed()",
+      "source_file": "lib/email/communication-preference-migration.ts",
+      "source_location": "L22"
     },
     {
       "id": "lib_email_communication_preference_model_test_validsubscription",
@@ -24038,6 +24038,17 @@
       "norm_label": "cohort_definitions",
       "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.ts",
       "source_location": "L119"
+    },
+    {
+      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test",
+      "label": "combined-broad-strategy-target-audit-runner.test.ts",
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "combined-broad-strategy-target-audit-runner.ts",
+      "file_type": "code",
+      "norm_label": "combined-broad-strategy-target-audit-runner.test.ts",
+      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
+      "source_location": "L1"
     },
     {
       "id": "lib_analysis_combined_broad_strategy_target_audit_test",
@@ -29518,25 +29529,58 @@
       "source_location": "L1"
     },
     {
-      "id": "lib_instruments_crypto_catalog",
-      "label": "crypto-catalog.ts",
+      "id": "lib_instruments_finnhub_forex",
+      "label": "finnhub-forex.ts",
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "crypto-catalog.ts",
-      "source_file": "lib/instruments/crypto-catalog.ts",
+      "norm_label": "finnhub-forex.ts",
+      "source_file": "lib/instruments/finnhub-forex.ts",
       "source_location": "L1"
     },
     {
-      "id": "lib_instruments_crypto_catalog_test",
-      "label": "crypto-catalog.test.ts",
+      "id": "lib_instruments_forex_catalog",
+      "label": "forex-catalog.ts",
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
-      "norm_label": "crypto-catalog.test.ts",
-      "source_file": "lib/instruments/crypto-catalog.test.ts",
+      "norm_label": "forex-catalog.ts",
+      "source_file": "lib/instruments/forex-catalog.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_instruments_forex_catalog_test",
+      "label": "forex-catalog.test.ts",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "forex-catalog.test.ts",
+      "source_file": "lib/instruments/forex-catalog.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_instruments_massive_forex",
+      "label": "massive-forex.ts",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "massive-forex.ts",
+      "source_file": "lib/instruments/massive-forex.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_instruments_massive_forex_test",
+      "label": "massive-forex.test.ts",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "forex-catalog.ts",
+      "file_type": "code",
+      "norm_label": "massive-forex.test.ts",
+      "source_file": "lib/instruments/massive-forex.test.ts",
       "source_location": "L1"
     },
     {
@@ -29544,7 +29588,7 @@
       "label": "pair-policy.ts",
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
       "norm_label": "pair-policy.ts",
       "source_file": "lib/instruments/pair-policy.ts",
@@ -29555,33 +29599,11 @@
       "label": "pair-policy.test.ts",
       "_origin": "ast",
       "community": 64,
-      "community_name": "crypto-catalog.ts",
+      "community_name": "forex-catalog.ts",
       "file_type": "code",
       "norm_label": "pair-policy.test.ts",
       "source_file": "lib/instruments/pair-policy.test.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "lib_instruments_tradingview_availability",
-      "label": "tradingview-availability.ts",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "crypto-catalog.ts",
-      "file_type": "code",
-      "norm_label": "tradingview-availability.ts",
-      "source_file": "lib/instruments/tradingview-availability.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "lib_instruments_tradingview_availability_unavailable_coinbase_spot_symbols",
-      "label": "UNAVAILABLE_COINBASE_SPOT_SYMBOLS",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "crypto-catalog.ts",
-      "file_type": "code",
-      "norm_label": "unavailable_coinbase_spot_symbols",
-      "source_file": "lib/instruments/tradingview-availability.ts",
-      "source_location": "L5"
     },
     {
       "id": "lib_market_data_us_equity_session",
@@ -30024,22 +30046,11 @@
       "source_location": "L15"
     },
     {
-      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test",
-      "label": "combined-broad-train-diagnostic-runner.test.ts",
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
-      "file_type": "code",
-      "norm_label": "combined-broad-train-diagnostic-runner.test.ts",
-      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "lib_analysis_combined_broad_train_diagnostics",
       "label": "combined-broad-train-diagnostics.ts",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "combined-broad-train-diagnostics.ts",
       "source_file": "lib/analysis/combined-broad-train-diagnostics.ts",
@@ -30050,7 +30061,7 @@
       "label": "DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "daily_swing_combined_broad_train_diagnostic_id",
       "source_file": "lib/analysis/combined-broad-train-diagnostics.ts",
@@ -30061,7 +30072,7 @@
       "label": "DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "daily_swing_combined_broad_train_diagnostic_protocol",
       "source_file": "lib/analysis/combined-broad-train-diagnostics.ts",
@@ -30072,7 +30083,7 @@
       "label": "DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_VERSION",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "daily_swing_combined_broad_train_diagnostic_version",
       "source_file": "lib/analysis/combined-broad-train-diagnostics.ts",
@@ -30083,7 +30094,7 @@
       "label": "combined-broad-train-diagnostics.test.ts",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "combined-broad-train-diagnostics.test.ts",
       "source_file": "lib/analysis/combined-broad-train-diagnostics.test.ts",
@@ -30094,7 +30105,7 @@
       "label": "diagnose-analysis-broad-combined-train.ts",
       "_origin": "ast",
       "community": 71,
-      "community_name": "combined-broad-train-diagnostic-runner.test.ts",
+      "community_name": "diagnose-analysis-broad-combined-train.ts",
       "file_type": "code",
       "norm_label": "diagnose-analysis-broad-combined-train.ts",
       "source_file": "scripts/diagnose-analysis-broad-combined-train.ts",
@@ -30189,36 +30200,25 @@
       "source_location": "L39"
     },
     {
-      "id": "lib_instruments_finnhub_forex",
-      "label": "finnhub-forex.ts",
+      "id": "lib_instruments_crypto_catalog",
+      "label": "crypto-catalog.ts",
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "finnhub-forex.ts",
-      "source_file": "lib/instruments/finnhub-forex.ts",
+      "norm_label": "crypto-catalog.ts",
+      "source_file": "lib/instruments/crypto-catalog.ts",
       "source_location": "L1"
     },
     {
-      "id": "lib_instruments_forex_catalog",
-      "label": "forex-catalog.ts",
+      "id": "lib_instruments_crypto_catalog_test",
+      "label": "crypto-catalog.test.ts",
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "forex-catalog.ts",
-      "source_file": "lib/instruments/forex-catalog.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "lib_instruments_forex_catalog_test",
-      "label": "forex-catalog.test.ts",
-      "_origin": "ast",
-      "community": 74,
-      "community_name": "sync-instrument-catalog.ts",
-      "file_type": "code",
-      "norm_label": "forex-catalog.test.ts",
-      "source_file": "lib/instruments/forex-catalog.test.ts",
+      "norm_label": "crypto-catalog.test.ts",
+      "source_file": "lib/instruments/crypto-catalog.test.ts",
       "source_location": "L1"
     },
     {
@@ -30233,26 +30233,26 @@
       "source_location": "L1"
     },
     {
-      "id": "lib_instruments_massive_forex",
-      "label": "massive-forex.ts",
+      "id": "lib_instruments_tradingview_availability",
+      "label": "tradingview-availability.ts",
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "massive-forex.ts",
-      "source_file": "lib/instruments/massive-forex.ts",
+      "norm_label": "tradingview-availability.ts",
+      "source_file": "lib/instruments/tradingview-availability.ts",
       "source_location": "L1"
     },
     {
-      "id": "lib_instruments_massive_forex_test",
-      "label": "massive-forex.test.ts",
+      "id": "lib_instruments_tradingview_availability_unavailable_coinbase_spot_symbols",
+      "label": "UNAVAILABLE_COINBASE_SPOT_SYMBOLS",
       "_origin": "ast",
       "community": 74,
       "community_name": "sync-instrument-catalog.ts",
       "file_type": "code",
-      "norm_label": "massive-forex.test.ts",
-      "source_file": "lib/instruments/massive-forex.test.ts",
-      "source_location": "L1"
+      "norm_label": "unavailable_coinbase_spot_symbols",
+      "source_file": "lib/instruments/tradingview-availability.ts",
+      "source_location": "L5"
     },
     {
       "id": "lib_market_data_providers_finnhub_forex_client",
@@ -30396,61 +30396,6 @@
       "norm_label": "usetradingviewwidget.tsx",
       "source_file": "hooks/useTradingViewWidget.tsx",
       "source_location": "L1"
-    },
-    {
-      "id": "database_migrations_migrate_communication_preferences",
-      "label": "migrate-communication-preferences.ts",
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "migrate-communication-preferences.ts",
-      "source_file": "database/migrations/migrate-communication-preferences.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "database_migrations_migrate_communication_preferences_applychanges",
-      "label": "applyChanges",
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "applychanges",
-      "source_file": "database/migrations/migrate-communication-preferences.ts",
-      "source_location": "L12"
-    },
-    {
-      "id": "lib_email_communication_preference_migration",
-      "label": "communication-preference-migration.ts",
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "communication-preference-migration.ts",
-      "source_file": "lib/email/communication-preference-migration.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "lib_email_communication_preference_migration_test",
-      "label": "communication-preference-migration.test.ts",
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "communication-preference-migration.test.ts",
-      "source_file": "lib/email/communication-preference-migration.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "lib_email_communication_preference_migration_test_migratedat",
-      "label": "migratedAt",
-      "_origin": "ast",
-      "community": 79,
-      "community_name": "migrate-communication-preferences.ts",
-      "file_type": "code",
-      "norm_label": "migratedat",
-      "source_file": "lib/email/communication-preference-migration.test.ts",
-      "source_location": "L5"
     },
     {
       "id": "lib_analysis_portfolio_backtest",
@@ -31124,14 +31069,14 @@
       "source_location": "L1"
     },
     {
-      "id": "lib_analysis_combined_broad_strategy_target_audit_runner_test",
-      "label": "combined-broad-strategy-target-audit-runner.test.ts",
+      "id": "lib_analysis_combined_broad_train_diagnostic_runner_test",
+      "label": "combined-broad-train-diagnostic-runner.test.ts",
       "_origin": "ast",
       "community": 86,
       "community_name": "combined-broad-model-features.ts",
       "file_type": "code",
-      "norm_label": "combined-broad-strategy-target-audit-runner.test.ts",
-      "source_file": "lib/analysis/combined-broad-strategy-target-audit-runner.test.ts",
+      "norm_label": "combined-broad-train-diagnostic-runner.test.ts",
+      "source_file": "lib/analysis/combined-broad-train-diagnostic-runner.test.ts",
       "source_location": "L1"
     },
     {
@@ -31322,6 +31267,28 @@
       "norm_label": "default_etf_symbols",
       "source_file": "scripts/fetch-backtest-batch.ts",
       "source_location": "L11"
+    },
+    {
+      "id": "database_migrations_migrate_communication_preferences",
+      "label": "migrate-communication-preferences.ts",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "migrate-communication-preferences.ts",
+      "source_file": "database/migrations/migrate-communication-preferences.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "database_migrations_migrate_communication_preferences_applychanges",
+      "label": "applyChanges",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "applychanges",
+      "source_file": "database/migrations/migrate-communication-preferences.ts",
+      "source_location": "L12"
     },
     {
       "id": "database_models_communication_preference_model",
@@ -31531,6 +31498,39 @@
       "norm_label": "consentedat",
       "source_file": "lib/email/communication-policy.test.ts",
       "source_location": "L11"
+    },
+    {
+      "id": "lib_email_communication_preference_migration",
+      "label": "communication-preference-migration.ts",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "communication-preference-migration.ts",
+      "source_file": "lib/email/communication-preference-migration.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_email_communication_preference_migration_test",
+      "label": "communication-preference-migration.test.ts",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "communication-preference-migration.test.ts",
+      "source_file": "lib/email/communication-preference-migration.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_email_communication_preference_migration_test_migratedat",
+      "label": "migratedAt",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "communication-policy.ts",
+      "file_type": "code",
+      "norm_label": "migratedat",
+      "source_file": "lib/email/communication-preference-migration.test.ts",
+      "source_location": "L5"
     },
     {
       "id": "lib_email_communication_preference_model_test",
@@ -87486,7 +87486,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/(legal)/privacy/page.tsx",
-      "source_location": "L62",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -87519,7 +87519,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/(legal)/terms/page.tsx",
-      "source_location": "L57",
+      "source_location": "L64",
       "weight": 1.0
     },
     {

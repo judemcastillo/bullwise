@@ -1,5 +1,118 @@
 {
-  "generated_at": "2026-08-25T08:37:44.551898+00:00",
-  "nodes": {},
+  "generated_at": "2026-08-31T07:42:38.245945+00:00",
+  "nodes": {
+    "database_mongoose_connecttodatabase": {
+      "code_fingerprint": "4b2102fe78e332618ede5fddae127bb4818a82cfd509ec24a5ddedf3b8746848",
+      "label": "connectToDatabase()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "database/mongoose.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_better_auth_auth_createauth": {
+      "code_fingerprint": "1ad2f1f62b5545cc4e63781fd9e4c232ef5c5ede902427308803c0c5ac0ccec1",
+      "label": "createAuth()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/better-auth/auth.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_data_instruments_getinstrumentbycanonicalkey": {
+      "code_fingerprint": "180e832474e379d807ccaabc4b6ad979ef1e4b59d079068bbbb3356c94f375a1",
+      "label": "getInstrumentByCanonicalKey()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/data/instruments.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_data_instruments_getspyanalysisbenchmark": {
+      "code_fingerprint": "180e832474e379d807ccaabc4b6ad979ef1e4b59d079068bbbb3356c94f375a1",
+      "label": "getSpyAnalysisBenchmark()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/data/instruments.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_data_watchlist_addtocurrentuserwatchlist": {
+      "code_fingerprint": "006e4b4ac9f4e278b6f6e23ba95de6d09f616f3fdd8647510aea64980a8c92c2",
+      "label": "addToCurrentUserWatchlist()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/data/watchlist.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_email_communication_eligibility_getemaileligibility": {
+      "code_fingerprint": "7e4ad1929837bcc9877ce167af5371d4d3e8a31eff52c2bb68ec832c52c51bb9",
+      "label": "getEmailEligibility()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/email/communication-eligibility.ts",
+      "status": "tentative",
+      "uses": 1
+    },
+    "lib_email_market_news_delivery_log_claimmarketnewsdelivery": {
+      "code_fingerprint": "6f10cd45c029e728fb74b08317e49aba0995b3fea75d3efb78959d6d949a8f6f",
+      "label": "claimMarketNewsDelivery()",
+      "last": "2026-08-25T08:39:07.654162+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T08:39:07.654162+00:00",
+          "outcome": "useful",
+          "q": "Why does connectToDatabase() bridge 17 distinct communities?"
+        }
+      ],
+      "score": 0.871339978,
+      "source_file": "lib/email/market-news-delivery-log.ts",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
   "version": 1
 }

@@ -24,15 +24,15 @@
     "semantic_hash": ""
   },
   "app/(legal)/privacy/page.tsx": {
-    "mtime": 1788162371.805674,
-    "seen": 1788162406.073255,
-    "ast_hash": "c9e9647afba4757f41c9eb6b696462d7",
+    "mtime": 1788162256.235101,
+    "seen": 1788162351.2082598,
+    "ast_hash": "f872cb558977b2c7bc67a865031c64cd",
     "semantic_hash": ""
   },
   "app/(legal)/terms/page.tsx": {
-    "mtime": 1788162371.6248834,
-    "seen": 1788162406.0732572,
-    "ast_hash": "675526dac420aaa1e09fe16545dc483a",
+    "mtime": 1788162256.0337713,
+    "seen": 1788162351.208261,
+    "ast_hash": "232a04e2331c90aa5a4b749760d55582",
     "semantic_hash": ""
   },
   "app/(onboarding)/onboarding/page.tsx": {

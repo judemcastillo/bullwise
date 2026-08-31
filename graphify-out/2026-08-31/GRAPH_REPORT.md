@@ -1,11 +1,11 @@
 # Graph Report - bullwise  (2026-08-31)
 
 ## Corpus Check
-- 472 files · ~245,512 words
+- 472 files · ~245,558 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2861 nodes · 6878 edges · 128 communities (120 shown, 8 thin omitted)
+- 2861 nodes · 6878 edges · 127 communities (119 shown, 8 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 83 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
@@ -79,14 +79,14 @@
 - combined-broad-fold-dataset.types.ts
 - objective-features.ts
 - risk-controlled-momentum-v2-universe.ts
-- crypto-catalog.ts
+- forex-catalog.ts
 - us-equity-session.ts
 - requireUser
 - analysis-dataset.test.ts
 - MarketBars
 - index.ts
 - episode-validation.test.ts
-- combined-broad-train-diagnostic-runner.test.ts
+- diagnose-analysis-broad-combined-train.ts
 - fetch-backtest-history.ts
 - DashboardWatchlist.tsx
 - sync-instrument-catalog.ts
@@ -94,7 +94,6 @@
 - watchlist-policy.test.ts
 - WatchlistButton.tsx
 - TradingViewWidget.tsx
-- migrate-communication-preferences.ts
 - email-rendering.ts
 - backtest.test.ts
 - risk-controlled-momentum-v2-history.ts
@@ -180,7 +179,7 @@
 - **Outcome-Blind Broad Dataset Pipeline** — docs_daily_swing_broad_development_v1_outcome_blind_liquidity_policy, docs_daily_swing_broad_development_v2_sample_coverage_expansion, docs_daily_swing_broad_combined_dataset_v3_label_blind_combination, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 - **Sealed Research Evidence Safeguards** — _agents_skills_bullwise_analysis_research_holdout_safeguards, docs_daily_swing_backtesting_episode_first_one_shot_validation, docs_daily_swing_broad_dataset_v2_split_and_sealed_test_policy, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 
-## Communities (128 total, 8 thin omitted)
+## Communities (127 total, 8 thin omitted)
 
 ### Community 0 - "scripts"
 Cohesion: 0.03
@@ -219,8 +218,8 @@ Cohesion: 0.08
 Nodes (30): activeAtOpen(), activeOpeningExposure(), Candidate, DEFAULT_CONFIGURATION, descendingNullable(), finitePositive(), latestMark(), PortfolioBacktestInput (+22 more)
 
 ### Community 9 - "communication-policy.ts"
-Cohesion: 0.08
-Nodes (41): CommunicationPreferenceDocument, communicationPreferenceSchema, emailSubscriptionSchema, emailSuppressionSchema, subscriptionsValidationError(), validSubscriptions(), updateMarketNewsPreference(), COMMUNICATION_POLICY_VERSION (+33 more)
+Cohesion: 0.07
+Nodes (47): applyChanges, MigrationSummary, runMigration(), CommunicationPreferenceDocument, communicationPreferenceSchema, emailSubscriptionSchema, emailSuppressionSchema, subscriptionsValidationError() (+39 more)
 
 ### Community 10 - "technical-analysis.types.ts"
 Cohesion: 0.10
@@ -283,8 +282,8 @@ Cohesion: 0.07
 Nodes (48): applySlippage(), buildBacktestSignalFeatures(), buyAndHoldReturn(), calculateBaselines(), DEFAULT_BACKTEST_CONFIGURATION, entryBasePrice(), groupMetrics(), isStopTouched() (+40 more)
 
 ### Community 25 - "combined-broad-strategy-target-audit-runner.ts"
-Cohesion: 0.13
-Nodes (23): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+15 more)
+Cohesion: 0.12
+Nodes (25): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+17 more)
 
 ### Community 26 - "processor.ts"
 Cohesion: 0.09
@@ -331,8 +330,8 @@ Cohesion: 0.10
 Nodes (31): AnalysisState, TechnicalAnalysisReadyResult, TechnicalAnalysisUnavailableReason, analysisPanelContext(), APPROVED_WARNING_MAP, approvedWarnings(), BuildAnalysisPanelInput, buildAnalysisPanelResponse() (+23 more)
 
 ### Community 37 - "email-suppression.ts"
-Cohesion: 0.18
-Nodes (20): POST(), BetterAuthUser, capturePermanentSmtpFailure(), EmailSuppressionRecordResult, findUserIdByEmail(), lowerPriorityReasons, recordEmailSuppressionByEmail(), createEmailEventWebhookSignature() (+12 more)
+Cohesion: 0.17
+Nodes (22): POST(), EmailSuppressionReason, BetterAuthUser, capturePermanentSmtpFailure(), EmailSuppressionRecordResult, findUserIdByEmail(), lowerPriorityReasons, recordEmailSuppressionByEmail() (+14 more)
 
 ### Community 38 - "unsubscribe-token.ts"
 Cohesion: 0.16
@@ -438,9 +437,9 @@ Nodes (12): buildDailySwingObjectiveFeatures(), BuildDailySwingObjectiveFeatures
 Cohesion: 0.12
 Nodes (27): ORIGINAL_DEVELOPMENT_SYMBOLS, assertRiskControlledMomentumV2ManifestIntegrity(), Candidate, Exchange, RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256, RISK_CONTROLLED_MOMENTUM_V2_EXCLUDED_SYMBOLS, RISK_CONTROLLED_MOMENTUM_V2_INCEPTION_CUTOFF, RISK_CONTROLLED_MOMENTUM_V2_METADATA_VERIFIED_AT (+19 more)
 
-### Community 64 - "crypto-catalog.ts"
-Cohesion: 0.24
-Nodes (10): CryptoCatalogEntry, currency(), normalizeFinnhubCoinbaseCatalogEntry(), normalizeMassiveCryptoCatalogEntry(), pairKey(), reconcileCoinbaseCryptoCatalogs(), usesUsd(), isTradingViewCoinbaseSpotSymbolAvailable() (+2 more)
+### Community 64 - "forex-catalog.ts"
+Cohesion: 0.23
+Nodes (10): normalizeFinnhubOandaCatalogEntry(), ForexCatalogEntry, pairKey(), reconcileForexCatalogs(), tradingViewBinding(), normalizeMassiveForexCatalogEntry(), parseMassiveForexTicker(), usesUsd() (+2 more)
 
 ### Community 65 - "us-equity-session.ts"
 Cohesion: 0.16
@@ -466,9 +465,9 @@ Nodes (17): BetterAuthUser, getEmailEligibilityByEmail(), getPreference(), Email
 Cohesion: 0.31
 Nodes (8): evaluate(), features(), fixture(), PREREGISTRATION_SHA, row(), sealRows(), SOURCE_SHA, TRAINING_SHA
 
-### Community 71 - "combined-broad-train-diagnostic-runner.test.ts"
-Cohesion: 0.27
-Nodes (7): run(), syntheticDataset(), DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_VERSION, main(), readFrozen()
+### Community 71 - "diagnose-analysis-broad-combined-train.ts"
+Cohesion: 0.36
+Nodes (5): DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_VERSION, main(), readFrozen()
 
 ### Community 72 - "fetch-backtest-history.ts"
 Cohesion: 0.46
@@ -497,10 +496,6 @@ Nodes (4): WatchlistButton(), addToWatchlist(), removeFromWatchlist(), revalidat
 ### Community 78 - "TradingViewWidget.tsx"
 Cohesion: 0.60
 Nodes (3): TradingViewWidget(), TradingViewWidgetProps, useTradingViewWidget()
-
-### Community 79 - "migrate-communication-preferences.ts"
-Cohesion: 0.29
-Nodes (8): applyChanges, MigrationSummary, runMigration(), CommunicationPreferenceSnapshot, createLegacyCommunicationPreferenceSeed(), LegacyCommunicationPreferenceSeed, LegacyUserProfileEmailPreference, migratedAt
 
 ### Community 80 - "email-rendering.ts"
 Cohesion: 0.12

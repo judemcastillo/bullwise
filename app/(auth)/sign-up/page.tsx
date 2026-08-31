@@ -125,7 +125,7 @@ export default function SignUpPage() {
 			<p className="mt-10 text-center text-xs leading-5 text-gray-500">
 				By creating an account, you agree to our{" "}
 				<Link
-					href="/terms#terms-of-use"
+					href="/terms"
 					target="_blank"
 					rel="noreferrer"
 					className="underline underline-offset-2 hover:text-yellow-400"
@@ -134,7 +134,7 @@ export default function SignUpPage() {
 				</Link>{" "}
 				and{" "}
 				<Link
-					href="/terms#privacy-policy"
+					href="/privacy"
 					target="_blank"
 					rel="noreferrer"
 					className="underline underline-offset-2 hover:text-yellow-400"
