@@ -10,7 +10,7 @@ describe("transparent analysis daily observation helper", () => {
 	it("counts only dated valid-instrument requests", () => {
 		const lines = [
 			{ recordedDate: "2026-08-24", event: "transparent_analysis_request", outcome: "ready", duration: "under_250ms" },
-			{ recordedDate: "2026-08-25", event: "transparent_analysis_request", outcome: "partial", duration: "1s_to_2_99s" },
+			{ recordedDate: "2026-08-25", event: "transparent_analysis_request", outcome: "partial", duration: "1s_to_2_99s", partialReasons: ["participation_unavailable"], warningCodes: ["volume_incomplete"], historyBars: "400_to_499" },
 			{ recordedDate: "2026-08-25", event: "transparent_analysis_request", outcome: "unavailable", unavailableReason: "bars_provider_unavailable", duration: "3s_to_9_99s" },
 			{ recordedDate: "2026-08-25", event: "transparent_analysis_request", outcome: "unavailable", unavailableReason: "unsupported_instrument", duration: "under_250ms" },
 			{ event: "transparent_analysis_request", outcome: "ready", duration: "under_250ms" },
@@ -28,6 +28,8 @@ describe("transparent analysis daily observation helper", () => {
 			undatedRequestEvents: 1,
 			validRequests: 3,
 			distinctDays: 2,
+			firstDate: "2026-08-24",
+			lastDate: "2026-08-25",
 			todayRequests: 2,
 			remainingRequests: 47,
 			remainingDays: 5,
@@ -39,6 +41,10 @@ describe("transparent analysis daily observation helper", () => {
 				"1s_to_2_99s": 1,
 				"3s_to_9_99s": 1,
 			},
+			unavailableReasons: { bars_provider_unavailable: 1 },
+			partialReasons: { participation_unavailable: 1 },
+			warningCodes: { volume_incomplete: 1 },
+			historyBars: { "400_to_499": 1 },
 			failureCategories: { timeout_or_network: 1 },
 		});
 	});

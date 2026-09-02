@@ -90,6 +90,9 @@ type StoredTelemetryLine = {
 	outcome?: unknown;
 	duration?: unknown;
 	unavailableReason?: unknown;
+	partialReasons?: unknown;
+	warningCodes?: unknown;
+	historyBars?: unknown;
 	category?: unknown;
 };
 
@@ -99,6 +102,8 @@ export type TransparentAnalysisObservationProgress = {
 	undatedRequestEvents: number;
 	validRequests: number;
 	distinctDays: number;
+	firstDate: string | null;
+	lastDate: string | null;
 	todayRequests: number;
 	remainingRequests: number;
 	remainingDays: number;
@@ -106,11 +111,22 @@ export type TransparentAnalysisObservationProgress = {
 	dayMinimumMet: boolean;
 	outcomes: Partial<Record<TransparentAnalysisRequestOutcome, number>>;
 	durations: Partial<Record<TransparentAnalysisDurationBucket, number>>;
+	unavailableReasons: Record<string, number>;
+	partialReasons: Record<string, number>;
+	warningCodes: Record<string, number>;
+	historyBars: Record<string, number>;
 	failureCategories: Record<string, number>;
 };
 
 function increment(counts: Record<string, number>, key: string) {
 	counts[key] = (counts[key] ?? 0) + 1;
+}
+
+function incrementStringArray(counts: Record<string, number>, value: unknown) {
+	if (!Array.isArray(value)) return;
+	for (const item of value) {
+		if (typeof item === "string") increment(counts, item);
+	}
 }
 
 function isRecordedDate(value: unknown): value is string {
@@ -161,18 +177,31 @@ export function summarizeTransparentAnalysisObservation(
 	const validRequests = requestLines.filter(
 		(line) => isRecordedDate(line.recordedDate) && isValidInstrumentRequest(line),
 	);
-	const dates = new Set(validRequests.map((line) => line.recordedDate as string));
+	const dates = [
+		...new Set(validRequests.map((line) => line.recordedDate as string)),
+	].sort();
 	const todayDate = transparentAnalysisObservationDate(today);
 	const outcomes: Record<string, number> = {};
 	const durations: Record<string, number> = {};
+	const unavailableReasons: Record<string, number> = {};
+	const partialReasons: Record<string, number> = {};
+	const warningCodes: Record<string, number> = {};
+	const historyBars: Record<string, number> = {};
 	for (const line of validRequests) {
 		if (typeof line.outcome === "string") increment(outcomes, line.outcome);
 		if (typeof line.duration === "string") increment(durations, line.duration);
+		if (typeof line.unavailableReason === "string") {
+			increment(unavailableReasons, line.unavailableReason);
+		}
+		incrementStringArray(partialReasons, line.partialReasons);
+		incrementStringArray(warningCodes, line.warningCodes);
+		if (typeof line.historyBars === "string") increment(historyBars, line.historyBars);
 	}
 	const failureCategories: Record<string, number> = {};
 	for (const line of parsed) {
 		if (
 			line.event === "transparent_analysis_operational_failure" &&
+			isRecordedDate(line.recordedDate) &&
 			typeof line.category === "string"
 		) {
 			increment(failureCategories, line.category);
@@ -186,7 +215,9 @@ export function summarizeTransparentAnalysisObservation(
 			(line) => !isRecordedDate(line.recordedDate),
 		).length,
 		validRequests: validRequests.length,
-		distinctDays: dates.size,
+		distinctDays: dates.length,
+		firstDate: dates[0] ?? null,
+		lastDate: dates.at(-1) ?? null,
 		todayRequests: validRequests.filter(
 			(line) => line.recordedDate === todayDate,
 		).length,
@@ -196,13 +227,17 @@ export function summarizeTransparentAnalysisObservation(
 		),
 		remainingDays: Math.max(
 			0,
-			TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS - dates.size,
+			TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS - dates.length,
 		),
 		requestMinimumMet:
 			validRequests.length >= TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_REQUESTS,
-		dayMinimumMet: dates.size >= TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS,
+		dayMinimumMet: dates.length >= TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS,
 		outcomes,
 		durations,
+		unavailableReasons,
+		partialReasons,
+		warningCodes,
+		historyBars,
 		failureCategories,
 	};
 }

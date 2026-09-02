@@ -77,3 +77,9 @@ This command deliberately bypasses authentication and telemetry. It therefore do
 Run `npm run observe:transparent-analysis` once per testing day. It reports aggregate progress from the ignored local JSONL file and prints a rotating checklist of eight representative U.S. common stocks. Visit those stocks through the authenticated UI and allow each analysis panel to finish.
 
 The helper never calls the API or creates telemetry itself. This preserves the requirement that the sample consist of genuine UI requests rather than automated traffic. Unsupported instruments, authentication failures, malformed requests, not-found results, undated legacy lines, and invalid JSON lines do not count toward the 50 valid-instrument request minimum.
+
+## Formal operational review
+
+After the observation minimum is reached, stop deliberate requests and run `npm run review:transparent-analysis`. The fixed command writes `artifacts/telemetry/transparent-analysis-operational-review-v1.json` once and refuses all overrides or replacement. The report contains only its source checksum, coverage, aggregate closed-field counts, rates, gates, and decision.
+
+The executable gates preserve the thresholds above. For the qualitative recurrence criterion, two or more occurrences of either `participation_unavailable` or `relative_strength_unavailable` require investigation; zero or one is treated as isolated. Invalid JSON also fails the telemetry-integrity gate. A passing decision establishes operational readiness only and does not establish profitability or authorize trading signals.
