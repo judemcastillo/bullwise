@@ -1,6 +1,6 @@
 # Transparent analysis AI explanation v1.4 preregistration
 
-Status: preregistered development candidate; not yet executed or authorized for production
+Status: closed and rejected; not authorized for production
 
 Recorded: 2026-09-03
 
@@ -51,3 +51,26 @@ Run exactly once, only after this preregistration and implementation are committ
 `npm run evaluate:transparent-analysis-ai-content-v1-4`
 
 Retain the report and record its SHA-256 checksum and result here.
+
+## Development result
+
+The one-shot evaluation ran on 2026-09-03 and wrote
+`artifacts/analysis/transparent-analysis-ai-content-evaluation-v1-4.json` with
+SHA-256
+`c0b15f104ae69a2e22b7926285de858a3a3e39d3d722a5a62473dddc2b000c87`.
+`gemini-3.5-flash-lite` passed all eleven automated gates and completed all
+twenty generation requests under the frozen 6100 ms request-start pacing
+schedule.
+
+The required manual groundedness review examined every returned explanation.
+Nineteen of twenty outputs preserved the meaning of their cited deterministic
+facts. The `context-mixed-bearish` overview described volume as "baseline
+volume," although its cited fact said that latest volume was 0.8 standard
+deviations from its 20-day baseline. That compression can imply that volume was
+at the baseline and therefore does not satisfy the frozen requirement for fully
+supported prose without changed meaning.
+
+Manual groundedness was 95%, below the required 100%, so the twelfth gate failed
+and v1.4 is rejected. This result does not authorize product integration. The
+artifact must not be overwritten, and v1.4 must not be tuned and rerun against
+these observed outputs. No strategy validation or holdout data was read.
