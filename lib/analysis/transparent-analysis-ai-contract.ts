@@ -108,6 +108,8 @@ const FACTOR_STATES = {
 
 const PROHIBITED_ADVICE =
 	/\b(?:buy|sell|hold|long|short|entry|enter|exit|trade|recommend(?:ation|ed)?|position\s+siz(?:e|ing)|stop[ -]?loss|take[ -]?profit|price\s+target|should\s+(?:invest|buy|sell|hold))\b/i;
+const TEMPORAL_LONG_SHORT_PHRASE =
+	/\b(?:long|short)(?:[ -]?term|\s*-\s*and\s+(?:short|medium|long)[ -]?term)\b/gi;
 const UNSUPPORTED_DOMAINS =
 	/\b(?:news|earnings|revenue|fundamentals?|sentiment|options?|order\s+book|market\s+depth|liquidity|supply|demand|order\s+blocks?)\b/i;
 const NUMERIC_TOKEN = /[$€£]?\d+(?:[.,]\d+)*(?:%|[a-z]{0,2})?/gi;
@@ -243,7 +245,8 @@ function validateCitedText(input: {
 		input.reasons.push(`${input.label} cites a fact from another factor.`);
 		input.issueCodes.push("citation");
 	}
-	if (PROHIBITED_ADVICE.test(input.value.text)) {
+	const adviceCandidate = input.value.text.replace(TEMPORAL_LONG_SHORT_PHRASE, "");
+	if (PROHIBITED_ADVICE.test(adviceCandidate)) {
 		input.reasons.push(`${input.label} contains prohibited trading advice.`);
 		input.issueCodes.push("prohibited_advice");
 	}

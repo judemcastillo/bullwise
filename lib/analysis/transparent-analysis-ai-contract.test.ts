@@ -165,6 +165,34 @@ describe("transparent analysis AI explanation contract", () => {
 		}
 	});
 
+	it("allows temporal long and short wording but rejects position language", () => {
+		const input = buildTransparentAnalysisAiInput(response());
+		assert.ok(input);
+		for (const text of [
+			"Short-term and long-term trends are mixed.",
+			"Short- and medium-term moving-average slopes disagree.",
+		]) {
+			const explanation = validExplanation();
+			explanation.overview.text = text;
+			assert.equal(
+				validateTransparentAnalysisAiExplanation(input, explanation).ok,
+				true,
+			);
+		}
+
+		for (const text of [
+			"Go short while momentum is weak.",
+			"Take a long position while the trend is constructive.",
+			"This is a short setup.",
+		]) {
+			const explanation = validExplanation();
+			explanation.overview.text = text;
+			const result = validateTransparentAnalysisAiExplanation(input, explanation);
+			assert.equal(result.ok, false);
+			if (!result.ok) assert.ok(result.issueCodes.includes("prohibited_advice"));
+		}
+	});
+
 	it("freezes eleven all-or-nothing evaluation gates before provider selection", () => {
 		assert.equal(TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES.length, 11);
 		assert.equal(
