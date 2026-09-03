@@ -50,6 +50,7 @@
 		"evaluate:transparent-analysis-ai-content-v1-2": "node --import tsx scripts/evaluate-transparent-analysis-ai-content-v1-2.ts",
 		"evaluate:transparent-analysis-ai-content-v1-3": "node --import tsx scripts/evaluate-transparent-analysis-ai-content-v1-3.ts",
 		"evaluate:transparent-analysis-ai-content-v1-4": "node --import tsx scripts/evaluate-transparent-analysis-ai-content-v1-4.ts",
+		"evaluate:transparent-analysis-ai-selection-v1-5": "node --import tsx scripts/evaluate-transparent-analysis-ai-selection-v1-5.ts",
 		"observe:transparent-analysis-ai-latency": "node --import tsx scripts/observe-transparent-analysis-ai-latency.ts",
 		"observe:transparent-analysis-ai-provider-reliability": "node --import tsx scripts/observe-transparent-analysis-ai-provider-reliability.ts",
 		"observe:transparent-analysis-ai-provider-pacing": "node --import tsx scripts/observe-transparent-analysis-ai-provider-pacing.ts",
