@@ -31,3 +31,15 @@ Run exactly once, only after this preregistration and implementation are committ
 `npm run observe:transparent-analysis-ai-provider-reliability`
 
 Retain the report and record its SHA-256 checksum and compact result here.
+
+## Recorded observation
+
+The one-shot observation completed on 2026-09-03. All 20 sequential requests completed at the provider boundary. No transport, rate-limit, authentication, server, other HTTP, provider-response JSON, missing-output, model-output JSON, or unclassified failure was observed.
+
+Request duration ranged from 1559.446268 ms to 16672.802464 ms, with a mean of 3751.454398 ms, p50 of 1980.537559 ms, and p95 of 7910.642733 ms. Successful requests reported 13304 aggregate input tokens and 6805 aggregate output tokens. Generated prose was not retained or evaluated.
+
+This session did not reproduce the five provider failures from the rejected v1.2 evaluation. Therefore, it cannot identify their original cause or establish long-run provider reliability. The v1.2 rejection remains unchanged, and this observation does not authorize retries, pacing changes, or production integration.
+
+Report: `artifacts/analysis/transparent-analysis-ai-provider-reliability-v1.json`
+
+Report SHA-256: `d22e711c8ef2ac5659170ca0c5a537ef6ed3814fa265238ee8d796879acbc1a9`
