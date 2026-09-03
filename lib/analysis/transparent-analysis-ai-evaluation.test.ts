@@ -48,4 +48,19 @@ describe("transparent analysis AI development evaluation", () => {
 			null,
 		);
 	});
+
+	it("does not count a missing provider output as state or citation fidelity", async () => {
+		const report = await evaluateTransparentAnalysisAiCandidate({
+			model: "unavailable-candidate",
+			generate: async () => { throw new Error("synthetic provider failure"); },
+		});
+		assert.equal(
+			report.gates.find(({ id }) => id === "factor_state_fidelity")?.value,
+			0,
+		);
+		assert.equal(
+			report.gates.find(({ id }) => id === "citation_validity")?.value,
+			0,
+		);
+	});
 });

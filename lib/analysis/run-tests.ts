@@ -8,7 +8,7 @@ import "./transparent-analysis-daily-observation.test";
 import "./transparent-analysis-operational-review.test";
 import "./transparent-analysis-ai-contract.test";
 import "./transparent-analysis-ai-provider.test";
-import "./openai-transparent-analysis-ai-provider.test";
+import "./google-transparent-analysis-ai-provider.test";
 import "./transparent-analysis-ai-evaluation.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";

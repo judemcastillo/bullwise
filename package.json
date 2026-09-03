@@ -46,7 +46,7 @@
 		"smoke:transparent-analysis": "node --import tsx scripts/smoke-transparent-analysis.ts",
 		"observe:transparent-analysis": "node --import tsx scripts/observe-transparent-analysis.ts",
 		"review:transparent-analysis": "node --import tsx scripts/review-transparent-analysis.ts",
-		"evaluate:transparent-analysis-ai-candidates": "node --import tsx scripts/evaluate-transparent-analysis-ai-candidates.ts",
+		"evaluate:transparent-analysis-ai-candidate": "node --import tsx scripts/evaluate-transparent-analysis-ai-candidate.ts",
 		"export:analysis-dataset": "node --import tsx scripts/export-analysis-dataset.ts",
 		"train:analysis-baselines": "node --import tsx scripts/train-analysis-baselines.ts",
 		"train:analysis-boosted": "node --import tsx scripts/train-analysis-boosted.ts",

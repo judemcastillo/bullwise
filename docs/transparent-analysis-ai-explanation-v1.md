@@ -88,8 +88,20 @@ This preregistration now authorizes selecting candidate providers and models, im
 
 ## Local candidate evaluation
 
-The local-only OpenAI adapter uses the Responses API with `store: false`, strict Structured Outputs, the frozen prompt, and the minimized deterministic input. The candidate set is frozen in code as `gpt-5.6-luna` (primary cost-sensitive candidate) and the dated `gpt-5.4-nano-2026-03-17` snapshot (reproducibility comparator). Pricing metadata is frozen with the candidate definitions and is used only to calculate evaluation cost.
+The local-only Google adapter uses the Gemini GenerateContent API with structured JSON output, the frozen prompt, and the minimized deterministic input. Google documents the evaluated Flash candidates as supporting structured outputs and providing free-tier input and output. Free-tier availability remains subject to Google's current quotas and account eligibility, and Google states that free-tier data may be used to improve its products.
 
-Run `npm run evaluate:transparent-analysis-ai-candidates` with `OPENAI_API_KEY` configured. The command makes 40 paid generation calls—20 frozen generation fixtures for each candidate—and writes a non-overwriting, gitignored report to `artifacts/analysis/transparent-analysis-ai-development-evaluation-v1.json`. It does not call market-data services, inspect strategy validation or holdout data, or connect AI to the application.
+An initial endpoint check selected `gemini-2.5-flash-lite` from Google's published free-tier table, but Google returned `NOT_FOUND` for every attempted request and stated that the model is unavailable to new users. Those requests produced zero model outputs and were retained only as an invalid-model diagnostic. The candidate was corrected to Google's recommended `gemini-3.5-flash-lite` before any fixture output was observed, so this did not tune the candidate against development outcomes.
+
+The first `gemini-3.5-flash-lite` adapter check also produced zero outputs because that model rejected an explicit zero thinking budget. A minimal configuration diagnostic isolated that unsupported field; it was removed before the development evaluation without changing the prompt, output contract, fixtures, or gates.
+
+With the corrected adapter, `gemini-3.5-flash-lite` passed 7/10 automated gates but was rejected: 9/20 outputs were fully valid, 10 fixtures contained novel numeric tokens, and two contained prohibited language. That report is preserved as a rejected development result. The next frozen Google-only candidate is the stronger free-tier `gemini-3.5-flash`; the prompt, fixtures, validator, and gates remain unchanged.
+
+Run `npm run evaluate:transparent-analysis-ai-candidate` with `GEMINI_API_KEY` configured. The command makes 20 free-tier generation calls and writes a non-overwriting, gitignored report to `artifacts/analysis/transparent-analysis-ai-development-evaluation-v1.json`. It does not call market-data services, inspect strategy validation or holdout data, or connect AI to the application.
 
 Ten gates are evaluated automatically. The manual-groundedness gate remains pending until every generated explanation in the report is reviewed against its cited facts. A candidate cannot pass or be integrated into the product until that manual gate and all automated gates pass. A failed candidate is rejected; the frozen fixture results must not be used to weaken a gate.
+
+## Development results
+
+The corrected `gemini-3.5-flash-lite` run produced 20 outputs. Only 9/20 passed the full deterministic validator; the candidate passed 7/10 automated gates and was rejected for structured-output validity, novel numeric claims, and prohibited directional language. The model frequently repeated fact IDs inside prose or rewrote exact numeric units, both of which violate the frozen grounding contract.
+
+The stronger `gemini-3.5-flash` candidate produced no output inside the frozen five-second deadline and was also rejected. Its report exposed an evaluator accounting defect: a missing output was not initially counted against the separate state-fidelity and citation-validity percentages. That metric bug was corrected without changing any gate, prompt, fixture, or candidate result. Neither rejected model is authorized for product integration.

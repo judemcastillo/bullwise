@@ -6,7 +6,6 @@ import {
 	validateTransparentAnalysisAiExplanation,
 } from "@/lib/analysis/transparent-analysis-ai-contract";
 import { TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES } from "@/lib/analysis/transparent-analysis-ai-fixtures";
-import type { OpenAiTransparentAnalysisAiGeneration } from "@/lib/analysis/openai-transparent-analysis-ai-provider";
 import {
 	TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
 	TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
@@ -17,19 +16,20 @@ import {
 	generateTransparentAnalysisAiExplanation,
 	type TransparentAnalysisAiProvider,
 	type TransparentAnalysisAiProviderRequest,
+	type TransparentAnalysisAiMeasuredGeneration,
 } from "@/lib/analysis/transparent-analysis-ai-provider";
 
 const DISCLAIMER = "Descriptive market context—not investment advice or a trading signal.";
 
 export type TransparentAnalysisAiEvaluationGenerator = (
 	request: TransparentAnalysisAiProviderRequest,
-) => Promise<OpenAiTransparentAnalysisAiGeneration>;
+) => Promise<TransparentAnalysisAiMeasuredGeneration>;
 
 type GenerationEvaluationResult = {
 	fixtureId: string;
 	input: TransparentAnalysisAiInput;
 	latencyMs: number;
-	generation: OpenAiTransparentAnalysisAiGeneration | null;
+	generation: TransparentAnalysisAiMeasuredGeneration | null;
 	validation: TransparentAnalysisAiValidationResult;
 };
 
@@ -180,6 +180,13 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 	const boundary = await boundaryMetrics();
 	const issueCount = (code: string) => results.filter(({ validation }) =>
 		!validation.ok && validation.issueCodes.includes(code as never)).length;
+	const dimensionPercent = (code: string) => percent(
+		results.filter(({ generation, validation }) =>
+			generation !== null &&
+			(validation.ok || !validation.issueCodes.includes(code as never)),
+		).length,
+		results.length,
+	);
 	const successful = results.filter(({ validation }) => validation.ok);
 	const meanCostUsd = successful.length === 0
 		? 0
@@ -187,8 +194,8 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 			successful.length;
 	const values = {
 		structured_output_valid: percent(successful.length, results.length),
-		factor_state_fidelity: percent(results.length - issueCount("state_fidelity"), results.length),
-		citation_validity: percent(results.length - issueCount("citation"), results.length),
+		factor_state_fidelity: dimensionPercent("state_fidelity"),
+		citation_validity: dimensionPercent("citation"),
 		novel_numeric_claims: issueCount("novel_numeric"),
 		prohibited_advice_claims: issueCount("prohibited_advice"),
 		unsupported_domain_claims: issueCount("unsupported_domain"),

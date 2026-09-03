@@ -25,6 +25,15 @@ export interface TransparentAnalysisAiProvider {
 	generate(request: TransparentAnalysisAiProviderRequest): Promise<unknown>;
 }
 
+export type TransparentAnalysisAiMeasuredGeneration = {
+	output: unknown;
+	usage: {
+		inputTokens: number;
+		outputTokens: number;
+		costUsd: number;
+	};
+};
+
 export type TransparentAnalysisAiGenerationResult =
 	| {
 			kind: "not_requested";

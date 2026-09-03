@@ -3,9 +3,9 @@ import { describe, it } from "node:test";
 import { buildTransparentAnalysisAiInput } from "@/lib/analysis/transparent-analysis-ai-contract";
 import { TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES } from "@/lib/analysis/transparent-analysis-ai-fixtures";
 import {
-	OPENAI_TRANSPARENT_ANALYSIS_AI_CANDIDATES,
-	OpenAiTransparentAnalysisAiProvider,
-} from "@/lib/analysis/openai-transparent-analysis-ai-provider";
+	GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE,
+	GoogleTransparentAnalysisAiProvider,
+} from "@/lib/analysis/google-transparent-analysis-ai-provider";
 import {
 	TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
 	TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
@@ -29,49 +29,45 @@ function request(): TransparentAnalysisAiProviderRequest {
 	};
 }
 
-describe("OpenAI transparent analysis local adapter", () => {
-	it("sends a non-stored strict structured-output request and measures cost", async () => {
+describe("Google transparent analysis local adapter", () => {
+	it("uses only the stable free-tier candidate and a JSON response schema", async () => {
+		let url = "";
 		let sent: Record<string, unknown> | undefined;
-		const candidate = OPENAI_TRANSPARENT_ANALYSIS_AI_CANDIDATES[0];
-		const provider = new OpenAiTransparentAnalysisAiProvider({
+		const provider = new GoogleTransparentAnalysisAiProvider({
 			apiKey: "test-key",
-			candidate,
-			fetchImplementation: async (_url, init) => {
+			fetchImplementation: async (input, init) => {
+				url = String(input);
 				sent = JSON.parse(String(init?.body));
-				return new Response(
-					JSON.stringify({
-						status: "completed",
-						output: [{ type: "message", content: [{ type: "output_text", text: '{"ok":true}' }] }],
-						usage: { input_tokens: 1_000, output_tokens: 500 },
-					}),
-					{ status: 200, headers: { "Content-Type": "application/json" } },
-				);
+				return new Response(JSON.stringify({
+					candidates: [{ content: { parts: [{ text: '{"ok":true}' }] } }],
+					usageMetadata: { promptTokenCount: 1_000, candidatesTokenCount: 500 },
+				}), { status: 200, headers: { "Content-Type": "application/json" } });
 			},
 		});
 
 		const result = await provider.generateForEvaluation(request());
 		assert.deepEqual(result.output, { ok: true });
-		assert.equal(result.usage.costUsd, 0.0008);
-		assert.equal(sent?.model, candidate.model);
-		assert.equal(sent?.store, false);
+		assert.equal(result.usage.costUsd, 0);
+		assert.match(url, new RegExp(GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE.model));
+		assert.doesNotMatch(url, /test-key/);
 		assert.equal(JSON.stringify(sent).includes("uniqueItems"), false);
-		assert.deepEqual(
-			(sent?.text as { format: Record<string, unknown> }).format.strict,
-			true,
+		assert.equal(JSON.stringify(sent).includes('"const"'), false);
+		assert.equal(
+			(sent?.generationConfig as { responseMimeType: string }).responseMimeType,
+			"application/json",
 		);
 	});
 
-	it("returns only sanitized failures", async () => {
-		const provider = new OpenAiTransparentAnalysisAiProvider({
+	it("does not expose a provider response body in failures", async () => {
+		const provider = new GoogleTransparentAnalysisAiProvider({
 			apiKey: "test-key",
-			candidate: OPENAI_TRANSPARENT_ANALYSIS_AI_CANDIDATES[0],
 			fetchImplementation: async () =>
 				new Response("secret provider body", { status: 429 }),
 		});
 		await assert.rejects(
 			provider.generate(request()),
 			(error: Error) =>
-				error.message === "OpenAI request failed" &&
+				error.message === "Gemini request failed (429)" &&
 				!error.message.includes("secret provider body"),
 		);
 	});
