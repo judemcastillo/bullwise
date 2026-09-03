@@ -1326,9 +1326,9 @@
     "semantic_hash": "fa5b2e949522c1ae3f3c24ae370c8fc5"
   },
   "lib/analysis/run-tests.ts": {
-    "mtime": 1788358371.72135,
-    "seen": 1788358435.331336,
-    "ast_hash": "953e41a471a0a0c9f5639c77d97d11b6",
+    "mtime": 1787930070.919942,
+    "seen": 1787930124.7569556,
+    "ast_hash": "8d9c258bbba38f2e4ed9e51fe6d06c6d",
     "semantic_hash": ""
   },
   "lib/analysis/setup-scan-report.test.ts": {
@@ -2298,9 +2298,9 @@
     "semantic_hash": "daad32b4de0b92afe04301ebf0a6cc76"
   },
   "package.json": {
-    "mtime": 1788358371.892454,
-    "seen": 1788358435.3316298,
-    "ast_hash": "69590c926a0d56689439be2c7cf71fe1",
+    "mtime": 1787930071.0840056,
+    "seen": 1787930124.7571623,
+    "ast_hash": "a9cd849b5d45c0f26ab91a4c0b09a777",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -2802,9 +2802,9 @@
     "semantic_hash": "e1a5899ea7e504766310981261b07775"
   },
   "docs/transparent-analysis-telemetry-v1.md": {
-    "mtime": 1788358372.0350404,
-    "seen": 1788358435.3317518,
-    "ast_hash": "6d22a817d6843c22d7fe5b166778df13",
+    "mtime": 1787930071.2240624,
+    "seen": 1787930124.757265,
+    "ast_hash": "68dc5806381a89a5fa0de1b85ac2be17",
     "semantic_hash": ""
   },
   "lib/alerts/email.html": {
@@ -2850,15 +2850,15 @@
     "semantic_hash": "5e7d40de28112eb666b5a5b44d626d38"
   },
   "lib/analysis/transparent-analysis-daily-observation.test.ts": {
-    "mtime": 1788358371.1021168,
-    "seen": 1788358435.3313801,
-    "ast_hash": "4b05b47d10fc239672c1b982cef58288",
+    "mtime": 1787930070.6038244,
+    "seen": 1787930124.7569811,
+    "ast_hash": "44c31f8d9fdee74218ed06486198106a",
     "semantic_hash": ""
   },
   "lib/analysis/transparent-analysis-daily-observation.ts": {
-    "mtime": 1788358370.9432347,
-    "seen": 1788358435.3313828,
-    "ast_hash": "986a75181b13b44b14b3137d1a090b58",
+    "mtime": 1787930070.4397635,
+    "seen": 1787930124.7569826,
+    "ast_hash": "93a9b70848254813098e2c61b35e0dcc",
     "semantic_hash": ""
   },
   "scripts/observe-transparent-analysis.ts": {
@@ -2871,30 +2871,6 @@
     "mtime": 1787647147.6517117,
     "seen": 1787930124.7572665,
     "ast_hash": "8f6e2c9aa38c9caa0af0f8194a2edce5",
-    "semantic_hash": ""
-  },
-  "lib/analysis/transparent-analysis-operational-review.test.ts": {
-    "mtime": 1788358371.4239552,
-    "seen": 1788358435.3313863,
-    "ast_hash": "10dc3b70808c2d1233fa5b0332961f68",
-    "semantic_hash": ""
-  },
-  "lib/analysis/transparent-analysis-operational-review.ts": {
-    "mtime": 1788358371.2772946,
-    "seen": 1788358435.3313882,
-    "ast_hash": "1cec71bdebde0ad2f37ee87848d7871c",
-    "semantic_hash": ""
-  },
-  "scripts/review-transparent-analysis.ts": {
-    "mtime": 1788358371.5787635,
-    "seen": 1788358435.331677,
-    "ast_hash": "101cb9f458988948e8955d067d7125c8",
-    "semantic_hash": ""
-  },
-  "graphify-out/memory/query_20260831_074706_can_you_make_the_terms_and_privacy_to_be_separate.md": {
-    "mtime": 1788162426.7771485,
-    "seen": 1788358435.3317552,
-    "ast_hash": "581e5abeaf493973657d39f262476eb6",
     "semantic_hash": ""
   }
 }

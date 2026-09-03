@@ -1,22 +1,22 @@
-# Graph Report - bullwise  (2026-09-02)
+# Graph Report - bullwise  (2026-08-31)
 
 ## Corpus Check
-- 476 files · ~246,867 words
+- 472 files · ~245,512 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2882 nodes · 6919 edges · 129 communities (121 shown, 8 thin omitted)
+- 2861 nodes · 6878 edges · 128 communities (120 shown, 8 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 83 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f0c33da7`
+- Built from commit: `5ff13290`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - scripts
-- cn
+- input-group.tsx
 - technical-analysis.ts
 - dependencies
 - functions.ts
@@ -25,80 +25,79 @@
 - batch-diagnostics.ts
 - portfolio-backtest.ts
 - communication-policy.ts
-- connectToDatabase
+- technical-analysis.types.ts
 - email-delivery.ts
 - Graphify Pipeline
 - combined-broad-model-runner.ts
-- market-data/finnhub.ts
+- utils.ts
 - types.ts
 - analysis-dataset.ts
 - risk-controlled-momentum-v3-runner.ts
 - combined-broad-train-diagnostic-runner.ts
 - episode-validation.ts
 - types/instruments.ts
-- analysis-dataset.types.ts
-- OnboardingForm.tsx
+- broad-dataset.types.ts
+- market-structure.ts
 - constants.ts
 - backtest.ts
 - combined-broad-strategy-target-audit-runner.ts
 - processor.ts
 - symmetric-regime-strategy-runner.ts
 - cross-sectional-momentum-runner.ts
-- stock-data.ts
+- data/instruments.ts
 - DailyMarketAnalysisCard.tsx
 - combined-broad-episode-dataset.ts
 - global.d.ts
 - compilerOptions
-- backtest.types.ts
+- scan-analysis-setups.ts
 - combined-broad-strategy-redesign-runner.ts
 - transparent-analysis-panel.ts
 - email-suppression.ts
 - unsubscribe-token.ts
-- SearchCommand.tsx
+- cn
 - UserDropdown.tsx
-- setup-scan.ts
+- analysis/run-tests.ts
 - onboarding/service.ts
 - boosted-model.ts
 - equity-catalog.ts
 - devDependencies
 - baseline-model.ts
-- access-policy.ts
-- analysis/run-tests.ts
-- AnalysisDatasetRow
-- baseline-model.types.ts
+- require-user.ts
+- transparent-analysis-daily-observation.ts
+- training-diagnostics.ts
+- market-data/service.ts
 - backtest-daily-swing-batch.ts
 - watchlist.ts
 - components.json
-- v3-confirmation.ts
+- transparent-analysis-service.ts
 - transparent-analysis-orchestrator.ts
-- finnhub-equity.ts
+- mongoose.ts
 - broad-dataset.ts
 - auth.actions.ts
 - NotificationsForm.tsx
-- DailySwingAnalysisDataset
+- analysis-dataset.types.ts
 - combined-broad-fold-dataset.types.ts
 - objective-features.ts
-- risk-controlled-momentum-v3-history.ts
+- risk-controlled-momentum-v2-universe.ts
 - crypto-catalog.ts
 - us-equity-session.ts
-- require-user.ts
-- writeLargeJsonObjectWithArray
-- MarketBar
-- email-rendering.ts
+- requireUser
+- analysis-dataset.test.ts
+- MarketBars
+- index.ts
 - episode-validation.test.ts
-- diagnose-analysis-broad-combined-train.ts
+- combined-broad-train-diagnostic-runner.test.ts
 - fetch-backtest-history.ts
-- utils.ts
+- DashboardWatchlist.tsx
 - sync-instrument-catalog.ts
-- data/instruments.ts
-- v2-confirmation.ts
+- transparent-analysis-telemetry.test.ts
+- watchlist-policy.test.ts
 - WatchlistButton.tsx
-- email-client-compatibility.test.ts
+- TradingViewWidget.tsx
 - migrate-communication-preferences.ts
-- content-safety.ts
-- Q: Can you make the terms and privacy to be separate pages
+- email-rendering.ts
+- backtest.test.ts
 - risk-controlled-momentum-v2-history.ts
-- backtest-daily-swing-portfolio.ts
 - watchlist/page.tsx
 - alerts/run-tests.ts
 - combined-broad-model-features.ts
@@ -108,13 +107,13 @@
 - CountryList
 - AlertDialogs.tsx
 - Daily Swing Episode Model v1 Preregistration
-- market-news-delivery-log.ts
+- connectToDatabase
 - risk-controlled-momentum-v3-report.test.ts
 - risk-controlled-momentum-v3-development.ts
 - risk-controlled-momentum-v3-source.ts
 - email-template.test.ts
 - smoke-transparent-analysis.ts
-- alert-event.model.ts
+- instruments/run-tests.ts
 - package.json
 - Signalist Financial Dashboard
 - Daily Swing Combined Train Diagnostics v1
@@ -144,7 +143,7 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 94 edges
-2. `scripts` - 65 edges
+2. `scripts` - 64 edges
 3. `connectToDatabase()` - 50 edges
 4. `MarketBars` - 40 edges
 5. `DailySwingAnalysisDataset` - 22 edges
@@ -181,19 +180,19 @@
 - **Outcome-Blind Broad Dataset Pipeline** — docs_daily_swing_broad_development_v1_outcome_blind_liquidity_policy, docs_daily_swing_broad_development_v2_sample_coverage_expansion, docs_daily_swing_broad_combined_dataset_v3_label_blind_combination, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 - **Sealed Research Evidence Safeguards** — _agents_skills_bullwise_analysis_research_holdout_safeguards, docs_daily_swing_backtesting_episode_first_one_shot_validation, docs_daily_swing_broad_dataset_v2_split_and_sealed_test_policy, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 
-## Communities (129 total, 8 thin omitted)
+## Communities (128 total, 8 thin omitted)
 
 ### Community 0 - "scripts"
 Cohesion: 0.03
-Nodes (65): scripts, audit:analysis-broad-combined-strategy-target, audit:backtest-providers, backtest:daily-swing, backtest:daily-swing-batch, backtest:daily-swing-portfolio, backtest:daily-swing-v2-holdout, backtest:daily-swing-v3-holdout (+57 more)
+Nodes (64): scripts, audit:analysis-broad-combined-strategy-target, audit:backtest-providers, backtest:daily-swing, backtest:daily-swing-batch, backtest:daily-swing-portfolio, backtest:daily-swing-v2-holdout, backtest:daily-swing-v3-holdout (+56 more)
 
-### Community 1 - "cn"
-Cohesion: 0.12
-Nodes (28): Avatar(), AvatarBadge(), AvatarFallback(), AvatarGroup(), AvatarGroupCount(), AvatarImage(), Checkbox(), InputGroup() (+20 more)
+### Community 1 - "input-group.tsx"
+Cohesion: 0.21
+Nodes (10): InputGroup(), InputGroupAddon(), inputGroupAddonVariants, InputGroupButton(), inputGroupButtonVariants, InputGroupInput(), InputGroupText(), InputGroupTextarea() (+2 more)
 
 ### Community 2 - "technical-analysis.ts"
-Cohesion: 0.05
-Nodes (72): momentumReturn(), analyzeDailySwingV2(), applyDailySwingV2Rules(), DAILY_SWING_V2_RULES, plan(), readyResult(), annualizedRealizedVolatility(), averageTrueRangeSeries() (+64 more)
+Cohesion: 0.10
+Nodes (39): annualizedRealizedVolatility(), averageTrueRangeSeries(), exponentialMovingAverageSeries(), macdSeries(), NumericBar, parseMarketBar(), percentageReturn(), relativeStrengthIndexSeries() (+31 more)
 
 ### Community 3 - "dependencies"
 Cohesion: 0.04
@@ -201,31 +200,31 @@ Nodes (47): @base-ui/react, better-auth, class-variance-authority, clsx, cmdk, c
 
 ### Community 4 - "functions.ts"
 Cohesion: 0.11
-Nodes (36): { GET, POST, PUT }, deliverAlertEmailOutbox(), BetterAuthUser, getVerifiedMarketNewsRecipient(), listMarketNewsRecipientIdsPage(), MarketNewsRecipientPage, PreferenceUserId, EmailEligibilityResult (+28 more)
+Nodes (34): { GET, POST, PUT }, deliverAlertEmailOutbox(), BetterAuthUser, listMarketNewsRecipientIdsPage(), MarketNewsRecipientPage, PreferenceUserId, createMarketNewsDeliveryEvents(), deliveryFrequencies (+26 more)
 
 ### Community 5 - "user-alerts.ts"
-Cohesion: 0.13
-Nodes (28): AlertDetailsDialogState(), actionError(), deleteAlertAction(), sendTestAlertEmailAction(), setAlertStatusAction(), updateAlertAction(), deliverSpecificAlertEmail(), requireCompletedUser() (+20 more)
+Cohesion: 0.14
+Nodes (27): AlertDetailsDialogState(), actionError(), deleteAlertAction(), sendTestAlertEmailAction(), setAlertStatusAction(), updateAlertAction(), deliverSpecificAlertEmail(), requireCompletedUser() (+19 more)
 
 ### Community 6 - "transparent-analysis-telemetry.ts"
-Cohesion: 0.05
-Nodes (59): dynamic, GET(), runtime, DAILY_CANDIDATES, increment(), incrementStringArray(), isRecordedDate(), isValidInstrumentRequest() (+51 more)
+Cohesion: 0.13
+Nodes (18): TransparentAnalysisOrchestrationResult, handleTransparentAnalysisRequest(), json(), PRIVATE_JSON_HEADERS, unavailableResponse, TransparentAnalysisRouteDependencies, buildTransparentAnalysisRequestTelemetry(), historyBars() (+10 more)
 
 ### Community 7 - "batch-diagnostics.ts"
-Cohesion: 0.16
-Nodes (17): BacktestTradeExitReason, runDailySwingBatchBacktest(), average(), buildDailySwingBatchDiagnostics(), diagnosticTradeMetrics(), FrictionScenarioReports, GroupDefinition, groups() (+9 more)
+Cohesion: 0.10
+Nodes (27): DailySwingBacktestDependencies, BacktestTradeExitReason, DailySwingBacktestReport, aggregateSummary(), average(), DailySwingBatchBacktestInput, instrumentSummary(), median() (+19 more)
 
 ### Community 8 - "portfolio-backtest.ts"
-Cohesion: 0.12
-Nodes (18): activeAtOpen(), activeOpeningExposure(), Candidate, DEFAULT_CONFIGURATION, descendingNullable(), finitePositive(), latestMark(), PortfolioBacktestInput (+10 more)
+Cohesion: 0.08
+Nodes (30): activeAtOpen(), activeOpeningExposure(), Candidate, DEFAULT_CONFIGURATION, descendingNullable(), finitePositive(), latestMark(), PortfolioBacktestInput (+22 more)
 
 ### Community 9 - "communication-policy.ts"
 Cohesion: 0.08
-Nodes (36): CommunicationPreferenceDocument, communicationPreferenceSchema, emailSubscriptionSchema, emailSuppressionSchema, subscriptionsValidationError(), validSubscriptions(), COMMUNICATION_POLICY_VERSION, COMMUNICATION_PREFERENCE_SCHEMA_VERSION (+28 more)
+Nodes (41): CommunicationPreferenceDocument, communicationPreferenceSchema, emailSubscriptionSchema, emailSuppressionSchema, subscriptionsValidationError(), validSubscriptions(), updateMarketNewsPreference(), COMMUNICATION_POLICY_VERSION (+33 more)
 
-### Community 10 - "connectToDatabase"
-Cohesion: 0.14
-Nodes (19): NotificationSettingsPage(), NotificationsForm(), preferenceKey(), runMigration(), connectToDatabase(), updateMarketNewsPreference(), BetterAuthUser, getEmailEligibility() (+11 more)
+### Community 10 - "technical-analysis.types.ts"
+Cohesion: 0.10
+Nodes (23): analyzeDailySwingV2(), applyDailySwingV2Rules(), DAILY_SWING_V2_RULES, plan(), readyResult(), plan(), result(), AnalysisDataQuality (+15 more)
 
 ### Community 11 - "email-delivery.ts"
 Cohesion: 0.10
@@ -239,21 +238,21 @@ Nodes (39): Bullwise Analysis Research, Holdout Safeguards, Graphify Pipeline, H
 Cohesion: 0.18
 Nodes (21): compareClassificationToConstantBaseline(), evaluateClassificationMetrics(), fitBaselineLinearModel(), linearPrediction(), predictBaselineProbabilities(), sigmoid(), DailySwingCombinedBroadFoldPartitionId, average() (+13 more)
 
-### Community 14 - "market-data/finnhub.ts"
-Cohesion: 0.20
-Nodes (15): POPULAR_STOCK_SYMBOLS, articleKey(), buildFinnhubUrl(), fetchArticleList(), FinnhubCompanyProfile, getGeneralNews(), getNews(), isRawNewsArticle() (+7 more)
+### Community 14 - "utils.ts"
+Cohesion: 0.11
+Nodes (19): WatchlistNews(), WatchlistNewsSection(), POPULAR_STOCK_SYMBOLS, articleKey(), buildFinnhubUrl(), fetchArticleList(), FinnhubCompanyProfile, getGeneralNews() (+11 more)
 
 ### Community 15 - "types.ts"
-Cohesion: 0.05
-Nodes (49): FakeProvider, invertBars(), invertPositiveDecimal(), invertQuote(), marketStateForCalendar(), normalizeMarketNumber(), AlpacaBar, AlpacaBarsPayload (+41 more)
+Cohesion: 0.08
+Nodes (27): AlpacaBar, AlpacaBarsPayload, AlpacaBarsProvider, AlpacaBarsProviderOptions, parseBar(), validateRequest(), INTERVALS, MassiveAggregate (+19 more)
 
 ### Community 16 - "analysis-dataset.ts"
-Cohesion: 0.09
-Nodes (30): buildDailySwingAnalysisDataset(), BuildDatasetInput, CandidateRow, collectRows(), DatasetOutcomeReport, DEFAULT_ANALYSIS_DATASET_SPLIT_RATIOS, features(), FROZEN_CONFIRMATION_SYMBOLS (+22 more)
+Cohesion: 0.14
+Nodes (21): buildDailySwingAnalysisDataset(), BuildDatasetInput, CandidateRow, collectRows(), DatasetOutcomeReport, DEFAULT_ANALYSIS_DATASET_SPLIT_RATIOS, features(), normalizedSymbols() (+13 more)
 
 ### Community 17 - "risk-controlled-momentum-v3-runner.ts"
-Cohesion: 0.13
-Nodes (36): addTurnover(), candidateAt(), Costs, EquityPoint, evaluateGates(), executeTargets(), formationBars(), median() (+28 more)
+Cohesion: 0.14
+Nodes (34): addTurnover(), candidateAt(), Costs, EquityPoint, evaluateGates(), executeTargets(), formationBars(), median() (+26 more)
 
 ### Community 18 - "combined-broad-train-diagnostic-runner.ts"
 Cohesion: 0.17
@@ -264,52 +263,52 @@ Cohesion: 0.15
 Nodes (24): DAILY_SWING_EPISODE_DATASET_VERSION, DailySwingEpisodeTrainingDataset, EpisodeTrainingRow, EpisodeTrainingTarget, preregisterDailySwingEpisodeExperiment(), sha256(), DAILY_SWING_EPISODE_EXPERIMENT_FROZEN_SHA256, DAILY_SWING_EPISODE_EXPERIMENT_ID (+16 more)
 
 ### Community 20 - "types/instruments.ts"
-Cohesion: 0.09
-Nodes (40): applyChanges, EquityInstrument, listingKey(), run(), INSTRUMENT_TYPES_BY_ASSET_CLASS, InstrumentContract, instrumentContractSchema, InstrumentItem (+32 more)
+Cohesion: 0.08
+Nodes (45): ASSET_FILTERS, SearchCommand(), SECURITY_TYPE_FILTERS, INSTRUMENT_TYPES_BY_ASSET_CLASS, InstrumentContract, instrumentContractSchema, InstrumentItem, instrumentSchema (+37 more)
 
-### Community 21 - "analysis-dataset.types.ts"
-Cohesion: 0.09
-Nodes (35): AnalysisDatasetLabels, AnalysisDatasetSplitRatios, DAILY_SWING_ANALYSIS_DATASET_VERSION, BacktestSignalQuality, DAILY_SWING_BROAD_DATASET_VERSION, DailySwingBroadDataset, DailySwingBroadDatasetRow, buildDailySwingBroadEpisodeDataset() (+27 more)
+### Community 21 - "broad-dataset.types.ts"
+Cohesion: 0.16
+Nodes (23): AnalysisDatasetLabels, DAILY_SWING_BROAD_DATASET_VERSION, DAILY_SWING_BROAD_SPLIT_BOUNDARIES, DAILY_SWING_BROAD_WALK_FORWARD_FOLDS, DailySwingBroadDataset, DailySwingBroadDatasetRow, DailySwingBroadFeatureVector, buildDailySwingBroadEpisodeDataset() (+15 more)
 
-### Community 22 - "OnboardingForm.tsx"
-Cohesion: 0.13
-Nodes (19): CountrySelectField(), MultiSelectField(), defaultValues, OnboardingForm(), stepFields, stepLabels, SelectField(), PreferencesForm() (+11 more)
+### Community 22 - "market-structure.ts"
+Cohesion: 0.25
+Nodes (9): addRangeBoundary(), clusterLevels(), DerivedMarketStructure, deriveMarketStructure(), findPivots(), InternalPriceLevel, LevelSource, toPublicLevel() (+1 more)
 
 ### Community 23 - "constants.ts"
-Cohesion: 0.10
-Nodes (23): Home(), MARKET_SUMMARY_WIDGET_CONFIG, StockAlertButton(), DASHBOARD_TOP_STORIES_WIDGET_CONFIG, DashboardNews(), InstrumentDashboard(), InstrumentDashboardProps, TradingViewWidget() (+15 more)
+Cohesion: 0.07
+Nodes (37): Home(), MARKET_SUMMARY_WIDGET_CONFIG, StockAlertButton(), DASHBOARD_TOP_STORIES_WIDGET_CONFIG, DashboardNews(), CountrySelectField(), MultiSelectField(), defaultValues (+29 more)
 
 ### Community 24 - "backtest.ts"
 Cohesion: 0.07
-Nodes (44): applySlippage(), buildBacktestSignalFeatures(), buyAndHoldReturn(), calculateBaselines(), entryBasePrice(), groupMetrics(), isStopTouched(), isTargetTouched() (+36 more)
+Nodes (48): applySlippage(), buildBacktestSignalFeatures(), buyAndHoldReturn(), calculateBaselines(), DEFAULT_BACKTEST_CONFIGURATION, entryBasePrice(), groupMetrics(), isStopTouched() (+40 more)
 
 ### Community 25 - "combined-broad-strategy-target-audit-runner.ts"
-Cohesion: 0.12
-Nodes (25): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+17 more)
+Cohesion: 0.13
+Nodes (23): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+15 more)
 
 ### Community 26 - "processor.ts"
 Cohesion: 0.09
-Nodes (32): AlertEvaluationInput, AlertEvaluationReason, AlertEvaluationResult, buildOneTimeAlertDedupeKey(), comparePriceValues(), DEFAULT_MAX_QUOTE_AGE_MS, evaluatePriceAlert(), ParsedDecimal (+24 more)
+Nodes (29): AlertEvaluationInput, AlertEvaluationReason, AlertEvaluationResult, buildOneTimeAlertDedupeKey(), comparePriceValues(), DEFAULT_MAX_QUOTE_AGE_MS, evaluatePriceAlert(), ParsedDecimal (+21 more)
 
 ### Community 27 - "symmetric-regime-strategy-runner.ts"
-Cohesion: 0.11
-Nodes (29): DailySwingBroadCandidateRow, scanDailySwingSetupBatch(), DailySwingInstrumentSetupScan, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_ID, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_PROTOCOL, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_VERSION, assertFrozenConfiguration(), buildDailySwingSymmetricCandidateRows() (+21 more)
+Cohesion: 0.10
+Nodes (30): BacktestTrade, DailySwingBroadCandidateRow, scanDailySwingSetupBatch(), readFrozenSymmetricTrainHistory(), DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_ID, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_PROTOCOL, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_VERSION, assertFrozenConfiguration() (+22 more)
 
 ### Community 28 - "cross-sectional-momentum-runner.ts"
-Cohesion: 0.07
-Nodes (52): DEFAULT_BACKTEST_CONFIGURATION, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_ID, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_PROTOCOL, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_VERSION, writeMomentumDevelopmentReport(), Costs, EquityPoint, evaluateMomentumDevelopmentGates() (+44 more)
+Cohesion: 0.10
+Nodes (37): ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_ID, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_PROTOCOL, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_VERSION, writeMomentumDevelopmentReport(), Costs, EquityPoint, evaluateMomentumDevelopmentGates(), executeTargets() (+29 more)
 
-### Community 29 - "stock-data.ts"
-Cohesion: 0.18
-Nodes (16): DashboardProfileData, DashboardQuoteData, getListedSecurityQuoteDetails, getStockMetrics, getStockProfile, getStockQuote, getStocksDetails, normalizeSymbol() (+8 more)
+### Community 29 - "data/instruments.ts"
+Cohesion: 0.13
+Nodes (22): InstrumentResolutionError, isDuplicateKeyError(), normalizeFinnhubSymbol(), resolveFinnhubEquityCatalogInstrument(), resolveFinnhubEquityInstrument(), DashboardProfileData, DashboardQuoteData, fetchStockData() (+14 more)
 
 ### Community 30 - "DailyMarketAnalysisCard.tsx"
 Cohesion: 0.11
-Nodes (24): analysisEndpointForInstrument(), AnalysisLoadState, AvailableAnalysis(), DailyMarketAnalysisCard(), DailyMarketAnalysisCardProps, DailyMarketAnalysisError(), DailyMarketAnalysisLoading(), DailyMarketAnalysisView() (+16 more)
+Nodes (23): analysisEndpointForInstrument(), AnalysisLoadState, AvailableAnalysis(), DailyMarketAnalysisCard(), DailyMarketAnalysisCardProps, DailyMarketAnalysisError(), DailyMarketAnalysisLoading(), DailyMarketAnalysisView() (+15 more)
 
 ### Community 31 - "combined-broad-episode-dataset.ts"
 Cohesion: 0.10
-Nodes (34): AnalysisDatasetSplit, DAILY_SWING_BROAD_WALK_FORWARD_FOLDS, DailySwingBroadFeatureVector, DailySwingCombinedBroadDataset, DailySwingCombinedBroadDatasetRow, buildDailySwingCombinedBroadEpisodeDataset(), finiteUtility(), requireSource() (+26 more)
+Nodes (34): AnalysisDatasetSplitSummary, DailySwingBroadWalkForwardFold, DAILY_SWING_COMBINED_BROAD_DATASET_VERSION, DAILY_SWING_COMBINED_BROAD_UNIVERSE_NAME, DailySwingCombinedBroadDataset, DailySwingCombinedBroadDatasetRow, DailySwingCombinedBroadSourceScan, buildDailySwingCombinedBroadEpisodeDataset() (+26 more)
 
 ### Community 32 - "global.d.ts"
 Cohesion: 0.07
@@ -319,9 +318,9 @@ Nodes (29): Alert, AlertData, AlertModalProps, AlertsListProps, CountrySelectPro
 Cohesion: 0.07
 Nodes (28): dom, dom.iterable, esnext, **/*.mts, .next/dev/types/**/*.ts, next-env.d.ts, .next/types/**/*.ts, node_modules (+20 more)
 
-### Community 34 - "backtest.types.ts"
-Cohesion: 0.10
-Nodes (27): DailySwingBacktestDependencies, BacktestConfiguration, BacktestTrade, BacktestTradeMark, DailySwingBacktestInput, DailySwingBacktestReport, SameBarPolicy, UntriggeredSetup (+19 more)
+### Community 34 - "scan-analysis-setups.ts"
+Cohesion: 0.21
+Nodes (12): writeDailySwingSetupScanReport(), writeLargeJsonObjectWithArray(), writeText(), main(), main(), option(), parseInput(), parseMarketBars() (+4 more)
 
 ### Community 35 - "combined-broad-strategy-redesign-runner.ts"
 Cohesion: 0.10
@@ -329,199 +328,195 @@ Nodes (29): DAILY_SWING_COMBINED_BROAD_STRATEGY_REDESIGN_ID, DAILY_SWING_COMBINE
 
 ### Community 36 - "transparent-analysis-panel.ts"
 Cohesion: 0.10
-Nodes (31): AnalysisState, TechnicalAnalysisUnavailableReason, TechnicalAnalysisUnavailableResult, analysisPanelContext(), APPROVED_WARNING_MAP, approvedWarnings(), BuildAnalysisPanelInput, buildAnalysisPanelResponse() (+23 more)
+Nodes (31): AnalysisState, TechnicalAnalysisReadyResult, TechnicalAnalysisUnavailableReason, analysisPanelContext(), APPROVED_WARNING_MAP, approvedWarnings(), BuildAnalysisPanelInput, buildAnalysisPanelResponse() (+23 more)
 
 ### Community 37 - "email-suppression.ts"
-Cohesion: 0.15
-Nodes (22): POST(), BetterAuthUser, capturePermanentSmtpFailure(), EmailSuppressionRecordResult, findUserIdByEmail(), lowerPriorityReasons, recordEmailSuppressionByEmail(), createEmailEventWebhookSignature() (+14 more)
+Cohesion: 0.18
+Nodes (20): POST(), BetterAuthUser, capturePermanentSmtpFailure(), EmailSuppressionRecordResult, findUserIdByEmail(), lowerPriorityReasons, recordEmailSuppressionByEmail(), createEmailEventWebhookSignature() (+12 more)
 
 ### Community 38 - "unsubscribe-token.ts"
 Cohesion: 0.16
 Nodes (20): POST(), unsubscribeFromDailyNews(), UnsubscribePage(), unsubscribeFromMarketNews(), addUtcMonths(), assertSigningSecret(), createDailyNewsUnsubscribeToken(), createDailyNewsUnsubscribeUrls() (+12 more)
 
-### Community 39 - "SearchCommand.tsx"
-Cohesion: 0.12
-Nodes (19): CountrySelect(), CountrySelectProps, ASSET_FILTERS, SECURITY_TYPE_FILTERS, Command(), CommandDialog(), CommandEmpty(), CommandGroup() (+11 more)
+### Community 39 - "cn"
+Cohesion: 0.09
+Nodes (34): CountrySelect(), CountrySelectProps, Checkbox(), Command(), CommandDialog(), CommandEmpty(), CommandGroup(), CommandInput() (+26 more)
 
 ### Community 40 - "UserDropdown.tsx"
-Cohesion: 0.11
-Nodes (17): Header(), HeaderNavigation(), NavItems(), DropdownMenu(), DropdownMenuCheckboxItem(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuLabel() (+9 more)
+Cohesion: 0.10
+Nodes (21): NavItems(), Avatar(), AvatarBadge(), AvatarFallback(), AvatarGroup(), AvatarGroupCount(), AvatarImage(), DropdownMenu() (+13 more)
 
-### Community 41 - "setup-scan.ts"
+### Community 41 - "analysis/run-tests.ts"
 Cohesion: 0.11
-Nodes (28): DAILY_SWING_BACKTEST_VERSION, BROAD_DEVELOPMENT_CATEGORIES, BROAD_DEVELOPMENT_DATA_POLICY, BROAD_DEVELOPMENT_LIQUIDITY_POLICY, BROAD_DEVELOPMENT_SYMBOLS, BROAD_DEVELOPMENT_UNIVERSE_NAME, BROAD_DEVELOPMENT_UNIVERSE_VERSION, BroadDevelopmentCoverageEvaluation (+20 more)
+Nodes (28): FROZEN_CONFIRMATION_SYMBOLS, BROAD_DEVELOPMENT_CATEGORIES, BROAD_DEVELOPMENT_DATA_POLICY, BROAD_DEVELOPMENT_LIQUIDITY_POLICY, BROAD_DEVELOPMENT_UNIVERSE_VERSION, BroadDevelopmentCoverageEvaluation, BroadDevelopmentCoverageSnapshot, evaluateBroadDevelopmentCoverage() (+20 more)
 
 ### Community 42 - "onboarding/service.ts"
-Cohesion: 0.11
-Nodes (26): saveOnboardingProgress(), requireVerifiedUser(), allowedInvestmentExperiences, allowedInvestmentGoals, allowedPreferredIndustries, allowedPreferredMarkets, allowedRiskTolerances, CompleteOnboardingResult (+18 more)
+Cohesion: 0.12
+Nodes (23): allowedInvestmentExperiences, allowedInvestmentGoals, allowedPreferredIndustries, allowedPreferredMarkets, allowedRiskTolerances, CompleteOnboardingResult, completeOnboardingWorkflow(), createOnboardingDefaults() (+15 more)
 
 ### Community 43 - "boosted-model.ts"
-Cohesion: 0.15
-Nodes (19): binaryTarget(), BOOSTED_DEVELOPMENT_THRESHOLDS, BOOSTED_TRAINING_CONFIGURATION, CandidateThresholds, fitStump(), minimum(), rawPredictions(), sigmoid() (+11 more)
+Cohesion: 0.14
+Nodes (20): ClassificationMetrics, binaryTarget(), BOOSTED_DEVELOPMENT_THRESHOLDS, BOOSTED_TRAINING_CONFIGURATION, CandidateThresholds, fitStump(), minimum(), rawPredictions() (+12 more)
 
 ### Community 44 - "equity-catalog.ts"
-Cohesion: 0.14
-Nodes (24): formatInstrumentType(), WatchlistInstrumentDetails(), applyChanges, EquityInstrument, listingKey(), run(), typeCounts(), entryKey() (+16 more)
+Cohesion: 0.12
+Nodes (26): formatInstrumentType(), WatchlistInstrumentDetails(), WatchlistTable(), applyChanges, EquityInstrument, listingKey(), run(), typeCounts() (+18 more)
 
 ### Community 45 - "devDependencies"
 Cohesion: 0.08
 Nodes (25): eslint, eslint-config-next, @next/env, devDependencies, eslint, eslint-config-next, @next/env, tailwindcss (+17 more)
 
 ### Community 46 - "baseline-model.ts"
-Cohesion: 0.16
-Nodes (18): auc(), BASELINE_TRAINING_CONFIGURATION, binaryTarget(), CATEGORICAL_FEATURES, compareRegressionToConstantBaseline(), encodeBaselineFeatureRows(), EncodedBaselineRows, evaluateRegressionMetrics() (+10 more)
+Cohesion: 0.09
+Nodes (30): auc(), BASELINE_TRAINING_CONFIGURATION, binaryTarget(), CATEGORICAL_FEATURES, compareRegressionToConstantBaseline(), encodeBaselineFeatureRows(), EncodedBaselineRows, evaluateRegressionMetrics() (+22 more)
 
-### Community 47 - "access-policy.ts"
-Cohesion: 0.23
-Nodes (8): AccessControlError, assertCompletedUser(), assertVerifiedUser(), AuthenticatedUser, AuthenticationError, EmailVerificationRequiredError, OnboardingRequiredError, verifiedUser
+### Community 47 - "require-user.ts"
+Cohesion: 0.18
+Nodes (13): OnboardingForm(), PreferencesForm(), completeOnboarding(), saveOnboardingProgress(), AccessControlError, assertCompletedUser(), assertVerifiedUser(), AuthenticatedUser (+5 more)
 
-### Community 48 - "analysis/run-tests.ts"
-Cohesion: 0.15
-Nodes (14): ORIGINAL_DEVELOPMENT_SYMBOLS, RISK_CONTROLLED_MOMENTUM_V2_DEVELOPMENT_ID, RISK_CONTROLLED_MOMENTUM_V2_DEVELOPMENT_VERSION, RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL, Candidate, Exchange, RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256, RISK_CONTROLLED_MOMENTUM_V2_EXCLUDED_SYMBOLS (+6 more)
-
-### Community 49 - "AnalysisDatasetRow"
+### Community 48 - "transparent-analysis-daily-observation.ts"
 Cohesion: 0.22
-Nodes (11): AnalysisDatasetRow, dataset(), features(), row(), featureVector(), nonlinearDataset(), row(), BASE_FEATURES (+3 more)
+Nodes (15): DAILY_CANDIDATES, increment(), isRecordedDate(), isValidInstrumentRequest(), StoredTelemetryLine, summarizeTransparentAnalysisObservation(), TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS, TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_REQUESTS (+7 more)
 
-### Community 50 - "baseline-model.types.ts"
-Cohesion: 0.16
-Nodes (13): BaselineFeatureEncoder, BaselineLinearModel, BaselineTrainingConfiguration, CategoricalFeatureTransform, ClassificationMetrics, DAILY_SWING_BASELINE_MODEL_VERSION, DailySwingBaselineModelReport, NumericFeatureTransform (+5 more)
+### Community 49 - "training-diagnostics.ts"
+Cohesion: 0.14
+Nodes (20): DAILY_SWING_ANALYSIS_DATASET_VERSION, ACTIONABLE_SUCCESS_R_THRESHOLD, buildEpisodes(), diagnoseDailySwingTrainingData(), Episode, finiteR(), percentile(), repeatSimilarity() (+12 more)
+
+### Community 50 - "market-data/service.ts"
+Cohesion: 0.09
+Nodes (24): FakeProvider, getFinnhubApiKey(), invertBars(), invertPositiveDecimal(), invertQuote(), marketStateForCalendar(), normalizeMarketNumber(), FinnhubQuotePayload (+16 more)
 
 ### Community 51 - "backtest-daily-swing-batch.ts"
-Cohesion: 0.33
-Nodes (10): main(), metric(), option(), parseInput(), parseMarketBars(), printGroups(), SerializedBatchInput, SerializedMarketBar (+2 more)
+Cohesion: 0.14
+Nodes (20): runDailySwingBatchDiagnosticBacktest(), DailySwingBatchDiagnosticReport, withFriction(), DAILY_SWING_V2_CONFIRMATION_ID, DAILY_SWING_V2_CONFIRMATION_THRESHOLDS, DailySwingV2Confirmation, evaluateDailySwingV2Confirmation(), maximum() (+12 more)
 
 ### Community 52 - "watchlist.ts"
-Cohesion: 0.13
-Nodes (29): WatchlistContent(), mapWithConcurrency(), addToCurrentUserWatchlist(), enrichWatchlistItems(), getCurrentUserId(), getPaginatedWatchlistWithData(), getWatchlistSymbolsForUser(), getWatchlistWithData() (+21 more)
+Cohesion: 0.22
+Nodes (17): mapWithConcurrency(), addToCurrentUserWatchlist(), enrichWatchlistItems(), getCurrentUserId(), getPaginatedWatchlistWithData(), getWatchlistSymbolsForUser(), getWatchlistWithData(), isDuplicateKeyError() (+9 more)
 
 ### Community 53 - "components.json"
 Cohesion: 0.09
 Nodes (21): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+13 more)
 
-### Community 54 - "v3-confirmation.ts"
-Cohesion: 0.23
-Nodes (10): DailySwingBatchDiagnosticReport, DailySwingPortfolioBacktestReport, DAILY_SWING_V3_CONFIRMATION_ID, DAILY_SWING_V3_CONFIRMATION_THRESHOLDS, DailySwingV3Confirmation, evaluateDailySwingV3Confirmation(), maximum(), minimum() (+2 more)
+### Community 54 - "transparent-analysis-service.ts"
+Cohesion: 0.24
+Nodes (13): dynamic, GET(), runtime, orchestrateTransparentAnalysis(), response(), getMarketDataService(), getTransparentAnalysisPanel(), toAnalysisInstrument() (+5 more)
 
 ### Community 55 - "transparent-analysis-orchestrator.ts"
 Cohesion: 0.18
-Nodes (19): AnalysisCatalogInstrument, classifyTransparentAnalysisOperationalFailure(), hasEnabledBarsBinding(), isEligibleBenchmark(), isEligibleTarget(), loadBenchmarkBars(), orchestrateTransparentAnalysis(), reportFailure() (+11 more)
+Nodes (17): AnalysisCatalogInstrument, classifyTransparentAnalysisOperationalFailure(), hasEnabledBarsBinding(), isEligibleBenchmark(), isEligibleTarget(), loadBenchmarkBars(), reportFailure(), benchmarkInstrument() (+9 more)
 
-### Community 56 - "finnhub-equity.ts"
-Cohesion: 0.15
-Nodes (15): applyChanges, FinnhubProfile, getFinnhubProfile(), isDuplicateKeyError(), LEGACY_WATCHLIST_FILTER, LegacyWatchlistRow, runMigration(), WatchlistItem (+7 more)
+### Community 56 - "mongoose.ts"
+Cohesion: 0.12
+Nodes (19): runMigration(), applyChanges, FinnhubProfile, getFinnhubProfile(), isDuplicateKeyError(), LEGACY_WATCHLIST_FILTER, LegacyWatchlistRow, runMigration() (+11 more)
 
 ### Community 57 - "broad-dataset.ts"
-Cohesion: 0.08
-Nodes (46): AnalysisDatasetSplitSummary, BacktestSignalFeatures, applyDailySwingBroadSplitPolicy(), BASE_NULLABLE_FEATURES, baseFeatures(), buildDailySwingBroadDataset(), buildWalkForwardFolds(), collectDailySwingBroadRows() (+38 more)
+Cohesion: 0.06
+Nodes (58): BacktestSignalFeatures, DAILY_SWING_BACKTEST_VERSION, UntriggeredSetup, applyDailySwingBroadSplitPolicy(), BASE_NULLABLE_FEATURES, baseFeatures(), buildDailySwingBroadDataset(), buildWalkForwardFolds() (+50 more)
 
 ### Community 58 - "auth.actions.ts"
 Cohesion: 0.05
 Nodes (51): handler(), SignInPage(), SignUpPage(), VerifyEmailPage(), AuthDivider(), AuthFormError(), FooterLink(), GoogleAuthButton() (+43 more)
 
 ### Community 59 - "NotificationsForm.tsx"
-Cohesion: 0.18
-Nodes (14): InputField(), categoryLabels, frequencyOptions, Label(), Select(), SelectContent(), SelectGroup(), SelectItem() (+6 more)
+Cohesion: 0.16
+Nodes (17): InputField(), categoryLabels, frequencyOptions, NotificationsForm(), preferenceKey(), Label(), Select(), SelectContent() (+9 more)
 
-### Community 60 - "DailySwingAnalysisDataset"
-Cohesion: 0.24
-Nodes (12): DailySwingAnalysisDataset, buildDailySwingEpisodeTrainingDataset(), finiteR(), selectEpisodeFirstRows(), features(), row(), sealedRow(), SHA (+4 more)
+### Community 60 - "analysis-dataset.types.ts"
+Cohesion: 0.16
+Nodes (21): AnalysisDatasetFeatureVector, AnalysisDatasetRow, AnalysisDatasetSplit, DailySwingAnalysisDataset, dataset(), features(), row(), featureVector() (+13 more)
 
 ### Community 61 - "combined-broad-fold-dataset.types.ts"
 Cohesion: 0.17
 Nodes (12): DAILY_SWING_COMBINED_BROAD_FINAL_EPISODE_SHA256, DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_SHA256, DAILY_SWING_COMBINED_BROAD_FOLD_DATASET_VERSION, DAILY_SWING_COMBINED_BROAD_FOLD_INVENTORY, DailySwingCombinedBroadFoldDataset, CombinedBroadCandidateReport, CombinedBroadDevelopmentActuals, evaluateCombinedBroadDevelopmentGates() (+4 more)
 
 ### Community 62 - "objective-features.ts"
-Cohesion: 0.17
-Nodes (15): parseMarketBar(), buildDailySwingObjectiveFeatures(), BuildDailySwingObjectiveFeaturesInput, median(), nearestLevel(), parseBars(), percentileRank(), positiveDollarVolumes() (+7 more)
-
-### Community 63 - "risk-controlled-momentum-v3-history.ts"
 Cohesion: 0.23
-Nodes (15): RISK_CONTROLLED_MOMENTUM_V2_EXCLUSION_SHA256, buildRiskControlledMomentumV3HistoryArtifact(), RISK_CONTROLLED_MOMENTUM_V3_HISTORY_POLICY, RISK_CONTROLLED_MOMENTUM_V3_HISTORY_VERSION, serializeBar(), serializeMarketData(), serializeRiskControlledMomentumV3HistoryArtifact(), bars() (+7 more)
+Nodes (12): buildDailySwingObjectiveFeatures(), BuildDailySwingObjectiveFeaturesInput, median(), nearestLevel(), parseBars(), percentileRank(), positiveDollarVolumes(), positiveVolumes() (+4 more)
+
+### Community 63 - "risk-controlled-momentum-v2-universe.ts"
+Cohesion: 0.12
+Nodes (27): ORIGINAL_DEVELOPMENT_SYMBOLS, assertRiskControlledMomentumV2ManifestIntegrity(), Candidate, Exchange, RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256, RISK_CONTROLLED_MOMENTUM_V2_EXCLUDED_SYMBOLS, RISK_CONTROLLED_MOMENTUM_V2_INCEPTION_CUTOFF, RISK_CONTROLLED_MOMENTUM_V2_METADATA_VERIFIED_AT (+19 more)
 
 ### Community 64 - "crypto-catalog.ts"
-Cohesion: 0.12
-Nodes (18): CryptoCatalogEntry, currency(), normalizeFinnhubCoinbaseCatalogEntry(), normalizeMassiveCryptoCatalogEntry(), pairKey(), reconcileCoinbaseCryptoCatalogs(), ForexCatalogEntry, pairKey() (+10 more)
+Cohesion: 0.24
+Nodes (10): CryptoCatalogEntry, currency(), normalizeFinnhubCoinbaseCatalogEntry(), normalizeMassiveCryptoCatalogEntry(), pairKey(), reconcileCoinbaseCryptoCatalogs(), usesUsd(), isTradingViewCoinbaseSpotSymbolAvailable() (+2 more)
 
 ### Community 65 - "us-equity-session.ts"
 Cohesion: 0.16
 Nodes (18): CLOSED_SESSION_DATES, dateKey(), EARLY_CLOSE_SESSION_DATES, isSupported(), isWeekend(), LocalDate, LocalDateTime, NEW_YORK_PARTS (+10 more)
 
-### Community 66 - "require-user.ts"
-Cohesion: 0.35
-Nodes (8): Layout(), OnboardingPage(), Layout(), PreferencesSettingsPage(), getRequestSession, requireUser(), getOnboardingProfile(), hasCompletedOnboarding
+### Community 66 - "requireUser"
+Cohesion: 0.18
+Nodes (13): Layout(), OnboardingPage(), InstrumentPage(), Layout(), PreferencesSettingsPage(), Header(), HeaderNavigation(), getRequestSession (+5 more)
 
-### Community 67 - "writeLargeJsonObjectWithArray"
-Cohesion: 0.31
-Nodes (7): writeDailySwingSetupScanReport(), writeLargeJsonObjectWithArray(), writeText(), DailySwingSetupScanReport, main(), main(), main()
+### Community 67 - "analysis-dataset.test.ts"
+Cohesion: 0.27
+Nodes (8): at(), developmentReport(), FIRST_SIGNAL, instrumentReport(), SIGNAL_FEATURES, SIGNAL_QUALITY, trade(), untriggered()
 
-### Community 68 - "MarketBar"
+### Community 68 - "MarketBars"
+Cohesion: 0.15
+Nodes (16): auditProviderSeries(), BacktestProviderAuditReport, buildProviderAuditReport(), dateKey(), median(), percentile(), ProviderSeriesAudit, THRESHOLDS (+8 more)
+
+### Community 69 - "index.ts"
 Cohesion: 0.16
-Nodes (15): auditProviderSeries(), BacktestProviderAuditReport, buildProviderAuditReport(), dateKey(), median(), percentile(), ProviderSeriesAudit, THRESHOLDS (+7 more)
-
-### Community 69 - "email-rendering.ts"
-Cohesion: 0.19
-Nodes (19): getEmailEligibilityByEmail(), requireSafeEmailUrl(), EmailBranding, getApplicationBaseUrl(), getEmailBranding(), getMarketingEmailBranding(), MarketingEmailBranding, ENV_KEYS (+11 more)
+Nodes (17): BetterAuthUser, getEmailEligibilityByEmail(), getPreference(), EmailEligibilityRequest, EmailEligibilityResult, EmailBranding, getApplicationBaseUrl(), getEmailBranding() (+9 more)
 
 ### Community 70 - "episode-validation.test.ts"
 Cohesion: 0.31
 Nodes (8): evaluate(), features(), fixture(), PREREGISTRATION_SHA, row(), sealRows(), SOURCE_SHA, TRAINING_SHA
 
-### Community 71 - "diagnose-analysis-broad-combined-train.ts"
-Cohesion: 0.36
-Nodes (5): DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_VERSION, main(), readFrozen()
+### Community 71 - "combined-broad-train-diagnostic-runner.test.ts"
+Cohesion: 0.27
+Nodes (7): run(), syntheticDataset(), DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_ID, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_PROTOCOL, DAILY_SWING_COMBINED_BROAD_TRAIN_DIAGNOSTIC_VERSION, main(), readFrozen()
 
 ### Community 72 - "fetch-backtest-history.ts"
 Cohesion: 0.46
 Nodes (7): dateArgument(), ensureWritableDestination(), fetchBars(), main(), option(), requireSymbol(), serializeBars()
 
-### Community 73 - "utils.ts"
-Cohesion: 0.13
-Nodes (9): DashboardWatchlist(), DashboardWatchlistItem, StockLogo(), StockLogoProps, ScrollArea(), ScrollBar(), formatCurrencyValue(), getFormattedTodayDate() (+1 more)
+### Community 73 - "DashboardWatchlist.tsx"
+Cohesion: 0.27
+Nodes (7): DashboardWatchlist(), DashboardWatchlistItem, StockLogo(), StockLogoProps, ScrollArea(), ScrollBar(), formatCurrencyValue()
 
 ### Community 74 - "sync-instrument-catalog.ts"
-Cohesion: 0.13
-Nodes (31): applyChanges, bindingKey(), deactivateOnly, ExistingInstrument, matchingExistingInstruments(), normalizeCatalog(), omittedInstrumentFields(), OPTIONAL_INSTRUMENT_FIELDS (+23 more)
+Cohesion: 0.10
+Nodes (38): applyChanges, bindingKey(), deactivateOnly, ExistingInstrument, matchingExistingInstruments(), normalizeCatalog(), omittedInstrumentFields(), OPTIONAL_INSTRUMENT_FIELDS (+30 more)
 
-### Community 75 - "data/instruments.ts"
+### Community 75 - "transparent-analysis-telemetry.test.ts"
 Cohesion: 0.31
-Nodes (8): InstrumentPage(), getInstrumentByCanonicalKey(), InstrumentResolutionError, isDuplicateKeyError(), normalizeFinnhubSymbol(), resolveFinnhubEquityCatalogInstrument(), resolveFinnhubEquityInstrument(), getWatchlistInstrumentIdsForUser()
+Nodes (5): AnalysisPanelAvailableResponse, appendTransparentAnalysisLocalTelemetry(), TRANSPARENT_ANALYSIS_LOCAL_TELEMETRY_PATH, transparentAnalysisLocalTelemetryPath(), transparentAnalysisDurationBucket
 
-### Community 76 - "v2-confirmation.ts"
-Cohesion: 0.27
-Nodes (7): DAILY_SWING_V2_CONFIRMATION_ID, DAILY_SWING_V2_CONFIRMATION_THRESHOLDS, DailySwingV2Confirmation, evaluateDailySwingV2Confirmation(), maximum(), minimum(), V2ConfirmationCriterion
+### Community 76 - "watchlist-policy.test.ts"
+Cohesion: 0.52
+Nodes (5): hasWatchlistCapacity(), paginateWatchlist(), parseRequestedPage(), WATCHLIST_MAX_ITEMS, WATCHLIST_PAGE_SIZE
 
 ### Community 77 - "WatchlistButton.tsx"
 Cohesion: 0.73
 Nodes (4): WatchlistButton(), addToWatchlist(), removeFromWatchlist(), revalidateWatchlistViews()
 
-### Community 78 - "email-client-compatibility.test.ts"
-Cohesion: 0.20
-Nodes (5): createAlertJob(), emailBranding, EmailFixture, marketingEmailBranding, RenderedEmail
+### Community 78 - "TradingViewWidget.tsx"
+Cohesion: 0.60
+Nodes (3): TradingViewWidget(), TradingViewWidgetProps, useTradingViewWidget()
 
 ### Community 79 - "migrate-communication-preferences.ts"
 Cohesion: 0.29
 Nodes (8): applyChanges, MigrationSummary, runMigration(), CommunicationPreferenceSnapshot, createLegacyCommunicationPreferenceSeed(), LegacyCommunicationPreferenceSeed, LegacyUserProfileEmailPreference, migratedAt
 
-### Community 80 - "content-safety.ts"
-Cohesion: 0.26
-Nodes (14): dashboardUrl(), formatPrice(), formatTimestamp(), renderAlertEmail(), controlledTag(), escapeHtml(), PARAGRAPH_ATTRIBUTES, parseSafeHttpUrl() (+6 more)
+### Community 80 - "email-rendering.ts"
+Cohesion: 0.12
+Nodes (26): dashboardUrl(), formatPrice(), formatTimestamp(), renderAlertEmail(), controlledTag(), escapeHtml(), PARAGRAPH_ATTRIBUTES, parseSafeHttpUrl() (+18 more)
 
-### Community 81 - "Q: Can you make the terms and privacy to be separate pages"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Can you make the terms and privacy to be separate pages, Source Nodes
+### Community 81 - "backtest.test.ts"
+Cohesion: 0.24
+Nodes (6): bar(), historicalBars(), longPlan(), SIGNAL_AT, simulate(), DailySwingAnalysisInput
 
 ### Community 82 - "risk-controlled-momentum-v2-history.ts"
-Cohesion: 0.25
-Nodes (15): buildRiskControlledMomentumV2HistoryArtifact(), RISK_CONTROLLED_MOMENTUM_V2_HISTORY_POLICY, RISK_CONTROLLED_MOMENTUM_V2_HISTORY_VERSION, serializeBar(), serializeMarketData(), serializeRiskControlledMomentumV2HistoryArtifact(), bars(), fixture() (+7 more)
-
-### Community 83 - "backtest-daily-swing-portfolio.ts"
-Cohesion: 1.00
-Nodes (3): main(), numericOption(), option()
+Cohesion: 0.19
+Nodes (17): RISK_CONTROLLED_MOMENTUM_V2_DEVELOPMENT_ID, RISK_CONTROLLED_MOMENTUM_V2_DEVELOPMENT_VERSION, RISK_CONTROLLED_MOMENTUM_V2_PROTOCOL, buildRiskControlledMomentumV2HistoryArtifact(), RISK_CONTROLLED_MOMENTUM_V2_HISTORY_POLICY, RISK_CONTROLLED_MOMENTUM_V2_HISTORY_VERSION, serializeBar(), serializeMarketData() (+9 more)
 
 ### Community 84 - "watchlist/page.tsx"
-Cohesion: 0.17
-Nodes (11): WatchlistSearchParams, SearchCommand(), WatchlistAlerts(), WatchlistNews(), WatchlistNewsLoading(), WatchlistNewsSection(), WatchlistPageLoading(), WatchlistPagination() (+3 more)
+Cohesion: 0.22
+Nodes (8): WatchlistContent(), WatchlistSearchParams, WatchlistAlerts(), WatchlistNewsLoading(), WatchlistPageLoading(), WatchlistPagination(), WatchlistSearch(), getFinnhubWatchlistNewsSymbol()
 
 ### Community 85 - "alerts/run-tests.ts"
 Cohesion: 0.19
@@ -548,24 +543,24 @@ Cohesion: 0.13
 Nodes (4): CountryList, CountryMap, CountryOption, react-select-country-list
 
 ### Community 91 - "AlertDialogs.tsx"
-Cohesion: 0.14
-Nodes (19): AlertDetailsDialog(), AlertDetailsDialogProps, CreateAlertDialog(), CreateAlertDialogProps, CreateAlertDialogState(), instrumentKey(), suggestedThreshold(), Button() (+11 more)
+Cohesion: 0.24
+Nodes (12): AlertDetailsDialog(), AlertDetailsDialogProps, CreateAlertDialog(), CreateAlertDialogProps, CreateAlertDialogState(), instrumentKey(), suggestedThreshold(), Button() (+4 more)
 
 ### Community 92 - "Daily Swing Episode Model v1 Preregistration"
 Cohesion: 0.15
 Nodes (14): 5,000-Episode Coverage Gate, Daily Swing Broad Episode Training v1, Episode-First Selection, Walk-Forward Model Selection, Daily Swing Episode Model v1 Preregistration, Episode Actionable Logistic Model, Independent Episode Split Policy, Rejected Episode Validation Result (+6 more)
 
-### Community 95 - "market-news-delivery-log.ts"
-Cohesion: 0.18
-Nodes (10): MarketNewsDeliveryLogDocument, marketNewsDeliveryLogSchema, MarketNewsDeliveryStatus, ActiveMarketNewsDeliveryLease, claimMarketNewsDelivery(), completeMarketNewsDelivery(), failMarketNewsDelivery(), isDuplicateKeyError() (+2 more)
+### Community 95 - "connectToDatabase"
+Cohesion: 0.12
+Nodes (20): NotificationSettingsPage(), MarketNewsDeliveryLogDocument, marketNewsDeliveryLogSchema, MarketNewsDeliveryStatus, connectToDatabase(), getVerifiedMarketNewsRecipient(), getEmailEligibility(), getLegacyDailyNewsEmailPreference() (+12 more)
 
 ### Community 97 - "risk-controlled-momentum-v3-development.ts"
 Cohesion: 0.32
 Nodes (8): assertRiskControlledMomentumV3IsOpen(), RISK_CONTROLLED_MOMENTUM_V3_CLOSURE, RISK_CONTROLLED_MOMENTUM_V3_CLOSURE_STATUS, RISK_CONTROLLED_MOMENTUM_V3_CLOSURE_VERSION, RISK_CONTROLLED_MOMENTUM_V3_DEVELOPMENT_ID, RISK_CONTROLLED_MOMENTUM_V3_DEVELOPMENT_VERSION, RISK_CONTROLLED_MOMENTUM_V3_PROTOCOL, main()
 
 ### Community 98 - "risk-controlled-momentum-v3-source.ts"
-Cohesion: 0.44
-Nodes (9): bar(), JsonObject, marketBars(), object(), parseRiskControlledMomentumV3HistoryArtifact(), positive(), readRegisteredRiskControlledMomentumV3History(), string() (+1 more)
+Cohesion: 0.33
+Nodes (11): RiskControlledMomentumBenchmarkHistory, RiskControlledMomentumSleeveId, bar(), JsonObject, marketBars(), object(), parseRiskControlledMomentumV3HistoryArtifact(), positive() (+3 more)
 
 ### Community 99 - "email-template.test.ts"
 Cohesion: 0.29
@@ -575,9 +570,9 @@ Nodes (10): NEWS_SUMMARY_EMAIL_PROMPT, PERSONALIZED_WELCOME_EMAIL_PROMPT, TRADIN
 Cohesion: 0.33
 Nodes (9): transparentAnalysisHistoryQuery(), AnalysisPanelResponse, buildTransparentAnalysisSmokeFailure(), buildTransparentAnalysisSmokeSummary(), TRANSPARENT_ANALYSIS_SMOKE_VERSION, TransparentAnalysisSmokeFailure, TransparentAnalysisSmokeSummary, validateTransparentAnalysisSmokeArguments() (+1 more)
 
-### Community 101 - "alert-event.model.ts"
-Cohesion: 0.16
-Nodes (13): applyChanges, EquityInstrument, run(), AlertEventItem, alertEventSchema, EmailDeliveryStatus, AlertItem, alertSchema (+5 more)
+### Community 101 - "instruments/run-tests.ts"
+Cohesion: 0.10
+Nodes (16): applyChanges, EquityInstrument, run(), AlertEventItem, alertEventSchema, EmailDeliveryStatus, AlertItem, alertSchema (+8 more)
 
 ### Community 104 - "package.json"
 Cohesion: 0.20
@@ -656,24 +651,24 @@ Cohesion: 1.00
 Nodes (3): Bull and Rising Market Chart Motif, Bull Wise Email Logo, Bull Wise Wordmark
 
 ## Knowledge Gaps
-- **651 isolated node(s):** `metadata`, `sections`, `metadata`, `sections`, `MARKET_SUMMARY_WIDGET_CONFIG` (+646 more)
+- **646 isolated node(s):** `metadata`, `sections`, `metadata`, `sections`, `MARKET_SUMMARY_WIDGET_CONFIG` (+641 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `connectToDatabase()` connect `connectToDatabase` to `require-user.ts`, `auth.actions.ts`, `user-alerts.ts`, `transparent-analysis-telemetry.ts`, `functions.ts`, `email-rendering.ts`, `email-suppression.ts`, `onboarding/service.ts`, `email-delivery.ts`, `data/instruments.ts`, `types/instruments.ts`, `watchlist.ts`, `OnboardingForm.tsx`, `processor.ts`, `market-news-delivery-log.ts`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `AssetClass` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.ts`, `user-alerts.ts`, `SearchCommand.tsx`, `sync-instrument-catalog.ts`, `types.ts`, `watchlist.ts`, `processor.ts`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
-- **Why does `EquitySecurityType` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.ts`, `SearchCommand.tsx`, `fetch-backtest-history.ts`, `equity-catalog.ts`, `watchlist.ts`, `transparent-analysis-orchestrator.ts`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `connectToDatabase()` connect `connectToDatabase` to `requireUser`, `auth.actions.ts`, `instruments/run-tests.ts`, `user-alerts.ts`, `functions.ts`, `index.ts`, `email-suppression.ts`, `communication-policy.ts`, `email-delivery.ts`, `require-user.ts`, `types/instruments.ts`, `watchlist.ts`, `transparent-analysis-service.ts`, `mongoose.ts`, `processor.ts`, `data/instruments.ts`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Why does `AssetClass` connect `types/instruments.ts` to `global.d.ts`, `user-alerts.ts`, `technical-analysis.types.ts`, `sync-instrument-catalog.ts`, `types.ts`, `market-data/service.ts`, `watchlist.ts`, `processor.ts`?**
+  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `EquitySecurityType` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.ts`, `fetch-backtest-history.ts`, `technical-analysis.types.ts`, `equity-catalog.ts`, `watchlist.ts`, `transparent-analysis-orchestrator.ts`?**
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **What connects `metadata`, `sections`, `metadata` to the rest of the system?**
-  _651 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _646 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `scripts` be split into smaller, more focused modules?**
-  _Cohesion score 0.03076923076923077 - nodes in this community are weakly interconnected._
-- **Should `cn` be split into smaller, more focused modules?**
-  _Cohesion score 0.12100840336134454 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.03125 - nodes in this community are weakly interconnected._
 - **Should `technical-analysis.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.04794007490636704 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10338164251207729 - nodes in this community are weakly interconnected._
+- **Should `dependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
