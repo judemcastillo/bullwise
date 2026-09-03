@@ -9,6 +9,7 @@ import "./transparent-analysis-operational-review.test";
 import "./transparent-analysis-ai-contract.test";
 import "./transparent-analysis-ai-provider.test";
 import "./google-transparent-analysis-ai-provider.test";
+import "./transparent-analysis-ai-provider-reliability.test";
 import "./transparent-analysis-ai-evaluation.test";
 import "./transparent-analysis-ai-content-evaluation-v1-2.test";
 import "./transparent-analysis-ai-latency-observation.test";

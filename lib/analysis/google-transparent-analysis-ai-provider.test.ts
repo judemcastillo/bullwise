@@ -5,6 +5,7 @@ import { TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES } from "@/lib/analysis/tran
 import {
 	GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE,
 	GoogleTransparentAnalysisAiProvider,
+	GoogleTransparentAnalysisAiProviderError,
 } from "@/lib/analysis/google-transparent-analysis-ai-provider";
 import {
 	TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
@@ -66,9 +67,38 @@ describe("Google transparent analysis local adapter", () => {
 		});
 		await assert.rejects(
 			provider.generate(request()),
-			(error: Error) =>
+			(error: GoogleTransparentAnalysisAiProviderError) =>
+				error instanceof GoogleTransparentAnalysisAiProviderError &&
 				error.message === "Gemini request failed (429)" &&
+				error.category === "rate_limited" &&
+				error.httpStatus === 429 &&
 				!error.message.includes("secret provider body"),
+		);
+	});
+
+	it("classifies transport and response-shape failures without raw details", async () => {
+		const transport = new GoogleTransparentAnalysisAiProvider({
+			apiKey: "test-key",
+			fetchImplementation: async () => { throw new TypeError("secret network detail"); },
+		});
+		await assert.rejects(
+			transport.generate(request()),
+			(error: GoogleTransparentAnalysisAiProviderError) =>
+				error.category === "transport_error" &&
+				!error.message.includes("secret network detail"),
+		);
+
+		const missingOutput = new GoogleTransparentAnalysisAiProvider({
+			apiKey: "test-key",
+			fetchImplementation: async () => new Response("{}", {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			}),
+		});
+		await assert.rejects(
+			missingOutput.generate(request()),
+			(error: GoogleTransparentAnalysisAiProviderError) =>
+				error.category === "missing_output",
 		);
 	});
 });

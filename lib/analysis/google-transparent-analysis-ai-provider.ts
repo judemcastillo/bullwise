@@ -26,6 +26,35 @@ type GeminiResponse = {
 	};
 };
 
+export type GoogleTransparentAnalysisAiProviderFailureCategory =
+	| "transport_error"
+	| "rate_limited"
+	| "authentication_error"
+	| "server_error"
+	| "other_http_error"
+	| "response_not_json"
+	| "missing_output"
+	| "output_not_json";
+
+export class GoogleTransparentAnalysisAiProviderError extends Error {
+	readonly category: GoogleTransparentAnalysisAiProviderFailureCategory;
+	readonly httpStatus: number | null;
+	readonly retryAfterSeconds: number | null;
+
+	constructor(input: {
+		message: string;
+		category: GoogleTransparentAnalysisAiProviderFailureCategory;
+		httpStatus?: number;
+		retryAfterSeconds?: number;
+	}) {
+		super(input.message);
+		this.name = "GoogleTransparentAnalysisAiProviderError";
+		this.category = input.category;
+		this.httpStatus = input.httpStatus ?? null;
+		this.retryAfterSeconds = input.retryAfterSeconds ?? null;
+	}
+}
+
 const UNSUPPORTED_SCHEMA_KEYS = new Set([
 	"uniqueItems",
 	"minLength",
@@ -61,6 +90,24 @@ function tokenCount(value: unknown): number {
 		: 0;
 }
 
+function httpFailureCategory(
+	status: number,
+): GoogleTransparentAnalysisAiProviderFailureCategory {
+	if (status === 429) return "rate_limited";
+	if (status === 401 || status === 403) return "authentication_error";
+	if (status >= 500) return "server_error";
+	return "other_http_error";
+}
+
+function retryAfterSeconds(response: Response): number | undefined {
+	const value = response.headers.get("retry-after");
+	if (!value || !/^\d+$/.test(value)) return undefined;
+	const seconds = Number(value);
+	return Number.isSafeInteger(seconds) && seconds >= 0 && seconds <= 86_400
+		? seconds
+		: undefined;
+}
+
 export class GoogleTransparentAnalysisAiProvider
 	implements TransparentAnalysisAiProvider
 {
@@ -83,49 +130,75 @@ export class GoogleTransparentAnalysisAiProvider
 	async generateForEvaluation(
 		request: TransparentAnalysisAiProviderRequest,
 	): Promise<TransparentAnalysisAiMeasuredGeneration> {
-		const response = await this.fetchImplementation(
-			`https://generativelanguage.googleapis.com/v1beta/models/${GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE.model}:generateContent`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"x-goog-api-key": this.apiKey,
-				},
-				body: JSON.stringify({
-					systemInstruction: {
-						parts: [{ text: request.systemPrompt }],
+		let response: Response;
+		try {
+			response = await this.fetchImplementation(
+				`https://generativelanguage.googleapis.com/v1beta/models/${GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE.model}:generateContent`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"x-goog-api-key": this.apiKey,
 					},
-					contents: [
-						{
-							role: "user",
-							parts: [{ text: JSON.stringify(request.input) }],
+					body: JSON.stringify({
+						systemInstruction: {
+							parts: [{ text: request.systemPrompt }],
 						},
-					],
-					generationConfig: {
-						responseMimeType: "application/json",
-						responseJsonSchema: geminiCompatibleSchema(request.outputSchema),
-						maxOutputTokens: 2_000,
-					},
-				}),
-				signal: request.signal,
-			},
-		);
-		if (!response.ok) throw new Error(`Gemini request failed (${response.status})`);
+						contents: [
+							{
+								role: "user",
+								parts: [{ text: JSON.stringify(request.input) }],
+							},
+						],
+						generationConfig: {
+							responseMimeType: "application/json",
+							responseJsonSchema: geminiCompatibleSchema(request.outputSchema),
+							maxOutputTokens: 2_000,
+						},
+					}),
+					signal: request.signal,
+				},
+			);
+		} catch {
+			throw new GoogleTransparentAnalysisAiProviderError({
+				message: "Gemini request transport failed",
+				category: "transport_error",
+			});
+		}
+		if (!response.ok) {
+			throw new GoogleTransparentAnalysisAiProviderError({
+				message: `Gemini request failed (${response.status})`,
+				category: httpFailureCategory(response.status),
+				httpStatus: response.status,
+				retryAfterSeconds: retryAfterSeconds(response),
+			});
+		}
 
 		let body: GeminiResponse;
 		try {
 			body = (await response.json()) as GeminiResponse;
 		} catch {
-			throw new Error("Gemini response was not JSON");
+			throw new GoogleTransparentAnalysisAiProviderError({
+				message: "Gemini response was not JSON",
+				category: "response_not_json",
+			});
 		}
 		const text = outputText(body);
-		if (!text) throw new Error("Gemini response contained no output text");
+		if (!text) {
+			throw new GoogleTransparentAnalysisAiProviderError({
+				message: "Gemini response contained no output text",
+				category: "missing_output",
+			});
+		}
 
 		let output: unknown;
 		try {
 			output = JSON.parse(text);
 		} catch {
-			throw new Error("Gemini output text was not JSON");
+			throw new GoogleTransparentAnalysisAiProviderError({
+				message: "Gemini output text was not JSON",
+				category: "output_not_json",
+			});
 		}
 		const inputTokens = tokenCount(body.usageMetadata?.promptTokenCount);
 		const outputTokens = tokenCount(body.usageMetadata?.candidatesTokenCount);

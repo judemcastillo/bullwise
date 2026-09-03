@@ -49,6 +49,7 @@
 		"evaluate:transparent-analysis-ai-candidate": "node --import tsx scripts/evaluate-transparent-analysis-ai-candidate.ts",
 		"evaluate:transparent-analysis-ai-content-v1-2": "node --import tsx scripts/evaluate-transparent-analysis-ai-content-v1-2.ts",
 		"observe:transparent-analysis-ai-latency": "node --import tsx scripts/observe-transparent-analysis-ai-latency.ts",
+		"observe:transparent-analysis-ai-provider-reliability": "node --import tsx scripts/observe-transparent-analysis-ai-provider-reliability.ts",
 		"export:analysis-dataset": "node --import tsx scripts/export-analysis-dataset.ts",
 		"train:analysis-baselines": "node --import tsx scripts/train-analysis-baselines.ts",
 		"train:analysis-boosted": "node --import tsx scripts/train-analysis-boosted.ts",
