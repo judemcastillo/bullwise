@@ -7,6 +7,7 @@ import "./transparent-analysis-smoke.test";
 import "./transparent-analysis-daily-observation.test";
 import "./transparent-analysis-operational-review.test";
 import "./transparent-analysis-ai-contract.test";
+import "./transparent-analysis-ai-provider.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";

@@ -1,6 +1,6 @@
 # Transparent analysis AI explanation v1 preregistration
 
-Status: contract frozen; provider integration not authorized
+Status: contract, prompt, provider boundary, and synthetic fixtures frozen; external provider integration not authorized
 
 Recorded: 2026-09-03
 
@@ -28,7 +28,7 @@ The model never receives raw bars, levels or prices outside approved evidence, p
 
 ## Frozen output boundary
 
-The model must return strict structured JSON containing:
+The provider request includes the frozen strict JSON schema exported as `TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA`. The model must return structured JSON containing:
 
 - version `1.0.0`;
 - the unchanged deterministic context label;
@@ -80,4 +80,8 @@ All eleven gates are mandatory. Model or prompt selection may use development fi
 
 ## Authorized next step
 
-This preregistration authorizes only synthetic fixtures, a provider abstraction, a frozen prompt, local development evaluation, and deterministic fallback tests. It does not authorize production model calls, AI trading signals, backtests, model training on market outcomes, portfolio advice, or order execution.
+The frozen system prompt is version `1.0.0` and is checksum-bound in `lib/analysis/transparent-analysis-ai-prompt.ts`. The vendor-neutral interface and fail-safe runner are in `lib/analysis/transparent-analysis-ai-provider.ts`. Exactly 32 synthetic scenarios are frozen in `lib/analysis/transparent-analysis-ai-fixtures.ts`, covering the context matrix, factor states, partial data, conflicting and numeric evidence, unavailable inputs, provider failure, and eight adversarial-output classes.
+
+The runner never calls a provider for unavailable analysis. Provider exceptions and invalid output return the original deterministic panel with a closed fallback reason and no raw error or partial AI prose.
+
+This preregistration now authorizes selecting candidate providers and models, implementing local-only adapters, and running the frozen development evaluation. It does not authorize production model calls, AI trading signals, backtests, model training on market outcomes, portfolio advice, or order execution.
