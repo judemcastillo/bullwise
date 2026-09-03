@@ -36,5 +36,6 @@ export const TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_2_PROTOCOL = {
 	systemPrompt: TRANSPARENT_ANALYSIS_AI_CONTENT_PROMPT_V1_2,
 	outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
 	gates: TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_2_GATES,
+	contentDenominator: "all_requests",
 	requestSignal: () => new AbortController().signal,
 } satisfies TransparentAnalysisAiEvaluationProtocol;

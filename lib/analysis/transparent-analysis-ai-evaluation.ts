@@ -26,13 +26,23 @@ export type TransparentAnalysisAiEvaluationGenerator = (
 	request: TransparentAnalysisAiProviderRequest,
 ) => Promise<TransparentAnalysisAiMeasuredGeneration>;
 
+export type TransparentAnalysisAiEvaluationGate = {
+	id:
+		| (typeof TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES)[number]["id"]
+		| "provider_completion";
+	comparison: "=" | "<=" | ">=";
+	threshold: number;
+	unit: "percent" | "count" | "milliseconds" | "usd_cents";
+};
+
 export type TransparentAnalysisAiEvaluationProtocol = {
 	version: string;
 	promptVersion: string;
 	promptSha256: string;
 	systemPrompt: string;
 	outputSchema: Record<string, unknown>;
-	gates: readonly (typeof TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES)[number][];
+	gates: readonly TransparentAnalysisAiEvaluationGate[];
+	contentDenominator: "all_requests" | "provider_completed";
 	requestSignal: () => AbortSignal;
 };
 
@@ -51,6 +61,7 @@ const DEFAULT_PROTOCOL: TransparentAnalysisAiEvaluationProtocol = {
 	systemPrompt: TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT,
 	outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
 	gates: TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES,
+	contentDenominator: "all_requests",
 	requestSignal: () => AbortSignal.timeout(5_000),
 };
 
@@ -204,22 +215,26 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 	}
 
 	const boundary = await boundaryMetrics();
-	const issueCount = (code: string) => results.filter(({ validation }) =>
+	const completed = results.filter(({ generation }) => generation !== null);
+	const contentResults = protocol.contentDenominator === "provider_completed"
+		? completed
+		: results;
+	const issueCount = (code: string) => contentResults.filter(({ validation }) =>
 		!validation.ok && validation.issueCodes.includes(code as never)).length;
 	const dimensionPercent = (code: string) => percent(
-		results.filter(({ generation, validation }) =>
+		contentResults.filter(({ generation, validation }) =>
 			generation !== null &&
 			(validation.ok || !validation.issueCodes.includes(code as never)),
 		).length,
-		results.length,
+		contentResults.length,
 	);
-	const successful = results.filter(({ validation }) => validation.ok);
+	const successful = contentResults.filter(({ validation }) => validation.ok);
 	const meanCostUsd = successful.length === 0
 		? 0
 		: successful.reduce((sum, result) => sum + result.generation!.usage.costUsd, 0) /
 			successful.length;
 	const values = {
-		structured_output_valid: percent(successful.length, results.length),
+		structured_output_valid: percent(successful.length, contentResults.length),
 		factor_state_fidelity: dimensionPercent("state_fidelity"),
 		citation_validity: dimensionPercent("citation"),
 		novel_numeric_claims: issueCount("novel_numeric"),
@@ -230,6 +245,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		manual_groundedness: null,
 		generation_p95_latency: p95(results.map(({ latencyMs }) => latencyMs)),
 		mean_generation_cost: meanCostUsd * 100,
+		provider_completion: percent(completed.length, results.length),
 	} as const;
 	const gates = protocol.gates.map((gate) => {
 		const value = values[gate.id];
@@ -237,7 +253,9 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 			? null
 			: gate.comparison === "="
 				? value === gate.threshold
-				: value <= gate.threshold;
+				: gate.comparison === "<="
+					? value <= gate.threshold
+					: value >= gate.threshold;
 		return { ...gate, value, passed };
 	});
 	const automatedPassed = gates.filter(({ passed }) => passed === true).length;
@@ -256,6 +274,9 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		gates,
 		observations: {
 			generationP95LatencyMs: values.generation_p95_latency,
+			providerCompleted: completed.length,
+			providerFailed: results.length - completed.length,
+			providerCompletionPercent: values.provider_completion,
 		},
 		manualReview: results.map(({ fixtureId, input: modelInput, generation, validation }) => ({
 			fixtureId,
