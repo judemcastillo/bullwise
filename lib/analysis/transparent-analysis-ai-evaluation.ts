@@ -26,6 +26,16 @@ export type TransparentAnalysisAiEvaluationGenerator = (
 	request: TransparentAnalysisAiProviderRequest,
 ) => Promise<TransparentAnalysisAiMeasuredGeneration>;
 
+export type TransparentAnalysisAiEvaluationProtocol = {
+	version: string;
+	promptVersion: string;
+	promptSha256: string;
+	systemPrompt: string;
+	outputSchema: Record<string, unknown>;
+	gates: readonly (typeof TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES)[number][];
+	requestSignal: () => AbortSignal;
+};
+
 type GenerationEvaluationResult = {
 	fixtureId: string;
 	input: TransparentAnalysisAiInput;
@@ -34,14 +44,27 @@ type GenerationEvaluationResult = {
 	validation: TransparentAnalysisAiValidationResult;
 };
 
-function providerRequest(input: TransparentAnalysisAiInput) {
+const DEFAULT_PROTOCOL: TransparentAnalysisAiEvaluationProtocol = {
+	version: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
+	promptVersion: TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
+	promptSha256: TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
+	systemPrompt: TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT,
+	outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
+	gates: TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES,
+	requestSignal: () => AbortSignal.timeout(5_000),
+};
+
+function providerRequest(
+	input: TransparentAnalysisAiInput,
+	protocol: TransparentAnalysisAiEvaluationProtocol,
+) {
 	return {
-		promptVersion: TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
-		promptSha256: TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
-		systemPrompt: TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT,
-		outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
+		promptVersion: protocol.promptVersion,
+		promptSha256: protocol.promptSha256,
+		systemPrompt: protocol.systemPrompt,
+		outputSchema: protocol.outputSchema,
 		input,
-		signal: AbortSignal.timeout(5_000),
+		signal: protocol.requestSignal(),
 	} satisfies TransparentAnalysisAiProviderRequest;
 }
 
@@ -150,7 +173,9 @@ function p95(values: number[]) {
 export async function evaluateTransparentAnalysisAiCandidate(input: {
 	model: string;
 	generate: TransparentAnalysisAiEvaluationGenerator;
+	protocol?: TransparentAnalysisAiEvaluationProtocol;
 }) {
+	const protocol = input.protocol ?? DEFAULT_PROTOCOL;
 	const generationFixtures = TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES.filter(
 		({ kind }) => kind === "generation",
 	);
@@ -160,7 +185,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		if (!modelInput) throw new Error("Frozen generation fixture unexpectedly unavailable");
 		const startedAt = performance.now();
 		try {
-			const generation = await input.generate(providerRequest(modelInput));
+			const generation = await input.generate(providerRequest(modelInput, protocol));
 			const latencyMs = performance.now() - startedAt;
 			const validation = validateTransparentAnalysisAiExplanation(
 				modelInput,
@@ -206,7 +231,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		generation_p95_latency: p95(results.map(({ latencyMs }) => latencyMs)),
 		mean_generation_cost: meanCostUsd * 100,
 	} as const;
-	const gates = TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES.map((gate) => {
+	const gates = protocol.gates.map((gate) => {
 		const value = values[gate.id];
 		const passed = value === null
 			? null
@@ -218,16 +243,20 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 	const automatedPassed = gates.filter(({ passed }) => passed === true).length;
 	const automatedFailed = gates.filter(({ passed }) => passed === false).length;
 	return {
-		version: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
+		version: protocol.version,
+		contractVersion: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
 		model: input.model,
-		promptVersion: TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
-		promptSha256: TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
+		promptVersion: protocol.promptVersion,
+		promptSha256: protocol.promptSha256,
 		fixtureCount: TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES.length,
 		generationFixtureCount: generationFixtures.length,
 		decision: automatedFailed > 0 ? "reject_candidate" : "manual_review_required",
 		automatedPassed,
 		automatedFailed,
 		gates,
+		observations: {
+			generationP95LatencyMs: values.generation_p95_latency,
+		},
 		manualReview: results.map(({ fixtureId, input: modelInput, generation, validation }) => ({
 			fixtureId,
 			input: modelInput,

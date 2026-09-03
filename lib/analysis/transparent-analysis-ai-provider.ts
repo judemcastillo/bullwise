@@ -13,10 +13,10 @@ import {
 import type { AnalysisPanelResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 
 export type TransparentAnalysisAiProviderRequest = {
-	promptVersion: typeof TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION;
-	promptSha256: typeof TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256;
-	systemPrompt: typeof TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT;
-	outputSchema: typeof TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA;
+	promptVersion: string;
+	promptSha256: string;
+	systemPrompt: string;
+	outputSchema: Record<string, unknown>;
 	input: TransparentAnalysisAiInput;
 	signal: AbortSignal;
 };
