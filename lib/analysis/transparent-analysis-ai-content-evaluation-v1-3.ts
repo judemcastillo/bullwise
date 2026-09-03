@@ -32,5 +32,6 @@ export const TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_3_PROTOCOL = {
 	outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
 	gates: TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_3_GATES,
 	contentDenominator: "provider_completed",
+	minimumStartIntervalMs: 0,
 	requestSignal: () => new AbortController().signal,
 } satisfies TransparentAnalysisAiEvaluationProtocol;

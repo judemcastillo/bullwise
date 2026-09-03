@@ -29,7 +29,8 @@ export type TransparentAnalysisAiEvaluationGenerator = (
 export type TransparentAnalysisAiEvaluationGate = {
 	id:
 		| (typeof TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES)[number]["id"]
-		| "provider_completion";
+		| "provider_completion"
+		| "minimum_request_start_interval";
 	comparison: "=" | "<=" | ">=";
 	threshold: number;
 	unit: "percent" | "count" | "milliseconds" | "usd_cents";
@@ -43,12 +44,14 @@ export type TransparentAnalysisAiEvaluationProtocol = {
 	outputSchema: Record<string, unknown>;
 	gates: readonly TransparentAnalysisAiEvaluationGate[];
 	contentDenominator: "all_requests" | "provider_completed";
+	minimumStartIntervalMs: number;
 	requestSignal: () => AbortSignal;
 };
 
 type GenerationEvaluationResult = {
 	fixtureId: string;
 	input: TransparentAnalysisAiInput;
+	startedAfterPreviousMs: number | null;
 	latencyMs: number;
 	generation: TransparentAnalysisAiMeasuredGeneration | null;
 	validation: TransparentAnalysisAiValidationResult;
@@ -62,6 +65,7 @@ const DEFAULT_PROTOCOL: TransparentAnalysisAiEvaluationProtocol = {
 	outputSchema: TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA,
 	gates: TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES,
 	contentDenominator: "all_requests",
+	minimumStartIntervalMs: 0,
 	requestSignal: () => AbortSignal.timeout(5_000),
 };
 
@@ -185,29 +189,57 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 	model: string;
 	generate: TransparentAnalysisAiEvaluationGenerator;
 	protocol?: TransparentAnalysisAiEvaluationProtocol;
+	now?: () => number;
+	wait?: (milliseconds: number) => Promise<void>;
 }) {
 	const protocol = input.protocol ?? DEFAULT_PROTOCOL;
+	const now = input.now ?? (() => performance.now());
+	const wait = input.wait ?? ((milliseconds: number) =>
+		new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
+	if (
+		!Number.isFinite(protocol.minimumStartIntervalMs) ||
+		protocol.minimumStartIntervalMs < 0
+	) {
+		throw new Error("Minimum request-start interval must be a non-negative number");
+	}
 	const generationFixtures = TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES.filter(
 		({ kind }) => kind === "generation",
 	);
 	const results: GenerationEvaluationResult[] = [];
+	let previousStartedAt: number | null = null;
 	for (const fixture of generationFixtures) {
 		const modelInput = buildTransparentAnalysisAiInput(fixture.panel);
 		if (!modelInput) throw new Error("Frozen generation fixture unexpectedly unavailable");
-		const startedAt = performance.now();
+		if (previousStartedAt !== null) {
+			const remainingDelay = protocol.minimumStartIntervalMs - (now() - previousStartedAt);
+			if (remainingDelay > 0) await wait(remainingDelay);
+		}
+		const startedAt = now();
+		const startedAfterPreviousMs = previousStartedAt === null
+			? null
+			: startedAt - previousStartedAt;
+		previousStartedAt = startedAt;
 		try {
 			const generation = await input.generate(providerRequest(modelInput, protocol));
-			const latencyMs = performance.now() - startedAt;
+			const latencyMs = now() - startedAt;
 			const validation = validateTransparentAnalysisAiExplanation(
 				modelInput,
 				generation.output,
 			);
-			results.push({ fixtureId: fixture.id, input: modelInput, latencyMs, generation, validation });
+			results.push({
+				fixtureId: fixture.id,
+				input: modelInput,
+				startedAfterPreviousMs,
+				latencyMs,
+				generation,
+				validation,
+			});
 		} catch {
 			results.push({
 				fixtureId: fixture.id,
 				input: modelInput,
-				latencyMs: performance.now() - startedAt,
+				startedAfterPreviousMs,
+				latencyMs: now() - startedAt,
 				generation: null,
 				validation: { ok: false as const, reasons: ["Provider failure."], issueCodes: ["schema" as const] },
 			});
@@ -229,6 +261,12 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		contentResults.length,
 	);
 	const successful = contentResults.filter(({ validation }) => validation.ok);
+	const requestStartIntervals = results
+		.map(({ startedAfterPreviousMs }) => startedAfterPreviousMs)
+		.filter((value): value is number => value !== null);
+	const minimumRequestStartInterval = requestStartIntervals.length === 0
+		? 0
+		: Math.min(...requestStartIntervals);
 	const meanCostUsd = successful.length === 0
 		? 0
 		: successful.reduce((sum, result) => sum + result.generation!.usage.costUsd, 0) /
@@ -246,6 +284,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 		generation_p95_latency: p95(results.map(({ latencyMs }) => latencyMs)),
 		mean_generation_cost: meanCostUsd * 100,
 		provider_completion: percent(completed.length, results.length),
+		minimum_request_start_interval: minimumRequestStartInterval,
 	} as const;
 	const gates = protocol.gates.map((gate) => {
 		const value = values[gate.id];
@@ -277,6 +316,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 			providerCompleted: completed.length,
 			providerFailed: results.length - completed.length,
 			providerCompletionPercent: values.provider_completion,
+			minimumRequestStartIntervalMs: values.minimum_request_start_interval,
 		},
 		manualReview: results.map(({ fixtureId, input: modelInput, generation, validation }) => ({
 			fixtureId,
