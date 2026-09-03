@@ -46,17 +46,34 @@ export async function observeTransparentAnalysisAiProviderReliability(input: {
 	model: string;
 	generate: TransparentAnalysisAiProviderReliabilityGenerator;
 	now?: () => number;
+	wait?: (milliseconds: number) => Promise<void>;
+	minimumStartIntervalMs?: number;
 }) {
 	const now = input.now ?? (() => performance.now());
+	const wait = input.wait ?? ((milliseconds: number) =>
+		new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
+	const minimumStartIntervalMs = input.minimumStartIntervalMs ?? 0;
+	if (!Number.isFinite(minimumStartIntervalMs) || minimumStartIntervalMs < 0) {
+		throw new Error("Minimum request-start interval must be a non-negative number");
+	}
 	const fixtures = TRANSPARENT_ANALYSIS_AI_EVALUATION_FIXTURES.filter(
 		({ kind }) => kind === "generation",
 	);
 	const requests = [];
+	let previousStartedAt: number | null = null;
 
 	for (const [index, fixture] of fixtures.entries()) {
 		const modelInput = buildTransparentAnalysisAiInput(fixture.panel);
 		if (!modelInput) throw new Error("Frozen generation fixture unexpectedly unavailable");
+		if (previousStartedAt !== null) {
+			const remainingDelay = minimumStartIntervalMs - (now() - previousStartedAt);
+			if (remainingDelay > 0) await wait(remainingDelay);
+		}
 		const startedAt = now();
+		const startedAfterPreviousMs = previousStartedAt === null
+			? null
+			: startedAt - previousStartedAt;
+		previousStartedAt = startedAt;
 		try {
 			const generation = await input.generate({
 				promptVersion: TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_2_PROTOCOL.promptVersion,
@@ -69,6 +86,7 @@ export async function observeTransparentAnalysisAiProviderReliability(input: {
 			requests.push({
 				sequence: index + 1,
 				fixtureId: fixture.id,
+				startedAfterPreviousMs,
 				durationMs: now() - startedAt,
 				outcome: "provider_completed" as const,
 				failure: null,
@@ -78,6 +96,7 @@ export async function observeTransparentAnalysisAiProviderReliability(input: {
 			requests.push({
 				sequence: index + 1,
 				fixtureId: fixture.id,
+				startedAfterPreviousMs,
 				durationMs: now() - startedAt,
 				outcome: "provider_failure" as const,
 				failure: failure(error),
@@ -101,7 +120,7 @@ export async function observeTransparentAnalysisAiProviderReliability(input: {
 		promptSha256: TRANSPARENT_ANALYSIS_AI_CONTENT_EVALUATION_V1_2_PROTOCOL.promptSha256,
 		applicationTimeoutEnabled: false,
 		retryEnabled: false,
-		requestPacingDelayMs: 0,
+		requestPacingDelayMs: minimumStartIntervalMs,
 		requestCount: requests.length,
 		completedCount: requests.filter(({ outcome }) => outcome === "provider_completed").length,
 		providerFailureCount: requests.filter(({ outcome }) => outcome === "provider_failure").length,
