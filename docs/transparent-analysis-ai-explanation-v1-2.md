@@ -50,3 +50,21 @@ Run exactly once, only after this preregistration and its implementation are com
 `npm run evaluate:transparent-analysis-ai-content-v1-2`
 
 Retain the report and record its SHA-256 checksum and result in this document after the run.
+
+## Recorded development result
+
+The one-shot v1.2 development evaluation ran on 2026-09-03 and rejected `gemini-3.5-flash-lite` with 6 of 9 automated gates passing. Fifteen of the twenty generation fixtures returned outputs that passed the deterministic validator. Five requests returned no model output and were recorded as provider failures; the retained report does not include provider status or error categories, so their operational cause cannot be determined from this artifact.
+
+Failed gates:
+
+- structured-output validity: 75%, required 100%;
+- factor-state fidelity: 75%, required 100%;
+- citation validity: 75%, required 100%.
+
+The five affected fixtures were `participation-normal`, `participation-unavailable`, `partial-missing-relative-strength`, `partial-other-warning-and-conflict`, and `ready-conflicting-numeric-evidence`. Each had only the `schema` issue code because the evaluator maps a missing provider response to a fail-closed schema result. No generated output was available for these fixtures; this is different from receiving malformed model content.
+
+The observed p95 request duration was 1898.892944 ms. Latency was descriptive and was not an acceptance gate. Manual groundedness review was not opened because the automated gates did not all pass.
+
+Report: `artifacts/analysis/transparent-analysis-ai-content-evaluation-v1-2.json`
+
+Report SHA-256: `b90f7ffb1e9325a642711aefd59e6082d15e2c5ef6bbf9af99509a0001482552`
