@@ -1,6 +1,6 @@
 # Transparent analysis AI explanation v1.1 preregistration
 
-Status: preregistered development experiment; not authorized for production
+Status: development candidate rejected; not authorized for production
 
 Recorded: 2026-09-03
 
@@ -42,3 +42,22 @@ Run `npm run evaluate:transparent-analysis-ai-candidate` exactly once for v1.1.
 - A development pass never authorizes production use.
 
 The generated report must be retained with its SHA-256 checksum. Any later experiment must receive a new version, prompt checksum, artifact path, and preregistration before execution.
+
+## Recorded development result
+
+The one-shot v1.1 development evaluation ran on 2026-09-03 and rejected `gemini-3.5-flash-lite` with 6 of 10 automated gates passing. None of the 20 generation fixtures returned a usable output within the fixed request boundary, so manual groundedness review was not applicable and the revised prompt's compliance hypothesis was not established.
+
+Failed gates:
+
+- structured output validity: 0%, required 100%;
+- factor-state fidelity: 0%, required 100%;
+- citation validity: 0%, required 100%;
+- p95 generation latency: 5020.185425 ms, required at most 5000 ms.
+
+The other six automated gates passed, including zero novel numeric, prohibited-advice, unsupported-domain, and unavailable-input-call violations, 100% local fallback success, and zero measured free-tier generation cost. The zero content-violation counts reflect the absence of model output; they are not evidence of prompt compliance.
+
+Report: `artifacts/analysis/transparent-analysis-ai-development-evaluation-v1-1.json`
+
+Report SHA-256: `4c6f598342a621c292ccba046be836e874624fae5bfd00297ec07e34a88650ba`
+
+Prompt SHA-256: `8a84ba9f2d42aaa1daca80761f7fb610e14127ebc1100d6619f158cd9306f84a`
