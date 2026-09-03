@@ -1,6 +1,6 @@
 # Transparent analysis telemetry v1
 
-Status: instrumented; production observation pending.
+Status: first local operational review passed; ongoing production observation pending.
 
 ## Purpose
 
