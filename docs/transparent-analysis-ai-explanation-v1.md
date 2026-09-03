@@ -1,6 +1,6 @@
 # Transparent analysis AI explanation v1 preregistration
 
-Status: contract, prompt, provider boundary, and synthetic fixtures frozen; external provider integration not authorized
+Status: contract, prompt, provider boundary, synthetic fixtures, and local candidate evaluator implemented; production integration not authorized
 
 Recorded: 2026-09-03
 
@@ -85,3 +85,11 @@ The frozen system prompt is version `1.0.0` and is checksum-bound in `lib/analys
 The runner never calls a provider for unavailable analysis. Provider exceptions and invalid output return the original deterministic panel with a closed fallback reason and no raw error or partial AI prose.
 
 This preregistration now authorizes selecting candidate providers and models, implementing local-only adapters, and running the frozen development evaluation. It does not authorize production model calls, AI trading signals, backtests, model training on market outcomes, portfolio advice, or order execution.
+
+## Local candidate evaluation
+
+The local-only OpenAI adapter uses the Responses API with `store: false`, strict Structured Outputs, the frozen prompt, and the minimized deterministic input. The candidate set is frozen in code as `gpt-5.6-luna` (primary cost-sensitive candidate) and the dated `gpt-5.4-nano-2026-03-17` snapshot (reproducibility comparator). Pricing metadata is frozen with the candidate definitions and is used only to calculate evaluation cost.
+
+Run `npm run evaluate:transparent-analysis-ai-candidates` with `OPENAI_API_KEY` configured. The command makes 40 paid generation calls—20 frozen generation fixtures for each candidate—and writes a non-overwriting, gitignored report to `artifacts/analysis/transparent-analysis-ai-development-evaluation-v1.json`. It does not call market-data services, inspect strategy validation or holdout data, or connect AI to the application.
+
+Ten gates are evaluated automatically. The manual-groundedness gate remains pending until every generated explanation in the report is reviewed against its cited facts. A candidate cannot pass or be integrated into the product until that manual gate and all automated gates pass. A failed candidate is rejected; the frozen fixture results must not be used to weaken a gate.
