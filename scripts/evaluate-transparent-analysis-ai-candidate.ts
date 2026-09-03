@@ -6,12 +6,13 @@ import {
 	GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE,
 	GoogleTransparentAnalysisAiProvider,
 } from "@/lib/analysis/google-transparent-analysis-ai-provider";
+import { TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION } from "@/lib/analysis/transparent-analysis-ai-contract";
 import { evaluateTransparentAnalysisAiCandidate } from "@/lib/analysis/transparent-analysis-ai-evaluation";
 
-const OUTPUT = "artifacts/analysis/transparent-analysis-ai-development-evaluation-v1.json";
+const OUTPUT = "artifacts/analysis/transparent-analysis-ai-development-evaluation-v1-1.json";
 const USAGE = `Usage: npm run evaluate:transparent-analysis-ai-candidate
 
-Runs the frozen Gemini 3.5 Flash candidate against the 32 development
+Runs the frozen Gemini 3.5 Flash-Lite candidate against the 32 v1.1 development
 fixtures using the Gemini API free tier. It does not connect AI to the application.
 Requires GEMINI_API_KEY. No overrides or overwrite flag are accepted.`;
 
@@ -34,7 +35,7 @@ async function main() {
 		generate: (request) => provider.generateForEvaluation(request),
 	});
 	const report = {
-		version: "1.0.0",
+		version: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
 		createdAt: new Date().toISOString(),
 		scope: "frozen_development_fixtures_only",
 		provider: "google",

@@ -1,5 +1,6 @@
 import {
 	buildTransparentAnalysisAiInput,
+	TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
 	TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES,
 	type TransparentAnalysisAiInput,
 	type TransparentAnalysisAiValidationResult,
@@ -56,7 +57,7 @@ function validOutput(input: TransparentAnalysisAiInput): Record<string, unknown>
 		}),
 	);
 	return {
-		version: "1.0.0",
+		version: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
 		context: input.context,
 		overview: {
 			text: input.factors.trend.facts[0].text,
@@ -217,7 +218,7 @@ export async function evaluateTransparentAnalysisAiCandidate(input: {
 	const automatedPassed = gates.filter(({ passed }) => passed === true).length;
 	const automatedFailed = gates.filter(({ passed }) => passed === false).length;
 	return {
-		version: "1.0.0",
+		version: TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION,
 		model: input.model,
 		promptVersion: TRANSPARENT_ANALYSIS_AI_PROMPT_VERSION,
 		promptSha256: TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,

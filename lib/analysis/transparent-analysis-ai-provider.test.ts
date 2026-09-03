@@ -28,7 +28,7 @@ function validOutput(input: TransparentAnalysisAiInput) {
 		},
 	});
 	return {
-		version: "1.0.0",
+		version: "1.1.0",
 		context: input.context,
 		overview: {
 			text: input.factors.trend.facts[0].text,
@@ -51,6 +51,9 @@ describe("transparent analysis AI provider boundary", () => {
 			createHash("sha256").update(TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT).digest("hex"),
 			TRANSPARENT_ANALYSIS_AI_PROMPT_SHA256,
 		);
+		assert.match(TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT, /citations only in the factIds arrays/i);
+		assert.match(TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT, /complete numeric token verbatim/i);
+		assert.match(TRANSPARENT_ANALYSIS_AI_SYSTEM_PROMPT, /long-term or short-term/i);
 	});
 
 	it("accepts only provider output that passes the deterministic validator", async () => {

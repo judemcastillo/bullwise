@@ -1,6 +1,8 @@
 # Transparent analysis AI explanation v1 preregistration
 
-Status: contract, prompt, provider boundary, synthetic fixtures, and local candidate evaluator implemented; production integration not authorized
+Status: closed and rejected. This document preserves the v1 experiment. See `docs/transparent-analysis-ai-explanation-v1-1.md` for the separately preregistered successor.
+
+Prior status: contract, prompt, provider boundary, synthetic fixtures, and local candidate evaluator implemented; production integration not authorized
 
 Recorded: 2026-09-03
 

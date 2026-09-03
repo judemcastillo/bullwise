@@ -5,7 +5,7 @@ import {
 	type AnalysisPanelResponse,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 
-export const TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION = "1.0.0";
+export const TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION = "1.1.0";
 
 export const TRANSPARENT_ANALYSIS_AI_FACTOR_NAMES = [
 	"trend",

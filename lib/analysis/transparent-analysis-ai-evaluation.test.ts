@@ -15,7 +15,7 @@ function validOutput(input: TransparentAnalysisAiInput) {
 		}),
 	);
 	return {
-		version: "1.0.0",
+		version: "1.1.0",
 		context: input.context,
 		overview: factors[0].explanation,
 		factors,

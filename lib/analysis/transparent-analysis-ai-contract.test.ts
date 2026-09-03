@@ -61,7 +61,7 @@ function response(): AnalysisPanelResponse {
 
 function validExplanation() {
 	return {
-		version: "1.0.0",
+		version: "1.1.0",
 		context: "constructive",
 		overview: {
 			text: "Daily evidence is constructive, while participation could not be calculated.",

@@ -5,7 +5,7 @@ import type {
 } from "@/lib/analysis/transparent-analysis-ai-provider";
 
 export const GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE = {
-	model: "gemini-3.5-flash",
+	model: "gemini-3.5-flash-lite",
 	tier: "free" as const,
 	inputUsdPerMillionTokens: 0,
 	outputUsdPerMillionTokens: 0,
