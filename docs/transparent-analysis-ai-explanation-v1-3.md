@@ -51,3 +51,17 @@ Run exactly once, only after this preregistration and implementation are committ
 `npm run evaluate:transparent-analysis-ai-content-v1-3`
 
 Retain the report and record its SHA-256 checksum and result here.
+
+## Recorded development result
+
+The one-shot v1.3 development evaluation ran on 2026-09-03 and rejected `gemini-3.5-flash-lite` with 9 of 10 automated gates passing. Sixteen of twenty provider requests completed, producing an 80% completion rate below the frozen 90% minimum.
+
+The only failed gate was provider completion. Every automated content gate passed among the sixteen returned outputs: 100% structured-output validity, 100% factor-state fidelity, 100% citation validity, zero novel numeric claims, zero prohibited-advice claims, and zero unsupported-domain claims. Unavailable-input suppression, fallback behavior, and cost also passed.
+
+The four provider failures affected `partial-missing-participation`, `partial-missing-relative-strength`, `partial-other-warning-and-conflict`, and `ready-conflicting-numeric-evidence`. The v1.3 report records these as fail-closed missing outputs but does not retain their provider error categories. Observed p95 request duration was 2110.168373 ms; latency was descriptive only.
+
+Manual groundedness review was not opened because the provider-completion gate failed. The perfect automated content scores apply only to the sixteen returned outputs and do not reverse the rejected decision.
+
+Report: `artifacts/analysis/transparent-analysis-ai-content-evaluation-v1-3.json`
+
+Report SHA-256: `bebf67d0e052a037d79ff032499c6b5aba0d472eda1e7578b4dea431ba2c657d`
