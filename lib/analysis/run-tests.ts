@@ -16,6 +16,7 @@ import "./transparent-analysis-ai-content-evaluation-v1-2.test";
 import "./transparent-analysis-ai-content-evaluation-v1-3.test";
 import "./transparent-analysis-ai-content-evaluation-v1-4.test";
 import "./transparent-analysis-ai-selection-v1-5.test";
+import "./transparent-analysis-ai-selection-v1-6.test";
 import "./transparent-analysis-ai-latency-observation.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
