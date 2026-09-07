@@ -1,6 +1,6 @@
 # Transparent analysis AI deterministic-overview ordering v1.6 preregistration
 
-Status: preregistered development candidate; not yet executed or authorized for production
+Status: development passed; not authorized for production
 
 Recorded: 2026-09-07
 
@@ -108,3 +108,29 @@ committed:
 `npm run evaluate:transparent-analysis-ai-selection-v1-6`
 
 Retain the report and record its SHA-256 checksum and result here.
+
+## Development result
+
+The one-shot evaluation ran on 2026-09-07 and wrote
+`artifacts/analysis/transparent-analysis-ai-selection-evaluation-v1-6.json`
+with SHA-256
+`6db654929401a17350a8ac6120102c57e48a76e5b998c3b62b0a31a41f3f0b78`.
+
+`gemini-3.5-flash-lite` completed all twenty generation requests with no
+provider failures and passed all eleven automated gates. The measured minimum
+request-start interval was 6100.210323 ms. Required overview membership,
+same-factor membership, complete factor coverage, exact deterministic rendering,
+fallback behavior, cost, provider completion, and pacing all passed.
+
+The required manual review examined all twenty valid renderings. Every overview
+used exactly its deterministic balanced fact set, every factor preserved all of
+its supplied facts, and every visible fact sentence matched its deterministic
+input exactly. Manual groundedness was 20/20, or 100%, so the twelfth gate
+passed.
+
+V1.6 therefore passes development. This result does not authorize product
+integration or production model calls. Before continuing, Bullwise must decide
+whether model-based ordering provides enough user value to justify its latency
+and external dependency. If it does, a separately preregistered, previously
+unseen production acceptance fixture set must pass before integration. No
+strategy validation or holdout data was read.
