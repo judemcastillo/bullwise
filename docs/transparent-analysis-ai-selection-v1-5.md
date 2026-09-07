@@ -1,6 +1,6 @@
 # Transparent analysis AI fact-selection v1.5 preregistration
 
-Status: preregistered development candidate; not yet executed or authorized for production
+Status: closed and rejected; not authorized for production
 
 Recorded: 2026-09-03
 
@@ -98,3 +98,31 @@ committed:
 `npm run evaluate:transparent-analysis-ai-selection-v1-5`
 
 Retain the report and record its SHA-256 checksum and result here.
+
+## Development result
+
+The one-shot evaluation ran on 2026-09-03 and wrote
+`artifacts/analysis/transparent-analysis-ai-selection-evaluation-v1-5.json`
+with SHA-256
+`c10a5fe045a4e7643b70f9ae79abc0322af6a166727c194d533c82cff21c3452`.
+The report is complete and was preserved when a later invocation correctly
+refused to overwrite it.
+
+`gemini-3.5-flash-lite` completed all twenty requests with no provider failures.
+The measured minimum request-start interval was 6099.740421000002 ms. Eight of
+eleven automated gates passed.
+
+Eleven of twenty selections failed overview evidence balance. In every failed
+case, the model selected only supporting evidence for the overview even though
+the deterministic input also contained counter-evidence. All selected IDs were
+real, factor selections remained same-factor and complete, unavailable inputs
+caused no model calls, and fallback, cost, provider completion, and pacing gates
+passed.
+
+The balance failures also reduced the composite strict-selection-validity and
+exact-rendering eligibility metrics to 45%, producing three reported failed
+gates from the same underlying omission. Because an unbalanced overview could
+hide relevant conflicting evidence, v1.5 is rejected. Manual groundedness review
+was not opened because the automated gates did not all pass. The artifact must
+not be overwritten, and v1.5 must not be modified and rerun against these
+observed results. No strategy validation or holdout data was read.
