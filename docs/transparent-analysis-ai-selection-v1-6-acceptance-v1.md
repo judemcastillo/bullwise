@@ -1,6 +1,6 @@
 # Transparent analysis AI v1.6 acceptance v1 preregistration
 
-Status: acceptance passed under the frozen fidelity criteria; product integration pending
+Status: acceptance passed under the frozen fidelity criteria; product integration declined after value review
 
 Recorded: 2026-09-07
 
@@ -125,7 +125,8 @@ Synthetic ordinal typos such as "81th" were likewise copied from the source.
 Acceptance establishes compliance with the frozen contract on these synthetic
 cases. It does not establish useful AI ordering, representative summaries in all
 cases, live application behavior, or trading profitability. Product integration
-remains pending a value assessment and review of the deterministic summary rule.
+was subsequently declined after the value assessment and deterministic grouped
+presentation recorded in `docs/transparent-analysis-overview-product-review.md`.
 No additional provider requests were made during review. Only the authorized
 synthetic acceptance report was inspected; no strategy validation or holdout
 data was accessed.

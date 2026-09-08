@@ -1,7 +1,7 @@
 # Overview selection and AI ordering product review
 
 Recorded: 2026-09-08
-Status: review and presentation proposal; no candidate or application changes
+Status: deterministic presentation implemented; AI ordering integration declined
 
 ## Finding
 
@@ -94,3 +94,24 @@ formatting in future fixtures; preserve historical acceptance artifacts.
 No live model requests, strategy validation, or strategy holdout access were
 needed for this review. The v1.6 candidate and its recorded acceptance outcome
 remain preserved. This document does not authorize or implement a new AI run.
+
+## Implementation checkpoint result
+
+The deterministic grouped presentation was implemented in commit `89b46f7`.
+All supporting and counter-evidence is visible in its factor group, and missing
+participation facts and provider warnings are displayed in a separate data
+limitations section. Commit `e82841e` completed the focused edge-case coverage
+for bearish factors with positive short-term observations, mixed indicators,
+missing participation, high volatility, and factors containing only one
+evidence kind. The focused component suite passes 10/10 tests.
+
+The application was also checked manually in the local browser and the user
+confirmed that the presentation works. This is a functional UI check, not a
+blinded comparison showing that AI ordering improves readability.
+
+The v1.6 Gemini ordering candidate is therefore not selected for product
+integration. It passed its frozen fidelity acceptance criteria, but changed
+only 4/20 overview orders and 0/80 factor orders, while the deterministic
+grouping solves the identified omission without model latency or an external
+dependency. Preserve the candidate, reports, and acceptance result as research
+evidence; do not connect v1.6 to production solely to reorder facts.
