@@ -174,6 +174,68 @@ describe("daily market analysis UI", () => {
 		assert.doesNotMatch(html, /Data limitations/);
 	});
 
+	it("keeps mixed indicators grouped under their source factor", () => {
+		const response = structuredClone(readyResponse);
+		response.context = "mixed";
+		response.factors.trend = {
+			state: "mixed",
+			evidence: ["Price is above its 50-day moving average."],
+			counterEvidence: ["Price is below its 200-day moving average."],
+		};
+		response.factors.momentum = {
+			state: "mixed",
+			evidence: ["The latest session return is positive."],
+			counterEvidence: ["The 20-day return is negative."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+
+		assert.match(cards[0], />mixed</);
+		assert.match(cards[0], /Price is above its 50-day moving average/);
+		assert.match(cards[0], /Price is below its 200-day moving average/);
+		assert.doesNotMatch(cards[0], /latest session return|20-day return/);
+		assert.match(cards[1], />mixed</);
+		assert.match(cards[1], /latest session return is positive/);
+		assert.match(cards[1], /20-day return is negative/);
+	});
+
+	it("shows high-volatility evidence and counter-evidence together", () => {
+		const response = structuredClone(readyResponse);
+		response.factors.volatility = {
+			state: "high",
+			evidence: ["Twenty-day realized volatility is 42%."],
+			counterEvidence: ["The latest daily range was narrower than its recent baseline."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const volatilityCard = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)![2];
+
+		assert.match(volatilityCard, />high</);
+		assert.match(volatilityCard, /Twenty-day realized volatility is 42%/);
+		assert.match(volatilityCard, /latest daily range was narrower than its recent baseline/);
+		assert.doesNotMatch(html, /Data limitations/);
+	});
+
+	it("renders explicit empty-state copy for factors with one evidence kind", () => {
+		const response = structuredClone(readyResponse);
+		response.factors.trend = {
+			state: "bullish",
+			evidence: ["Price is above its 200-day moving average."],
+			counterEvidence: [],
+		};
+		response.factors.momentum = {
+			state: "bearish",
+			evidence: [],
+			counterEvidence: ["The 20-day return is negative."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+
+		assert.match(cards[0], /Price is above its 200-day moving average/);
+		assert.match(cards[0], /No counter evidence was identified/);
+		assert.match(cards[1], /No supporting evidence is available/);
+		assert.match(cards[1], /The 20-day return is negative/);
+	});
+
 	it("renders unavailable, loading, authentication, and retry states accessibly", () => {
 		const unavailable: AnalysisPanelResponse = {
 			version: "1.0.0",
