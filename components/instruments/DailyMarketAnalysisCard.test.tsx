@@ -147,6 +147,31 @@ describe("daily market analysis UI", () => {
 
 		assert.match(html, /Partial analysis/);
 		assert.match(html, /participation and SPY-relative strength are unavailable/);
+		const participationCard = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)![3];
+		assert.doesNotMatch(participationCard, /Counter evidence|Recent volume participation could not be calculated/);
+		assert.match(html, /Data limitations/);
+		assert.ok(html.indexOf("Recent volume participation could not be calculated.") > html.indexOf("Data limitations</h3>"));
+	});
+
+	it("keeps bearish and positive short-term facts visible together without expanding details", () => {
+		const response = structuredClone(readyResponse);
+		response.context = "defensive";
+		response.factors.trend.state = "bearish";
+		response.factors.trend.evidence = ["The shortest trend slope turned slightly positive."];
+		response.factors.trend.counterEvidence = ["Price is below its 200-day moving average."];
+		response.factors.momentum.state = "bearish";
+		response.factors.momentum.evidence = ["The latest session return is 0.36%."];
+		response.factors.momentum.counterEvidence = ["The 20-day return is negative."];
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+		assert.equal(cards.length, 4);
+		for (const [index, factor] of [response.factors.trend, response.factors.momentum].entries()) {
+			assert.doesNotMatch(cards[index], /<details/);
+			for (const fact of [...factor.evidence, ...factor.counterEvidence]) {
+				assert.ok(cards[index].includes(fact));
+			}
+		}
+		assert.doesNotMatch(html, /Data limitations/);
 	});
 
 	it("renders unavailable, loading, authentication, and retry states accessibly", () => {

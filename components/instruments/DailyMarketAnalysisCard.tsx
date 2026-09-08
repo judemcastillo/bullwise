@@ -292,9 +292,10 @@ function FactorCard({
 					{factor.state}
 				</span>
 			</div>
-			<details className="mt-4 text-xs text-gray-400">
-				<summary className="cursor-pointer font-medium text-gray-300">Review evidence</summary>
-				<div className="mt-3 space-y-3 leading-5">
+			{label === "participation" && factor.state === "unavailable" ? (
+				<p className="mt-4 text-sm text-gray-400">See Data limitations below.</p>
+			) : (
+				<div className="mt-4 space-y-3 text-sm leading-5 text-gray-400">
 					<div>
 						<p className="font-semibold text-gray-300">Supporting evidence</p>
 						{factor.evidence.length > 0 ? (
@@ -320,7 +321,7 @@ function FactorCard({
 						)}
 					</div>
 				</div>
-			</details>
+			)}
 		</article>
 	);
 }
@@ -345,7 +346,14 @@ function LevelRow({ label, level }: { label: string; level?: AnalysisPanelLevel 
 }
 
 function PartialNotice({ response }: { response: AnalysisPanelAvailableResponse }) {
-	if (response.status !== "partial") return null;
+	const participationUnavailable = response.factors.participation.state === "unavailable";
+	const notes = [...new Set([
+		...(participationUnavailable
+			? [...response.factors.participation.evidence, ...response.factors.participation.counterEvidence]
+			: []),
+		...response.dataQuality.warnings,
+	])];
+	if (response.status !== "partial" && notes.length === 0 && !participationUnavailable) return null;
 	const missing: string[] = [];
 	if (response.factors.participation.state === "unavailable") {
 		missing.push("participation");
@@ -359,10 +367,18 @@ function PartialNotice({ response }: { response: AnalysisPanelAvailableResponse 
 	}
 	return (
 		<div className="mt-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-100">
-			<strong>Partial analysis.</strong>{" "}
-			{missing.length > 0
-				? `${missing.join(" and ")} ${missing.length === 1 ? "is" : "are"} unavailable.`
-				: "One or more non-fatal market-data checks require review."}
+			<h3 className="mb-2 font-semibold">Data limitations</h3>
+			<p>
+				{response.status === "partial" && <><strong>Partial analysis.</strong>{" "}</>}
+				{missing.length > 0
+					? `${missing.join(" and ")} ${missing.length === 1 ? "is" : "are"} unavailable.`
+					: "One or more non-fatal market-data checks require review."}
+			</p>
+			{notes.length > 0 && (
+				<ul className="mt-2 list-disc space-y-1 pl-4">
+					{notes.map((note) => <li key={note}>{note}</li>)}
+				</ul>
+			)}
 		</div>
 	);
 }
@@ -432,8 +448,7 @@ function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableRespo
 						As of {formatTimestamp(response.asOf)}
 					</p>
 				</div>
-				<PartialNotice response={response} />
-				<div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+				<div className="mt-5 grid gap-3 md:grid-cols-2">
 					{(Object.keys(factorIcons) as Array<keyof typeof factorIcons>).map((factor) => (
 						<FactorCard
 							key={factor}
@@ -442,6 +457,7 @@ function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableRespo
 						/>
 					))}
 				</div>
+				<PartialNotice response={response} />
 				<div className="mt-5 rounded-lg border border-gray-600 bg-gray-700/30 p-4">
 					<div className="flex items-center gap-2">
 						<Target className="size-4 text-yellow-500" aria-hidden="true" />
