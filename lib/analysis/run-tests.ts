@@ -21,6 +21,7 @@ import "./transparent-analysis-ai-selection-acceptance-v1.test";
 import "./transparent-analysis-ai-latency-observation.test";
 import "./transparent-analysis-ai-question-routing.test";
 import "./transparent-analysis-ai-question-routing-evaluation.test";
+import "./transparent-analysis-ai-question-routing-prompt.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";

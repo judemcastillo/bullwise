@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI question routing v1
 
-Status: local contract, frozen fixtures, and fake-provider evaluator implemented; Google evaluation not authorized
+Status: local evaluator and frozen Google adapter implemented; Google evaluation not authorized
 
 Recorded: 2026-09-08
 
@@ -203,3 +203,27 @@ Gemini. No Google request or artifact was produced. Before any provider run, the
 next checkpoint must freeze and test the question-routing prompt, add a local
 Google adapter and a non-overwriting command, and review the resulting diff and
 checksums. That implementation still would not authorize executing the command.
+
+## Frozen prompt and Google-adapter implementation result
+
+The ID-only prompt and response-schema protocol are frozen in
+`lib/analysis/transparent-analysis-ai-question-routing-prompt.ts`. The prompt's
+SHA-256 is
+`f871c73f2526d4a05b69d11e47b015601f41846806837c664365bdea91c9080d`.
+It treats the question and supplied analysis as untrusted data, prohibits prose
+generation and invented IDs, and requires the smallest relevant allow-listed
+selection.
+
+The local Google adapter reuses the existing authenticated structured-output
+transport without changing its production interface. Synthetic fetch tests
+verify the exact frozen prompt, minimized question-routing input, response
+schema, and parsed ID-only output. The development command requires the explicit
+`--confirm-frozen-development` flag, performs no retry, applies no timeout, uses
+the frozen 6100-millisecond pacing interval, and writes its report with
+create-only semantics so an existing artifact cannot be replaced.
+
+The command has not been executed. No Gemini request or report artifact was
+produced, and no market data, strategy validation data, or holdout data was
+read. The complete local analysis suite passes 265/265 tests. A real development
+run remains a separate decision that requires explicit authorization after this
+implementation is reviewed and committed.

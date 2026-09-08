@@ -11,10 +11,15 @@ export const GOOGLE_TRANSPARENT_ANALYSIS_AI_CANDIDATE = {
 	outputUsdPerMillionTokens: 0,
 } as const;
 
-type FetchImplementation = (
+export type GoogleTransparentAnalysisAiFetchImplementation = (
 	input: string | URL | Request,
 	init?: RequestInit,
 ) => Promise<Response>;
+
+export type GoogleTransparentAnalysisAiEvaluationRequest<TInput> = Omit<
+	TransparentAnalysisAiProviderRequest,
+	"input"
+> & { input: TInput };
 
 type GeminiResponse = {
 	candidates?: Array<{
@@ -112,11 +117,11 @@ export class GoogleTransparentAnalysisAiProvider
 	implements TransparentAnalysisAiProvider
 {
 	private readonly apiKey: string;
-	private readonly fetchImplementation: FetchImplementation;
+	private readonly fetchImplementation: GoogleTransparentAnalysisAiFetchImplementation;
 
 	constructor(input: {
 		apiKey: string;
-		fetchImplementation?: FetchImplementation;
+		fetchImplementation?: GoogleTransparentAnalysisAiFetchImplementation;
 	}) {
 		if (!input.apiKey.trim()) throw new Error("Gemini API key is required");
 		this.apiKey = input.apiKey;
@@ -127,8 +132,8 @@ export class GoogleTransparentAnalysisAiProvider
 		return (await this.generateForEvaluation(request)).output;
 	}
 
-	async generateForEvaluation(
-		request: TransparentAnalysisAiProviderRequest,
+	async generateForEvaluation<TInput>(
+		request: GoogleTransparentAnalysisAiEvaluationRequest<TInput>,
 	): Promise<TransparentAnalysisAiMeasuredGeneration> {
 		let response: Response;
 		try {
