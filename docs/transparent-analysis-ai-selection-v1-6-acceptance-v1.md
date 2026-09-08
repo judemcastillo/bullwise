@@ -1,6 +1,6 @@
 # Transparent analysis AI v1.6 acceptance v1 preregistration
 
-Status: sealed and preregistered; not yet executed or authorized for production
+Status: acceptance passed under the frozen fidelity criteria; product integration pending
 
 Recorded: 2026-09-07
 
@@ -87,3 +87,45 @@ script are committed:
 `npm run accept:transparent-analysis-ai-selection-v1-6`
 
 Retain the report and record its SHA-256 checksum and result here.
+
+## Acceptance result
+
+The acceptance run completed on 2026-09-08. Report SHA-256:
+`27da165d1aadf1378faefc1399d9111391e8e38e28b43f49bc9f98d8a67e8f48`.
+The retained fixture and prompt checksums match this preregistration.
+
+All eleven automated gates passed, with 20/20 completed requests and a minimum
+observed request-start interval of 6099.423985000001 ms.
+
+An assistant review read all twenty rendered overviews and all eighty factor
+sections against their cited source text. Independent comparisons also checked
+required overview membership, complete same-factor membership, rendered citation
+arrays, context, states, limitations, version, and disclaimer. All twenty
+renderings preserved the required facts and exact text. The final groundedness
+gate passes at 20/20 under the frozen fidelity criteria. This was an assistant
+review with deterministic cross-checks, not an independent human review. The
+original report retains its pending manual-review field; this document records
+the subsequent review without overwriting the artifact.
+
+## Ordering value and limitations
+
+Compared with the deterministic input order, Gemini changed 4/20 overview
+orders and 0/80 factor-section orders. A changed order alone does not establish
+improved readability. No blinded user preference assessment has been performed.
+
+The review also identified a limitation in the deterministic summary rule. In
+`acceptance-generation-09`, the defensive overview contains positive short-term
+facts and a missing-participation warning, while the below-average price and
+negative 21-day return appear only in the detailed sections. The rule's inclusion
+of both evidence kinds therefore does not guarantee a representative summary of
+directional conditions. This is a limitation of the fixed input selection, not
+a change made by Gemini, and is outside the frozen text-and-membership gate.
+Synthetic ordinal typos such as "81th" were likewise copied from the source.
+
+Acceptance establishes compliance with the frozen contract on these synthetic
+cases. It does not establish useful AI ordering, representative summaries in all
+cases, live application behavior, or trading profitability. Product integration
+remains pending a value assessment and review of the deterministic summary rule.
+No additional provider requests were made during review. Only the authorized
+synthetic acceptance report was inspected; no strategy validation or holdout
+data was accessed.
