@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI question routing v1
 
-Status: local evaluator and frozen Google adapter implemented; Google evaluation not authorized
+Status: Gemini development candidate rejected; rerun and product integration not authorized
 
 Recorded: 2026-09-08
 
@@ -227,3 +227,34 @@ produced, and no market data, strategy validation data, or holdout data was
 read. The complete local analysis suite passes 265/265 tests. A real development
 run remains a separate decision that requires explicit authorization after this
 implementation is reviewed and committed.
+
+## Frozen development evaluation result
+
+The explicitly authorized frozen development evaluation ran once on 2026-09-09.
+Google's official model and pricing documentation still listed
+`gemini-3.5-flash-lite` as a stable structured-output model with free standard
+input and output tokens before the run.
+
+The report is
+`artifacts/analysis/transparent-analysis-ai-question-routing-development-v1.json`.
+Its SHA-256 is
+`c3fa1c49c7a9c7d4fd2616547214214ee9ef082aa4d91e901c2061e934b17e35`.
+The candidate completed 40/40 provider requests and passed 11/12 automated
+gates. Median measured latency was 1227 milliseconds and p95 latency was 2812
+milliseconds. The minimum interval between request starts was 6099
+milliseconds. The estimated generation cost was zero under the registered free
+tier assumption.
+
+The failed gate was required selection coverage: 92.59% against the frozen 95%
+minimum. In `context-mixed-bullish` and `context-mixed-bearish`, the model chose
+valid trend observations but omitted the required momentum observation. Output
+schema validity, selected-ID validity, exact rendering fidelity, prohibited
+routing, prompt-injection resistance, expected-route accuracy, deterministic
+fallback behavior, invalid-input call prevention, provider completion, cost,
+and pacing all passed their automated gates.
+
+The decision is `reject_candidate`. Manual relevance review is unnecessary
+because an automated gate already failed. Per the frozen decision rule, do not
+tune or rerun this candidate against the observed development fixtures, create
+an acceptance set for it, or integrate it into the product. No market data,
+strategy validation data, or holdout data was accessed.
