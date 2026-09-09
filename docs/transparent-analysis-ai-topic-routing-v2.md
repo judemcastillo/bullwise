@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI topic routing v2
 
-Status: preregistered design only; implementation and provider evaluation not yet authorized
+Status: pure topic contract and deterministic expander implemented; fixtures, prompt, and provider evaluation not yet authorized
 
 Preregistered: 2026-09-09
 
@@ -236,3 +236,31 @@ After this document is reviewed and committed, the next separately authorized
 checkpoint is the pure v2 topic contract and deterministic expander, with
 focused synthetic unit tests. Fixture generation, prompt implementation, Google
 adapter work, and provider evaluation remain later checkpoints.
+
+## Pure contract implementation result
+
+The pure v2 boundary is implemented in
+`lib/analysis/transparent-analysis-ai-topic-routing-v2.ts`. Its model input
+contains only the trimmed question and the fixed topic ID and routing-description
+catalog. Tests prove that serialized model input excludes instrument identity,
+prices, panel states, facts, and provider metadata.
+
+The strict validator accepts only version `2.0.0`, the three closed routes, and
+up to three unique known topic IDs with valid route-selection combinations.
+Unavailable analysis, empty or over-length input, and explicit trading requests
+are stopped locally before a model call can be requested.
+
+The deterministic expander applies the frozen local topic order, deduplicates
+overlapping factor bundles, includes every trend and momentum fact for
+`context`, preserves exact support and resistance levels, and renders only fixed
+definitions, limitations, messages, warnings, and the existing disclaimer.
+Eight focused synthetic tests cover input minimization, local rejection, strict
+validation, complete context expansion, bundle deduplication, level and
+limitation handling, fixed non-answer routes, and unavailable expansion.
+The complete local analysis suite passes 273/273 tests.
+
+No prompt, provider adapter, provider request, evaluation fixture set, report,
+endpoint, or UI was added. No market data, strategy validation data, or holdout
+data was accessed. The next checkpoint requires separate authorization and is
+limited to the independent frozen v2 development fixtures and a provider-neutral
+fake evaluator.
