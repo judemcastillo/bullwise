@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI topic routing v2
 
-Status: frozen prompt, local Google adapter, and evaluation command implemented; provider evaluation not yet authorized
+Status: frozen provider evaluation attempted once; operationally inconclusive and closed without rerun
 
 Preregistered: 2026-09-09
 
@@ -323,9 +323,31 @@ timeout or retry, omits question text from its report, and uses create-only,
 permission-restricted report writing so an existing artifact cannot be
 replaced.
 
-The command has not been executed. No Gemini request or development report was
-produced, and no market data, strategy validation data, or holdout data was
-accessed. The complete local analysis suite passes 279/279 tests. Executing the
-frozen development evaluation remains a separate
-decision requiring explicit authorization after this implementation is reviewed
+At this implementation checkpoint, the command had not been executed and no
+Gemini request or development report had been produced. No market data,
+strategy validation data, or holdout data was accessed. The complete local
+analysis suite passed 279/279 tests. Provider execution remained a separate
+decision requiring explicit authorization after the implementation was reviewed
 and committed.
+
+## Frozen provider-evaluation attempt
+
+The committed frozen command was explicitly authorized and started on
+2026-09-09 after reconfirming the prompt and fixture checksums, the unused
+create-only report path, local API-key presence, and Google's documentation for
+the registered model and free tier. The original process subsequently exited
+without creating the registered report. Its attached terminal output was lost
+when the execution channel expired, so no trustworthy terminal error, provider
+completion count, latency, token usage, cost, response, or gate result can be
+recovered.
+
+This is an operationally inconclusive attempt, not evidence that the candidate
+passed or failed. The registered report does not exist, no manual review is
+possible, and v2 is not accepted or authorized for product integration. To
+avoid an outcome-informed retry on the same frozen development set, the command
+must not be run again. Any future provider experiment requires a new versioned
+preregistration, independent checksum-bound fixtures, and durable per-request
+operational diagnostics that exclude question and response content.
+
+No market data, strategy validation data, or holdout data was accessed during
+this attempt.
