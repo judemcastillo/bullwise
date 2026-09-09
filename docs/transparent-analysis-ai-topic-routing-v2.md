@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI topic routing v2
 
-Status: independent fixtures and fake evaluator implemented; prompt, Google adapter, and provider evaluation not yet authorized
+Status: frozen prompt, local Google adapter, and evaluation command implemented; provider evaluation not yet authorized
 
 Preregistered: 2026-09-09
 
@@ -298,3 +298,34 @@ After this checkpoint is reviewed and committed, the next separately authorized
 checkpoint is limited to freezing the v2 prompt, adding a local Google adapter,
 and adding a non-overwriting evaluation command. Executing that command would
 remain a separate explicit decision.
+
+## Frozen prompt and Google-adapter implementation result
+
+The topic-only prompt and structured-output protocol are frozen in
+`lib/analysis/transparent-analysis-ai-topic-routing-v2-prompt.ts`. The prompt's
+SHA-256 is
+`ec326aee6f9d1b0c9abe6de3386cdc9807416e01e285695395ee9f00c84fd62f`.
+It treats the question and topic catalog as untrusted data, requires the
+smallest exact topic set, distinguishes indicator-specific questions from their
+parent factors, routes overall-context questions to `context` alone, and
+returns no prose or fact IDs.
+
+The local adapter in
+`lib/analysis/google-transparent-analysis-ai-topic-routing-v2-provider.ts`
+reuses the existing Google structured-output transport. A synthetic fetch test
+proves that it sends only version, question, and the fixed topic catalog and
+uses the strict topic-only response schema.
+
+The command `npm run evaluate:transparent-analysis-ai-topic-routing-v2` requires
+the explicit `--confirm-frozen-development` flag. It performs 62 sequential
+requests with the frozen 6100-millisecond pacing interval, applies no Bullwise
+timeout or retry, omits question text from its report, and uses create-only,
+permission-restricted report writing so an existing artifact cannot be
+replaced.
+
+The command has not been executed. No Gemini request or development report was
+produced, and no market data, strategy validation data, or holdout data was
+accessed. The complete local analysis suite passes 279/279 tests. Executing the
+frozen development evaluation remains a separate
+decision requiring explicit authorization after this implementation is reviewed
+and committed.
