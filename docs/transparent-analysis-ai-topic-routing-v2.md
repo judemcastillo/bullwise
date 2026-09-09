@@ -1,6 +1,6 @@
 # Transparent analysis grounded AI topic routing v2
 
-Status: pure topic contract and deterministic expander implemented; fixtures, prompt, and provider evaluation not yet authorized
+Status: independent fixtures and fake evaluator implemented; prompt, Google adapter, and provider evaluation not yet authorized
 
 Preregistered: 2026-09-09
 
@@ -264,3 +264,37 @@ endpoint, or UI was added. No market data, strategy validation data, or holdout
 data was accessed. The next checkpoint requires separate authorization and is
 limited to the independent frozen v2 development fixtures and a provider-neutral
 fake evaluator.
+
+## Frozen fixtures and fake-evaluator implementation result
+
+The independent synthetic development set is implemented in
+`lib/analysis/transparent-analysis-ai-topic-routing-v2-fixtures.ts`. It contains
+62 provider-generation cases and 20 local boundary cases. The canonical fixture
+JSON SHA-256 is
+`2a51b035a94f90687e63eb893e94fae565b1a8378a868e8ec2f2a3b6fac785cf`.
+An audit found zero exact question or fixture-ID overlap with the v1 development
+set.
+
+The fixture set covers every topic at least three times, all three context
+states, single- and multi-topic routing, complete and partial panels, missing
+participation and relative strength, zero, one, and several displayed levels,
+local and defense-in-depth prohibited requests, ambiguous and unrelated input,
+prompt attacks, provider failure, and every registered invalid-output class.
+
+The provider-neutral boundary and fake evaluator are implemented in
+`lib/analysis/transparent-analysis-ai-topic-routing-v2-provider.ts` and
+`lib/analysis/transparent-analysis-ai-topic-routing-v2-evaluation.ts`. The
+evaluator measures all 14 automated gates, simulates the frozen pacing interval,
+records latency without a latency threshold, and excludes question text from
+its report. An ideal paced fake provider passes 14/14 automated gates and
+advances only to `manual_review_required`. A fake provider that adds unnecessary
+topics is rejected by the exact-topic-set gate.
+The complete local analysis suite passes 277/277 tests.
+
+This is local test infrastructure, not Gemini development evidence. No prompt,
+Google adapter, provider request, development report, endpoint, or UI was
+created. No market data, strategy validation data, or holdout data was accessed.
+After this checkpoint is reviewed and committed, the next separately authorized
+checkpoint is limited to freezing the v2 prompt, adding a local Google adapter,
+and adding a non-overwriting evaluation command. Executing that command would
+remain a separate explicit decision.

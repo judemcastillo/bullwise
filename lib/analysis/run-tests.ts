@@ -23,6 +23,7 @@ import "./transparent-analysis-ai-question-routing.test";
 import "./transparent-analysis-ai-question-routing-evaluation.test";
 import "./transparent-analysis-ai-question-routing-prompt.test";
 import "./transparent-analysis-ai-topic-routing-v2.test";
+import "./transparent-analysis-ai-topic-routing-v2-evaluation.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";
