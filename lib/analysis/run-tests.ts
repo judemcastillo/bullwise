@@ -25,6 +25,8 @@ import "./transparent-analysis-ai-question-routing-prompt.test";
 import "./transparent-analysis-ai-topic-routing-v2.test";
 import "./transparent-analysis-ai-topic-routing-v2-evaluation.test";
 import "./transparent-analysis-ai-topic-routing-v2-prompt.test";
+import "./transparent-analysis-ai-topic-routing-v3-fixtures.test";
+import "./transparent-analysis-ai-topic-routing-v3-durable-run.test";
 import "../../components/instruments/DailyMarketAnalysisCard.test";
 import "./daily-swing-v2.test";
 import "./backtest.test";

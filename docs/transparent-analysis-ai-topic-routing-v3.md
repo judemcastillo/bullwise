@@ -1,6 +1,6 @@
 # Transparent analysis AI topic-routing experiment v3
 
-Status: preregistered design only; no fixtures, implementation, or provider run authorized
+Status: independent fixtures and provider-neutral durable runner implemented; no provider run authorized
 
 Preregistered: 2026-09-09
 
@@ -120,6 +120,8 @@ the raw response body, generated prose, provider error text, or secrets.
 Every manifest, marker, shard, log, and final report must use owner-only file
 permissions. Generated files belong under `artifacts/analysis/`, must be
 ignored by Git, and must never replace an existing file.
+Durable run directories use the dedicated ignored path
+`artifacts/analysis/transparent-analysis-ai-topic-routing-v3-runs/`.
 
 ## Frozen interruption and recovery rule
 
@@ -204,3 +206,40 @@ to creating the independent checksum-bound v3 fixtures and implementing the
 provider-neutral durable-run state machine with focused fake-provider crash and
 recovery tests. The Google adapter and real provider execution remain separate
 later decisions.
+
+## Independent fixtures and durable-run implementation result
+
+Implemented: 2026-09-10
+
+The v3 synthetic set contains 62 provider-generation fixtures and 20 local or
+simulated-provider boundary fixtures. Its canonical JSON SHA-256 is
+`cbe7b52311975370cf7fc8df19826b419fc0076c411b8804eecd9719cb1552b2`.
+Automated tests confirm unique IDs and questions, zero exact fixture-ID or
+question-text overlap with the v1 and v2 development sets, at least three cases
+for every closed topic, all context states and panel variants, all registered
+level shapes, multi-topic questions, local safety handling, and provider-
+routable generation inputs.
+
+The provider-neutral durable runner creates an owner-only run directory,
+manifest, operation log, request-start markers, and sanitized result shards.
+Files use create-only writes and durable file and directory synchronization.
+Recovery verifies the frozen hashes, ordered fixture digest, file shapes,
+permissions, and event consistency before doing any work. A fixture with a
+start marker is never called again, including when the marker has no result
+because a process may have stopped after starting its provider request.
+
+Focused fake-provider tests prove normal completion, zero calls after a
+completed run, create-only protection, owner-only permissions, omission of
+question and raw error content, bounded provider-failure records, refusal of
+checksum or permission drift, persistence of the 6100-millisecond pacing rule
+across continuation, and one-call maximum after a simulated interruption.
+
+The focused tests, TypeScript check, and targeted lint pass. The complete local
+analysis suite passes 286/286 tests. These are implementation results, not
+Gemini development evidence. No provider request, market-data operation,
+strategy experiment, validation access, or holdout access occurred.
+
+After this implementation is reviewed and committed, the next separately
+authorized checkpoint is limited to the provider-neutral durable evaluator and
+deterministic finalizer, exercised with fake providers. A Google-backed command
+and any real provider execution remain later decisions.
