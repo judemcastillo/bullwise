@@ -54,6 +54,7 @@
 		"evaluate:transparent-analysis-ai-selection-v1-6": "node --import tsx scripts/evaluate-transparent-analysis-ai-selection-v1-6.ts",
 		"evaluate:transparent-analysis-ai-question-routing-v1": "node --import tsx scripts/evaluate-transparent-analysis-ai-question-routing-v1.ts",
 		"evaluate:transparent-analysis-ai-topic-routing-v2": "node --import tsx scripts/evaluate-transparent-analysis-ai-topic-routing-v2.ts",
+		"evaluate:transparent-analysis-ai-topic-routing-v3": "node --import tsx scripts/evaluate-transparent-analysis-ai-topic-routing-v3.ts",
 		"accept:transparent-analysis-ai-selection-v1-6": "node --import tsx scripts/evaluate-transparent-analysis-ai-selection-acceptance-v1.ts",
 		"observe:transparent-analysis-ai-latency": "node --import tsx scripts/observe-transparent-analysis-ai-latency.ts",
 		"observe:transparent-analysis-ai-provider-reliability": "node --import tsx scripts/observe-transparent-analysis-ai-provider-reliability.ts",

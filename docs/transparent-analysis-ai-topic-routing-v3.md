@@ -284,3 +284,43 @@ reviewed and committed, the next separately authorized checkpoint is limited
 to a Google-backed initial/continuation/finalization command with explicit
 confirmation flags and synthetic transport tests. Executing that command
 against Google remains a separate later decision.
+
+## Google command implementation result
+
+Implemented: 2026-09-11
+
+The v3 command has three explicit actions. `start` creates a new opaque run ID,
+prints its durable directory before beginning the request sequence, and calls
+only the frozen synthetic generation fixtures. `continue` requires that run ID
+and uses the durable state machine to skip every fixture that already has a
+start marker. `finalize` reads normalized durable records and writes the
+create-only report without loading a provider key or making a provider call.
+Each action has a distinct confirmation flag:
+
+```text
+npm run evaluate:transparent-analysis-ai-topic-routing-v3 -- start --confirm-frozen-v3-initial-run
+npm run evaluate:transparent-analysis-ai-topic-routing-v3 -- continue <run-id> --confirm-frozen-v3-continuation
+npm run evaluate:transparent-analysis-ai-topic-routing-v3 -- finalize <run-id> --confirm-frozen-v3-finalization
+```
+
+The Google adapter retains the frozen model, prompt, strict schema, free-tier
+cost assumption, 6100-millisecond minimum request-start interval, no Bullwise
+timeout, and no retry. Successful HTTP responses with missing or non-JSON model
+output are counted as completed invalid schema results with measured token use;
+transport, authentication, rate-limit, server, and unusable HTTP-response
+failures remain bounded provider failures. Neither raw provider output nor
+provider error content is written to durable files.
+
+Synthetic transport tests cover confirmation refusal before any request,
+complete initial execution, deterministic zero-call finalization, continuation
+after an indeterminate attempt, pacing across recovery, completed malformed
+output classification, and omission of fixture questions, credentials, and raw
+output from stored records. Focused tests, TypeScript, and targeted lint pass.
+No live Gemini request, market-data operation, strategy experiment, validation
+access, holdout access, endpoint change, or production integration occurred.
+
+This implementation does not authorize running `start` or `continue`. The next
+checkpoint is a review of the command and synthetic evidence. A live frozen v3
+development run requires a separate explicit decision immediately before use,
+including verification that the registered model and free-tier availability
+still match the preregistration.

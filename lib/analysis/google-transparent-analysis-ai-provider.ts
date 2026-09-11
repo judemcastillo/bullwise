@@ -45,18 +45,21 @@ export class GoogleTransparentAnalysisAiProviderError extends Error {
 	readonly category: GoogleTransparentAnalysisAiProviderFailureCategory;
 	readonly httpStatus: number | null;
 	readonly retryAfterSeconds: number | null;
+	readonly usage: TransparentAnalysisAiMeasuredGeneration["usage"] | null;
 
 	constructor(input: {
 		message: string;
 		category: GoogleTransparentAnalysisAiProviderFailureCategory;
 		httpStatus?: number;
 		retryAfterSeconds?: number;
+		usage?: TransparentAnalysisAiMeasuredGeneration["usage"];
 	}) {
 		super(input.message);
 		this.name = "GoogleTransparentAnalysisAiProviderError";
 		this.category = input.category;
 		this.httpStatus = input.httpStatus ?? null;
 		this.retryAfterSeconds = input.retryAfterSeconds ?? null;
+		this.usage = input.usage ?? null;
 	}
 }
 
@@ -188,11 +191,15 @@ export class GoogleTransparentAnalysisAiProvider
 				category: "response_not_json",
 			});
 		}
+		const inputTokens = tokenCount(body.usageMetadata?.promptTokenCount);
+		const outputTokens = tokenCount(body.usageMetadata?.candidatesTokenCount);
+		const usage = { inputTokens, outputTokens, costUsd: 0 };
 		const text = outputText(body);
 		if (!text) {
 			throw new GoogleTransparentAnalysisAiProviderError({
 				message: "Gemini response contained no output text",
 				category: "missing_output",
+				usage,
 			});
 		}
 
@@ -203,13 +210,12 @@ export class GoogleTransparentAnalysisAiProvider
 			throw new GoogleTransparentAnalysisAiProviderError({
 				message: "Gemini output text was not JSON",
 				category: "output_not_json",
+				usage,
 			});
 		}
-		const inputTokens = tokenCount(body.usageMetadata?.promptTokenCount);
-		const outputTokens = tokenCount(body.usageMetadata?.candidatesTokenCount);
 		return {
 			output,
-			usage: { inputTokens, outputTokens, costUsd: 0 },
+			usage,
 		};
 	}
 }
