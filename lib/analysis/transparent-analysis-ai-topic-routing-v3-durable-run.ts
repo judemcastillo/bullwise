@@ -19,6 +19,7 @@ import {
 
 export const TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION = "1.0.0";
 export const TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RECOVERY_POLICY_VERSION = "1.0.0";
+export const TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_FINAL_REPORT_FILE = "report.json";
 
 const FILE_MODE = 0o600;
 const DIRECTORY_MODE = 0o700;
@@ -34,6 +35,12 @@ type Usage = {
 	estimatedCostUsd: number;
 };
 
+export type TransparentAnalysisAiTopicRoutingV3ValidationIssueCode =
+	| "schema"
+	| "route"
+	| "topic_id"
+	| "selection_rule";
+
 export type TransparentAnalysisAiTopicRoutingV3ProviderResult =
 	| {
 			kind: "completed_valid";
@@ -42,6 +49,7 @@ export type TransparentAnalysisAiTopicRoutingV3ProviderResult =
 	  }
 	| {
 			kind: "completed_invalid";
+			issueCodes: TransparentAnalysisAiTopicRoutingV3ValidationIssueCode[];
 			usage: Usage;
 	  };
 
@@ -57,7 +65,7 @@ export type TransparentAnalysisAiTopicRoutingV3RunConfig = {
 	minimumStartIntervalMs: number;
 };
 
-type Manifest = {
+export type TransparentAnalysisAiTopicRoutingV3RunManifest = {
 	version: typeof TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION;
 	recoveryPolicyVersion: typeof TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RECOVERY_POLICY_VERSION;
 	runId: string;
@@ -73,7 +81,7 @@ type Manifest = {
 	createdAtEpochMs: number;
 };
 
-type StartMarker = {
+export type TransparentAnalysisAiTopicRoutingV3StartMarker = {
 	version: typeof TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION;
 	runId: string;
 	fixtureId: string;
@@ -82,7 +90,7 @@ type StartMarker = {
 	startedAtEpochMs: number;
 };
 
-type ResultShard = {
+export type TransparentAnalysisAiTopicRoutingV3ResultShard = {
 	version: typeof TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION;
 	runId: string;
 	fixtureId: string;
@@ -91,6 +99,7 @@ type ResultShard = {
 	statusClass: "completed_valid" | "completed_invalid" | "provider_failure";
 	schemaValid: boolean | null;
 	validationOutcome: "valid" | "invalid" | "not_available";
+	validationIssueCodes: TransparentAnalysisAiTopicRoutingV3ValidationIssueCode[];
 	route: TransparentAnalysisAiTopicRoutingV2Route | null;
 	topicIds: TransparentAnalysisAiTopicRoutingV2TopicId[];
 	errorCategory: "invalid_output" | "provider_failure" | null;
@@ -99,6 +108,10 @@ type ResultShard = {
 	outputTokens: number | null;
 	estimatedCostUsd: number | null;
 };
+
+type Manifest = TransparentAnalysisAiTopicRoutingV3RunManifest;
+type StartMarker = TransparentAnalysisAiTopicRoutingV3StartMarker;
+type ResultShard = TransparentAnalysisAiTopicRoutingV3ResultShard;
 
 type OperationalEvent = {
 	version: typeof TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION;
@@ -243,7 +256,17 @@ function isRoute(value: unknown): value is TransparentAnalysisAiTopicRoutingV2Ro
 
 function isTopicIds(value: unknown): value is TransparentAnalysisAiTopicRoutingV2TopicId[] {
 	return Array.isArray(value) && value.length <= 3 &&
-		new Set(value).size === value.length && value.every((id) => TOPIC_IDS.has(String(id)));
+		new Set(value).size === value.length &&
+		value.every((id) => typeof id === "string" && TOPIC_IDS.has(id));
+}
+
+function isValidationIssueCodes(
+	value: unknown,
+): value is TransparentAnalysisAiTopicRoutingV3ValidationIssueCode[] {
+	const allowed = new Set(["schema", "route", "topic_id", "selection_rule"]);
+	return Array.isArray(value) && value.length <= allowed.size &&
+		new Set(value).size === value.length &&
+		value.every((code) => typeof code === "string" && allowed.has(code));
 }
 
 function assertStrictOutput(output: TransparentAnalysisAiTopicRoutingV2Output) {
@@ -336,7 +359,7 @@ function assertStartMarker(value: unknown, expected: Omit<StartMarker, "startedA
 function assertResultShard(value: unknown, marker: StartMarker): ResultShard {
 	if (!isRecord(value) || !hasExactKeys(value, [
 		"version", "runId", "fixtureId", "ordinal", "providerCompleted", "statusClass",
-		"schemaValid", "validationOutcome", "route", "topicIds", "errorCategory",
+		"schemaValid", "validationOutcome", "validationIssueCodes", "route", "topicIds", "errorCategory",
 		"durationMs", "inputTokens", "outputTokens", "estimatedCostUsd",
 	])) throw new Error(`The result shard for ${marker.fixtureId} is malformed.`);
 	const shard = value as ResultShard;
@@ -345,11 +368,13 @@ function assertResultShard(value: unknown, marker: StartMarker): ResultShard {
 		shard.ordinal !== marker.ordinal || !isNonnegativeNumber(shard.durationMs) ||
 		!isNullableNonnegativeNumber(shard.inputTokens) ||
 		!isNullableNonnegativeNumber(shard.outputTokens) ||
-		!isNullableNonnegativeNumber(shard.estimatedCostUsd) || !isTopicIds(shard.topicIds)) {
+		!isNullableNonnegativeNumber(shard.estimatedCostUsd) || !isTopicIds(shard.topicIds) ||
+		!isValidationIssueCodes(shard.validationIssueCodes)) {
 		throw new Error(`The result shard for ${marker.fixtureId} is inconsistent.`);
 	}
 	if (shard.statusClass === "completed_valid") {
 		if (!shard.providerCompleted || shard.schemaValid !== true || shard.validationOutcome !== "valid" ||
+			shard.validationIssueCodes.length !== 0 ||
 			!isRoute(shard.route) || shard.errorCategory !== null || shard.inputTokens === null ||
 			shard.outputTokens === null || shard.estimatedCostUsd === null) {
 			throw new Error(`The valid result shard for ${marker.fixtureId} is inconsistent.`);
@@ -361,13 +386,15 @@ function assertResultShard(value: unknown, marker: StartMarker): ResultShard {
 		});
 	} else if (shard.statusClass === "completed_invalid") {
 		if (!shard.providerCompleted || shard.schemaValid !== false || shard.validationOutcome !== "invalid" ||
+			shard.validationIssueCodes.length === 0 ||
 			shard.route !== null || shard.topicIds.length !== 0 || shard.errorCategory !== "invalid_output" ||
 			shard.inputTokens === null || shard.outputTokens === null || shard.estimatedCostUsd === null) {
 			throw new Error(`The invalid result shard for ${marker.fixtureId} is inconsistent.`);
 		}
 	} else if (shard.statusClass === "provider_failure") {
 		if (shard.providerCompleted || shard.schemaValid !== null ||
-			shard.validationOutcome !== "not_available" || shard.route !== null ||
+			shard.validationOutcome !== "not_available" || shard.validationIssueCodes.length !== 0 ||
+			shard.route !== null ||
 			shard.topicIds.length !== 0 || shard.errorCategory !== "provider_failure" ||
 			shard.inputTokens !== null || shard.outputTokens !== null ||
 			shard.estimatedCostUsd !== null) {
@@ -544,6 +571,7 @@ function resultShard(input: {
 			statusClass: "provider_failure",
 			schemaValid: null,
 			validationOutcome: "not_available",
+			validationIssueCodes: [],
 			route: null,
 			topicIds: [],
 			errorCategory: "provider_failure",
@@ -565,6 +593,7 @@ function resultShard(input: {
 			statusClass: "completed_valid",
 			schemaValid: true,
 			validationOutcome: "valid",
+			validationIssueCodes: [],
 			route: input.result.output.route,
 			topicIds: [...input.result.output.topicIds],
 			errorCategory: null,
@@ -573,6 +602,9 @@ function resultShard(input: {
 			outputTokens: input.result.usage.outputTokens,
 			estimatedCostUsd: input.result.usage.estimatedCostUsd,
 		};
+	}
+	if (!isValidationIssueCodes(input.result.issueCodes) || input.result.issueCodes.length === 0) {
+		throw new Error("The sanitized validation issue codes are invalid.");
 	}
 	return {
 		version: TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_RUN_VERSION,
@@ -583,6 +615,7 @@ function resultShard(input: {
 		statusClass: "completed_invalid",
 		schemaValid: false,
 		validationOutcome: "invalid",
+		validationIssueCodes: [...input.result.issueCodes],
 		route: null,
 		topicIds: [],
 		errorCategory: "invalid_output",
@@ -609,6 +642,14 @@ export async function continueTransparentAnalysisAiTopicRoutingV3Run<T extends o
 	const wait = input.wait ?? ((milliseconds: number) =>
 		new Promise<void>((resolvePromise) => setTimeout(resolvePromise, milliseconds)));
 	const path = runDirectory(input.config);
+	try {
+		await lstat(join(path, TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_FINAL_REPORT_FILE));
+		throw new Error("The durable run is finalized and cannot continue.");
+	} catch (error) {
+		if (!(error && typeof error === "object" && "code" in error && error.code === "ENOENT")) {
+			throw error;
+		}
+	}
 	let state = await inspectTransparentAnalysisAiTopicRoutingV3Run(input.config);
 	let previousStartedAt = Math.max(
 		...Array.from(state.markers.values(), ({ startedAtEpochMs }) => startedAtEpochMs),

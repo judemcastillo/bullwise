@@ -1,6 +1,6 @@
 # Transparent analysis AI topic-routing experiment v3
 
-Status: independent fixtures and provider-neutral durable runner implemented; no provider run authorized
+Status: provider-neutral durable evaluator and finalizer implemented; no provider run authorized
 
 Preregistered: 2026-09-09
 
@@ -243,3 +243,44 @@ After this implementation is reviewed and committed, the next separately
 authorized checkpoint is limited to the provider-neutral durable evaluator and
 deterministic finalizer, exercised with fake providers. A Google-backed command
 and any real provider execution remain later decisions.
+
+## Durable evaluator and finalizer implementation result
+
+Implemented: 2026-09-11
+
+The durable result format now retains only strict normalized route and topic
+IDs for valid responses or bounded validation issue codes for invalid
+responses. This supplies the registered schema and selected-topic gates without
+retaining raw provider output, response prose, provider error text, or fixture
+question text. Total token and cost accounting includes every completed
+provider response, while the registered mean-cost gate remains calculated per
+valid result.
+
+The provider-neutral evaluator verifies the frozen v3 fixture checksum and
+order, reused v2 prompt identity, no-retry setting, and 6100-millisecond pacing
+identity before calculating the 14 automated gates. It reconstructs provider
+selections from sanitized shards, revalidates them against the frozen input,
+performs deterministic topic expansion, evaluates the local boundary cases,
+and emits manual-review rows without question text.
+
+The deterministic finalizer writes one owner-only, create-only `report.json`
+inside the durable run directory and synchronizes it before returning its
+SHA-256. A complete ideal fake run advances only to
+`manual_review_required`; an invalid-topic fake result is rejected; and an
+unfinished run finalizes only as `operationally_inconclusive`. Finalization
+closes the run so later continuation is refused.
+
+Focused tests cover ideal completion, all-gate calculation, invalid-topic
+rejection, complete token and cost accounting, question omission, report
+permissions and no-overwrite behavior, unfinished-run closure, and refusal of
+fixture-order or prompt drift. Focused tests, TypeScript, targeted lint, and the
+complete local analysis suite pass; the suite now contains 290/290 passing
+tests.
+
+These are fake-provider implementation results, not Gemini development
+evidence. No provider request, market-data operation, strategy experiment,
+validation access, or holdout access occurred. After this implementation is
+reviewed and committed, the next separately authorized checkpoint is limited
+to a Google-backed initial/continuation/finalization command with explicit
+confirmation flags and synthetic transport tests. Executing that command
+against Google remains a separate later decision.

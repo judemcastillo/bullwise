@@ -9,6 +9,8 @@ import type {
 
 const DISCLAIMER = "Descriptive market context—not investment advice or a trading signal.";
 
+export const TRANSPARENT_ANALYSIS_AI_TOPIC_ROUTING_V3_FIXTURES_VERSION = "3.0.0";
+
 function syntheticPanel(input: {
 	status?: "ready" | "partial";
 	context: "constructive" | "mixed" | "defensive";
