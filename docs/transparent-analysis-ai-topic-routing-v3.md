@@ -324,3 +324,54 @@ checkpoint is a review of the command and synthetic evidence. A live frozen v3
 development run requires a separate explicit decision immediately before use,
 including verification that the registered model and free-tier availability
 still match the preregistration.
+
+## Live development result and manual review
+
+Run finalized: 2026-09-11T15:21:53.192Z
+
+The explicitly authorized frozen development run used
+`gemini-3.5-flash-lite` under durable run ID
+`v3-e6416a5b9f88c974ac98d2453078ec85`. Its create-only report is
+`artifacts/analysis/transparent-analysis-ai-topic-routing-v3-runs/v3-e6416a5b9f88c974ac98d2453078ec85/report.json`
+with SHA-256
+`d8864336ef98ff893a129317b831d0c5a0b6df4d16d820d888f98c0ab5cbd251`.
+
+Gemini completed all 62 generation requests with no provider failures,
+indeterminate attempts, or invalid structured outputs. All 14 automated gates
+passed. Expected-route accuracy was 96.77419355%, required-topic coverage was
+97.91666667%, and exact-topic-set accuracy was 95.83333333%. Measured request
+starts were at least 6099 milliseconds apart, satisfying the registered
+6000-millisecond gate. Median latency was 22640 milliseconds and p95 latency
+was 35109 milliseconds. The run used 37612 input tokens and 2094 output tokens;
+the registered free-tier estimate was USD 0.
+
+The subsequent assistant review joined every normalized selection to its
+version-controlled synthetic question and inspected all 62 deterministic
+renderings. This was an assistant review with deterministic cross-checks, not
+an independent human review. Fifty-eight renderings were relevant and useful.
+Four failed the strict 100% manual gate:
+
+- `v3-topic-participation-2` requested the recent-versus-normal activity
+  comparison, but selected broad `context`; its answer contained trend and
+  momentum facts and omitted participation.
+- `v3-topic-relative_strength-3` correctly selected `relative_strength` but
+  also selected `data_quality`; the expanded answer consequently added an
+  unrelated participation limitation and warning to the benchmark-relative
+  question.
+- `v3-clarify-value` referred to an unspecified value and required
+  clarification, but selected `context` and answered with unrelated trend and
+  momentum facts.
+- `v3-clarify-choice` was materially ambiguous and required clarification, but
+  selected `prohibited` and returned a trading-instructions refusal instead.
+
+Manual relevance and usefulness was therefore 58/62, or 93.5483871%, below the
+required 100%. The final v3 development decision is `reject_candidate`. The
+original create-only report retains `manual_review_required` and its null
+manual field; this document records the subsequent review without overwriting
+that artifact.
+
+V3 is closed. Do not rerun it, tune the prompt against these fixtures, replace
+its report, reinterpret its automated pass as acceptance, or integrate this
+candidate into production. No market data, strategy validation, sealed
+acceptance data, or holdout data was accessed during the provider run or
+manual review.
