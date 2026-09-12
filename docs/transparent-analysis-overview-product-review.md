@@ -1,7 +1,7 @@
 # Overview selection and AI ordering product review
 
 Recorded: 2026-09-08
-Status: deterministic presentation implemented; AI ordering integration declined
+Status: deterministic presentation retained; optional v1.6 AI overview implemented
 
 ## Finding
 
@@ -115,3 +115,20 @@ only 4/20 overview orders and 0/80 factor orders, while the deterministic
 grouping solves the identified omission without model latency or an external
 dependency. Preserve the candidate, reports, and acceptance result as research
 evidence; do not connect v1.6 to production solely to reorder facts.
+
+## Revised product decision
+
+Decided: 2026-09-12
+
+The user subsequently chose to expose the accepted v1.6 behavior as a small,
+optional AI feature. The deterministic panel remains the source of truth and
+loads without Gemini. A signed-in user may explicitly click **Generate AI
+analysis** to ask Gemini to order the approved deterministic fact IDs into a
+short overview. The server validates the returned IDs and renders the original
+fact text; Gemini cannot add facts, advice, or a trading signal.
+
+This does not reopen the rejected topic-routing research and does not authorize
+a v4 routing experiment. There is no page-load model call, chat interface,
+background job, provider retry, or artificial application timeout. If Gemini is
+missing, slow, unavailable, or returns invalid IDs, the deterministic analysis
+stays visible and the optional overview fails safely.

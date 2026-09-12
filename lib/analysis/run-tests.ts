@@ -17,6 +17,8 @@ import "./transparent-analysis-ai-content-evaluation-v1-3.test";
 import "./transparent-analysis-ai-content-evaluation-v1-4.test";
 import "./transparent-analysis-ai-selection-v1-5.test";
 import "./transparent-analysis-ai-selection-v1-6.test";
+import "./transparent-analysis-ai-production.test";
+import "./transparent-analysis-ai-production-route.test";
 import "./transparent-analysis-ai-selection-acceptance-v1.test";
 import "./transparent-analysis-ai-latency-observation.test";
 import "./transparent-analysis-ai-question-routing.test";

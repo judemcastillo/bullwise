@@ -9,11 +9,17 @@ import type {
 	AnalysisPanelUnavailableReason,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 import {
+	buildTransparentAnalysisAiInput,
+	validateTransparentAnalysisAiExplanation,
+	type TransparentAnalysisAiExplanation,
+} from "@/lib/analysis/transparent-analysis-ai-contract";
+import {
 	Activity,
 	BarChart3,
 	Gauge,
 	RefreshCw,
 	ShieldCheck,
+	Sparkles,
 	Target,
 	TrendingUp,
 } from "lucide-react";
@@ -29,6 +35,12 @@ type AnalysisLoadState =
 	| { kind: "loading" }
 	| { kind: "loaded"; response: AnalysisPanelResponse }
 	| { kind: "error"; reason: "authentication" | "request_failed" };
+
+type AiAnalysisState =
+	| { kind: "idle" }
+	| { kind: "loading" }
+	| { kind: "ready"; explanation: TransparentAnalysisAiExplanation }
+	| { kind: "error"; message: string };
 
 const factorIcons = {
 	trend: TrendingUp,
@@ -171,6 +183,29 @@ export function analysisEndpointForInstrument(
 	return eligible
 		? `/api/instruments/${encodeURIComponent(canonicalKey)}/analysis`
 		: null;
+}
+
+export function aiAnalysisEndpointForInstrument(canonicalKey: string) {
+	return `/api/instruments/${encodeURIComponent(canonicalKey)}/analysis/ai`;
+}
+
+export function isAiAnalysisResponse(
+	value: unknown,
+	panel: AnalysisPanelAvailableResponse,
+): value is { version: "1.0.0"; status: "ready"; explanation: TransparentAnalysisAiExplanation } {
+	if (
+		!isRecord(value) ||
+		value.version !== "1.0.0" ||
+		value.status !== "ready" ||
+		!("explanation" in value)
+	) {
+		return false;
+	}
+	const input = buildTransparentAnalysisAiInput(panel);
+	return input !== null && validateTransparentAnalysisAiExplanation(
+		input,
+		value.explanation,
+	).ok;
 }
 
 function formatTimestamp(value: string) {
@@ -431,6 +466,95 @@ function Provenance({ dataQuality }: { dataQuality: AnalysisPanelDataQuality }) 
 	);
 }
 
+function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResponse }) {
+	const [state, setState] = useState<AiAnalysisState>({ kind: "idle" });
+
+	const generate = async () => {
+		setState({ kind: "loading" });
+		try {
+			const result = await fetch(
+				aiAnalysisEndpointForInstrument(response.instrument.canonicalKey),
+				{
+					method: "POST",
+					cache: "no-store",
+					credentials: "same-origin",
+					headers: { Accept: "application/json" },
+				},
+			);
+			if (result.status === 401) {
+				setState({ kind: "error", message: "Sign in again to generate AI analysis." });
+				return;
+			}
+			const payload: unknown = await result.json();
+			if (!result.ok || !isAiAnalysisResponse(payload, response)) {
+				throw new Error("AI analysis was unavailable");
+			}
+			setState({ kind: "ready", explanation: payload.explanation });
+		} catch {
+			setState({
+				kind: "error",
+				message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
+			});
+		}
+	};
+
+	return (
+		<div className="mt-5 rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-4">
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<div className="flex items-center gap-2">
+						<Sparkles className="size-4 text-yellow-500" aria-hidden="true" />
+						<h3 className="text-sm font-semibold text-gray-200">AI analysis</h3>
+					</div>
+					<p className="mt-1 text-xs leading-5 text-gray-500">
+						Gemini can organize the verified facts into a short overview.
+					</p>
+				</div>
+				<button
+					type="button"
+					onClick={generate}
+					disabled={state.kind === "loading"}
+					className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md bg-yellow-500 px-4 text-sm font-semibold text-gray-900 disabled:cursor-wait disabled:opacity-60"
+				>
+					{state.kind === "loading" ? (
+						<RefreshCw className="size-4 animate-spin" aria-hidden="true" />
+					) : (
+						<Sparkles className="size-4" aria-hidden="true" />
+					)}
+					{state.kind === "loading"
+						? "Generating…"
+						: state.kind === "error"
+							? "Try AI analysis again"
+							: "Generate AI analysis"}
+				</button>
+			</div>
+			{state.kind === "loading" ? (
+				<p className="mt-4 text-sm text-gray-400" role="status" aria-live="polite">
+					Generating an overview… This may take several seconds.
+				</p>
+			) : null}
+			{state.kind === "ready" ? (
+				<div className="mt-4" aria-live="polite">
+					<p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+						AI-organized overview
+					</p>
+					<p className="mt-2 text-sm leading-6 text-gray-300">
+						{state.explanation.overview.text}
+					</p>
+				</div>
+			) : null}
+			{state.kind === "error" ? (
+				<p className="mt-4 text-sm text-red-300" role="alert">
+					{state.message}
+				</p>
+			) : null}
+			<p className="mt-3 text-xs leading-5 text-gray-500">
+				AI only orders the facts shown above. It does not create a buy or sell signal.
+			</p>
+		</div>
+	);
+}
+
 function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableResponse }) {
 	const contextLabel =
 		response.context[0].toUpperCase() + response.context.slice(1);
@@ -458,6 +582,7 @@ function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableRespo
 					))}
 				</div>
 				<PartialNotice response={response} />
+				<AiAnalysisOverview response={response} />
 				<div className="mt-5 rounded-lg border border-gray-600 bg-gray-700/30 p-4">
 					<div className="flex items-center gap-2">
 						<Target className="size-4 text-yellow-500" aria-hidden="true" />

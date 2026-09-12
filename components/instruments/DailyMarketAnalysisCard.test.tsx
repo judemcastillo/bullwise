@@ -5,9 +5,14 @@ import {
 	DailyMarketAnalysisError,
 	DailyMarketAnalysisLoading,
 	DailyMarketAnalysisView,
+	aiAnalysisEndpointForInstrument,
 	analysisEndpointForInstrument,
+	isAiAnalysisResponse,
 	isAnalysisPanelResponse,
 } from "@/components/instruments/DailyMarketAnalysisCard";
+import { buildTransparentAnalysisAiInput } from "@/lib/analysis/transparent-analysis-ai-contract";
+import { renderTransparentAnalysisAiSelection } from "@/lib/analysis/transparent-analysis-ai-selection-contract";
+import { buildTransparentAnalysisAiSelectionV16Input } from "@/lib/analysis/transparent-analysis-ai-selection-v1-6";
 import type {
 	AnalysisPanelAvailableResponse,
 	AnalysisPanelResponse,
@@ -88,6 +93,37 @@ describe("daily market analysis UI", () => {
 			analysisEndpointForInstrument("equity:xnas:aapl", true),
 			"/api/instruments/equity%3Axnas%3Aaapl/analysis",
 		);
+		assert.equal(
+			aiAnalysisEndpointForInstrument("equity:xnas:aapl"),
+			"/api/instruments/equity%3Axnas%3Aaapl/analysis/ai",
+		);
+	});
+
+	it("accepts only a grounded AI response for the current deterministic panel", () => {
+		const baseInput = buildTransparentAnalysisAiInput(readyResponse)!;
+		const input = buildTransparentAnalysisAiSelectionV16Input(baseInput);
+		const selection = {
+			version: "1.0.0" as const,
+			overviewFactIds: input.requiredOverviewFactIds,
+			factors: (["trend", "momentum", "volatility", "participation"] as const).map((factor) => ({
+				factor,
+				factIds: input.factors[factor].facts.map(({ id }) => id),
+			})),
+		};
+		const valid = {
+			version: "1.0.0",
+			status: "ready",
+			explanation: renderTransparentAnalysisAiSelection(input, selection),
+		};
+
+		assert.equal(isAiAnalysisResponse(valid, readyResponse), true);
+		assert.equal(
+			isAiAnalysisResponse({
+				...valid,
+				explanation: { ...valid.explanation, overview: { text: "Buy now.", factIds: [] } },
+			}, readyResponse),
+			false,
+		);
 	});
 
 	it("validates the allow-listed API response before rendering", () => {
@@ -118,6 +154,8 @@ describe("daily market analysis UI", () => {
 			"Nearest price levels",
 			"220.50",
 			"Data quality and provenance",
+			"Generate AI analysis",
+			"AI only orders the facts shown above",
 			"massive",
 			"Aug 21, 2026, 4:00 PM EDT",
 			readyResponse.disclaimer,

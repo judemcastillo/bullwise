@@ -375,3 +375,22 @@ its report, reinterpret its automated pass as acceptance, or integrate this
 candidate into production. No market data, strategy validation, sealed
 acceptance data, or holdout data was accessed during the provider run or
 manual review.
+
+## Final product decision
+
+Decided: 2026-09-12
+
+Bullwise will keep the current deterministic daily analysis without AI topic
+routing. There will be no v4 routing experiment, no acceptance set, no
+AI-routing endpoint, and no AI-routing button. The deterministic analysis
+panel remains the production source and presentation of market context.
+
+The earlier AI contracts, fixtures, evaluators, durable runner, command, and
+ignored run artifacts remain historical research evidence. They are not
+production integrations and must not be invoked by application routes,
+components, page loads, or user interactions. Retaining them preserves the
+audit trail and does not authorize another provider run.
+
+This decision closes the AI-routing research agenda. Reopening it would require
+an explicit future product decision; it must not be treated as an automatic v4
+continuation or inferred from routine maintenance work.
