@@ -1,7 +1,7 @@
 # Overview selection and AI ordering product review
 
 Recorded: 2026-09-08
-Status: deterministic presentation retained; optional v1.6 AI overview implemented
+Status: deterministic presentation retained; optional grounded AI synthesis implemented
 
 ## Finding
 
@@ -120,15 +120,29 @@ evidence; do not connect v1.6 to production solely to reorder facts.
 
 Decided: 2026-09-12
 
-The user subsequently chose to expose the accepted v1.6 behavior as a small,
-optional AI feature. The deterministic panel remains the source of truth and
-loads without Gemini. A signed-in user may explicitly click **Generate AI
-analysis** to ask Gemini to order the approved deterministic fact IDs into a
-short overview. The server validates the returned IDs and renders the original
-fact text; Gemini cannot add facts, advice, or a trading signal.
+The user subsequently tested the optional v1.6 ordering behavior and found that
+it merely repeated the deterministic panel without providing useful
+interpretation. That product finding supersedes the initial integration choice:
+v1.6 remains valid fidelity research, but it is no longer the application
+output.
 
-This does not reopen the rejected topic-routing research and does not authorize
-a v4 routing experiment. There is no page-load model call, chat interface,
+The click-triggered feature now requests a narrow synthesis with four fields:
+interpretation, conflicting evidence, risk conditions, and what to watch. The
+input includes deterministic factor states, evidence, and the nearest available
+support and resistance. Every generated section must cite the required source
+categories. Local validation rejects unknown citations, invented numbers,
+trading advice, unsupported data domains, direct fact-copying, and responses
+that do not use basic interpretive language.
+
+The deterministic panel remains the source of truth and loads without Gemini.
+This does not reopen the rejected topic-routing research or authorize a v4
+routing experiment. There is no page-load model call, chat interface,
 background job, provider retry, or artificial application timeout. If Gemini is
-missing, slow, unavailable, or returns invalid IDs, the deterministic analysis
-stays visible and the optional overview fails safely.
+missing, slow, unavailable, or fails validation, the deterministic analysis
+stays visible and the optional synthesis fails safely.
+
+This is an implementation result supported by synthetic provider tests, not a
+new registered Gemini evaluation or evidence that the generated text is useful
+across instruments. The user's manual result established that v1.6 lacked
+product value; the replacement still requires direct product testing. No
+strategy validation or holdout data was accessed.

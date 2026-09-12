@@ -5,16 +5,35 @@ import {
 	handleTransparentAnalysisAiProductionRequest,
 	type TransparentAnalysisAiProductionRouteDependencies,
 } from "@/lib/analysis/transparent-analysis-ai-production-route";
-import type { TransparentAnalysisAiExplanation } from "@/lib/analysis/transparent-analysis-ai-contract";
+import type { TransparentAnalysisAiSynthesis } from "@/lib/analysis/transparent-analysis-ai-production";
+import type { AnalysisPanelAvailableResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 import { AuthenticationError } from "@/lib/auth/access-policy";
 
-const explanation: TransparentAnalysisAiExplanation = {
-	version: "1.1.0",
-	context: "mixed",
-	overview: { text: "Verified fact.", factIds: ["trend.evidence.1"] },
-	factors: [],
-	limitations: [],
+const synthesis: TransparentAnalysisAiSynthesis = {
+	version: "2.0.0",
+	interpretation: { text: "Interpretation.", factIds: ["trend.1", "momentum.1"] },
+	conflict: { text: "Conflict.", factIds: ["trend.1", "momentum.1"] },
+	risk: { text: "Risk.", factIds: ["volatility.1", "participation.1"] },
+	watchNext: { text: "Watch.", factIds: ["support.1", "resistance.1"] },
 	disclaimer: "Descriptive market context—not investment advice or a trading signal.",
+};
+
+const availablePanel: AnalysisPanelAvailableResponse = {
+	version: "1.0.0",
+	status: "ready",
+	instrument: { canonicalKey: "equity:xnas:aapl", displaySymbol: "AAPL", name: "Apple", currency: "USD" },
+	asOf: "2026-08-21T20:00:00.000Z",
+	timeframe: { interval: "1d", description: "Daily context" },
+	context: "mixed",
+	factors: {
+		trend: { state: "mixed", evidence: [], counterEvidence: [] },
+		momentum: { state: "mixed", evidence: [], counterEvidence: [] },
+		volatility: { state: "normal", evidence: [], counterEvidence: [] },
+		participation: { state: "normal", evidence: [], counterEvidence: [] },
+	},
+	levels: { support: [], resistance: [] },
+	dataQuality: { provider: "massive", interval: "1d", adjusted: true, barsUsed: 500, firstBarAt: "2024-01-01", lastBarAt: "2026-08-21", completedThrough: "2026-08-21", warnings: [] },
+	disclaimer: synthesis.disclaimer,
 };
 
 function dependencies(
@@ -23,7 +42,7 @@ function dependencies(
 	return {
 		authenticate: async () => ({ id: "user-1" }),
 		getAnalysis: async () => ({ kind: "not_found" }),
-		generate: async () => ({ kind: "ready", explanation }),
+		generate: async () => ({ kind: "ready", synthesis }),
 		...overrides,
 	};
 }
@@ -58,10 +77,10 @@ describe("production AI analysis API boundary", () => {
 						status: "unavailable",
 						reason: "insufficient_history",
 						message: "Not enough history.",
-						disclaimer: explanation.disclaimer,
+						disclaimer: synthesis.disclaimer,
 					},
 				}),
-				generate: async () => { generationCalls += 1; return { kind: "ready", explanation }; },
+				generate: async () => { generationCalls += 1; return { kind: "ready", synthesis }; },
 			}),
 		);
 
@@ -77,23 +96,7 @@ describe("production AI analysis API boundary", () => {
 				getAnalysis: async () => ({
 					kind: "response",
 					transportStatus: 200,
-					response: {
-						version: "1.0.0",
-						status: "ready",
-						instrument: { canonicalKey: "equity:xnas:aapl", displaySymbol: "AAPL", name: "Apple", currency: "USD" },
-						asOf: "2026-08-21T20:00:00.000Z",
-						timeframe: { interval: "1d", description: "Daily context" },
-						context: "mixed",
-						factors: {
-							trend: { state: "mixed", evidence: [], counterEvidence: [] },
-							momentum: { state: "mixed", evidence: [], counterEvidence: [] },
-							volatility: { state: "normal", evidence: [], counterEvidence: [] },
-							participation: { state: "normal", evidence: [], counterEvidence: [] },
-						},
-						levels: { support: [], resistance: [] },
-						dataQuality: { provider: "massive", interval: "1d", adjusted: true, barsUsed: 500, firstBarAt: "2024-01-01", lastBarAt: "2026-08-21", completedThrough: "2026-08-21", warnings: [] },
-						disclaimer: explanation.disclaimer,
-					},
+					response: availablePanel,
 				}),
 				generate: async () => ({ kind: "fallback" }),
 			}),
@@ -105,6 +108,27 @@ describe("production AI analysis API boundary", () => {
 			status: "unavailable",
 			message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
 		});
+	});
+
+	it("returns the validated synthesis without exposing the deterministic panel", async () => {
+		const signal = new AbortController().signal;
+		let receivedSignal: AbortSignal | undefined;
+		const response = await handleTransparentAnalysisAiProductionRequest(
+			"equity:xnas:aapl",
+			signal,
+			dependencies({
+				getAnalysis: async () => ({ kind: "response", transportStatus: 200, response: availablePanel }),
+				generate: async (_panel, requestSignal) => {
+					receivedSignal = requestSignal;
+					return { kind: "ready", synthesis };
+				},
+			}),
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(receivedSignal, signal);
+		assert.deepEqual(await response.json(), { version: "1.0.0", status: "ready", synthesis });
+		assert.equal(response.headers.get("cache-control"), "private, no-store");
 	});
 
 	it("keeps the production route click-only and ignores request bodies", () => {

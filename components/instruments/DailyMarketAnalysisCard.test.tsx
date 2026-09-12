@@ -10,9 +10,7 @@ import {
 	isAiAnalysisResponse,
 	isAnalysisPanelResponse,
 } from "@/components/instruments/DailyMarketAnalysisCard";
-import { buildTransparentAnalysisAiInput } from "@/lib/analysis/transparent-analysis-ai-contract";
-import { renderTransparentAnalysisAiSelection } from "@/lib/analysis/transparent-analysis-ai-selection-contract";
-import { buildTransparentAnalysisAiSelectionV16Input } from "@/lib/analysis/transparent-analysis-ai-selection-v1-6";
+import type { TransparentAnalysisAiSynthesis } from "@/lib/analysis/transparent-analysis-ai-production";
 import type {
 	AnalysisPanelAvailableResponse,
 	AnalysisPanelResponse,
@@ -100,27 +98,25 @@ describe("daily market analysis UI", () => {
 	});
 
 	it("accepts only a grounded AI response for the current deterministic panel", () => {
-		const baseInput = buildTransparentAnalysisAiInput(readyResponse)!;
-		const input = buildTransparentAnalysisAiSelectionV16Input(baseInput);
-		const selection = {
-			version: "1.0.0" as const,
-			overviewFactIds: input.requiredOverviewFactIds,
-			factors: (["trend", "momentum", "volatility", "participation"] as const).map((factor) => ({
-				factor,
-				factIds: input.factors[factor].facts.map(({ id }) => id),
-			})),
+		const synthesis: TransparentAnalysisAiSynthesis = {
+			version: "2.0.0",
+			interpretation: { text: "Trend and momentum align, suggesting a consistent picture.", factIds: ["trend.1", "momentum.1"] },
+			conflict: { text: "Trend and momentum currently agree.", factIds: ["trend.1", "momentum.1"] },
+			risk: { text: "Normal volatility and participation may imply ordinary movement.", factIds: ["volatility.1", "participation.1"] },
+			watchNext: { text: "Watch the nearest support and resistance.", factIds: ["support.1", "resistance.1"] },
+			disclaimer: readyResponse.disclaimer,
 		};
 		const valid = {
 			version: "1.0.0",
 			status: "ready",
-			explanation: renderTransparentAnalysisAiSelection(input, selection),
+			synthesis,
 		};
 
 		assert.equal(isAiAnalysisResponse(valid, readyResponse), true);
 		assert.equal(
 			isAiAnalysisResponse({
 				...valid,
-				explanation: { ...valid.explanation, overview: { text: "Buy now.", factIds: [] } },
+				synthesis: { ...valid.synthesis, interpretation: { text: "Buy now.", factIds: [] } },
 			}, readyResponse),
 			false,
 		);
@@ -155,7 +151,7 @@ describe("daily market analysis UI", () => {
 			"220.50",
 			"Data quality and provenance",
 			"Generate AI analysis",
-			"AI only orders the facts shown above",
+			"AI interprets only the verified facts shown above",
 			"massive",
 			"Aug 21, 2026, 4:00 PM EDT",
 			readyResponse.disclaimer,

@@ -9,10 +9,10 @@ import type {
 	AnalysisPanelUnavailableReason,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 import {
-	buildTransparentAnalysisAiInput,
-	validateTransparentAnalysisAiExplanation,
-	type TransparentAnalysisAiExplanation,
-} from "@/lib/analysis/transparent-analysis-ai-contract";
+	buildTransparentAnalysisAiSynthesisInput,
+	validateTransparentAnalysisAiSynthesis,
+	type TransparentAnalysisAiSynthesis,
+} from "@/lib/analysis/transparent-analysis-ai-production";
 import {
 	Activity,
 	BarChart3,
@@ -39,7 +39,7 @@ type AnalysisLoadState =
 type AiAnalysisState =
 	| { kind: "idle" }
 	| { kind: "loading" }
-	| { kind: "ready"; explanation: TransparentAnalysisAiExplanation }
+	| { kind: "ready"; synthesis: TransparentAnalysisAiSynthesis }
 	| { kind: "error"; message: string };
 
 const factorIcons = {
@@ -192,20 +192,20 @@ export function aiAnalysisEndpointForInstrument(canonicalKey: string) {
 export function isAiAnalysisResponse(
 	value: unknown,
 	panel: AnalysisPanelAvailableResponse,
-): value is { version: "1.0.0"; status: "ready"; explanation: TransparentAnalysisAiExplanation } {
+): value is { version: "1.0.0"; status: "ready"; synthesis: TransparentAnalysisAiSynthesis } {
 	if (
 		!isRecord(value) ||
 		value.version !== "1.0.0" ||
 		value.status !== "ready" ||
-		!("explanation" in value)
+		!("synthesis" in value)
 	) {
 		return false;
 	}
-	const input = buildTransparentAnalysisAiInput(panel);
-	return input !== null && validateTransparentAnalysisAiExplanation(
+	const input = buildTransparentAnalysisAiSynthesisInput(panel);
+	return input !== null && validateTransparentAnalysisAiSynthesis(
 		input,
-		value.explanation,
-	).ok;
+		value.synthesis,
+	);
 }
 
 function formatTimestamp(value: string) {
@@ -489,7 +489,7 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 			if (!result.ok || !isAiAnalysisResponse(payload, response)) {
 				throw new Error("AI analysis was unavailable");
 			}
-			setState({ kind: "ready", explanation: payload.explanation });
+			setState({ kind: "ready", synthesis: payload.synthesis });
 		} catch {
 			setState({
 				kind: "error",
@@ -507,7 +507,7 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 						<h3 className="text-sm font-semibold text-gray-200">AI analysis</h3>
 					</div>
 					<p className="mt-1 text-xs leading-5 text-gray-500">
-						Gemini can organize the verified facts into a short overview.
+						Gemini explains how the verified trend, momentum, risk, and price levels interact.
 					</p>
 				</div>
 				<button
@@ -534,13 +534,20 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 				</p>
 			) : null}
 			{state.kind === "ready" ? (
-				<div className="mt-4" aria-live="polite">
-					<p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
-						AI-organized overview
-					</p>
-					<p className="mt-2 text-sm leading-6 text-gray-300">
-						{state.explanation.overview.text}
-					</p>
+				<div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
+					{([
+						["Interpretation", state.synthesis.interpretation.text],
+						["Conflicting evidence", state.synthesis.conflict.text],
+						["Risk conditions", state.synthesis.risk.text],
+						["What to watch", state.synthesis.watchNext.text],
+					] as const).map(([label, text]) => (
+						<div key={label} className="rounded-md bg-gray-800/80 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.1em] text-gray-500">
+								{label}
+							</p>
+							<p className="mt-2 text-sm leading-6 text-gray-300">{text}</p>
+						</div>
+					))}
 				</div>
 			) : null}
 			{state.kind === "error" ? (
@@ -549,7 +556,7 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 				</p>
 			) : null}
 			<p className="mt-3 text-xs leading-5 text-gray-500">
-				AI only orders the facts shown above. It does not create a buy or sell signal.
+				AI interprets only the verified facts shown above. It does not create a buy or sell signal.
 			</p>
 		</div>
 	);

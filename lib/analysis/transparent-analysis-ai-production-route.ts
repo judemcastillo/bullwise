@@ -1,4 +1,4 @@
-import type { TransparentAnalysisAiExplanation } from "@/lib/analysis/transparent-analysis-ai-contract";
+import type { TransparentAnalysisAiSynthesis } from "@/lib/analysis/transparent-analysis-ai-production";
 import type { TransparentAnalysisOrchestrationResult } from "@/lib/analysis/transparent-analysis-orchestrator";
 import type { AnalysisPanelResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 import { AuthenticationError } from "@/lib/auth/access-policy";
@@ -10,7 +10,7 @@ export type TransparentAnalysisAiResponse =
 	| {
 			version: typeof TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION;
 			status: "ready";
-			explanation: TransparentAnalysisAiExplanation;
+			synthesis: TransparentAnalysisAiSynthesis;
 	  }
 	| {
 			version: typeof TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION;
@@ -25,7 +25,7 @@ export type TransparentAnalysisAiProductionRouteDependencies = {
 		panel: AnalysisPanelResponse,
 		signal: AbortSignal,
 	): Promise<
-		| { kind: "ready"; explanation: TransparentAnalysisAiExplanation }
+		| { kind: "ready"; synthesis: TransparentAnalysisAiSynthesis }
 		| { kind: "not_requested" | "fallback" }
 	>;
 };
@@ -85,7 +85,7 @@ export async function handleTransparentAnalysisAiProductionRequest(
 		{
 			version: TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION,
 			status: "ready",
-			explanation: generated.explanation,
+			synthesis: generated.synthesis,
 		} satisfies TransparentAnalysisAiResponse,
 		200,
 	);

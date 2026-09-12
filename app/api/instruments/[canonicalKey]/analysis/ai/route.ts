@@ -21,9 +21,13 @@ export async function POST(
 			generate: async (panel, signal) => {
 				const apiKey = process.env.GEMINI_API_KEY?.trim();
 				if (!apiKey) return { kind: "fallback" };
+				const google = new GoogleTransparentAnalysisAiProvider({ apiKey });
 				return generateTransparentAnalysisAiProductionOverview({
 					panel,
-					provider: new GoogleTransparentAnalysisAiProvider({ apiKey }),
+					provider: {
+						generate: async (request) =>
+							(await google.generateForEvaluation(request)).output,
+					},
 					signal,
 				});
 			},

@@ -1,111 +1,135 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { TransparentAnalysisAiProvider } from "@/lib/analysis/transparent-analysis-ai-provider";
-import { generateTransparentAnalysisAiProductionOverview } from "@/lib/analysis/transparent-analysis-ai-production";
+import {
+	buildTransparentAnalysisAiSynthesisInput,
+	generateTransparentAnalysisAiProductionOverview,
+	validateTransparentAnalysisAiSynthesis,
+	type TransparentAnalysisAiSynthesis,
+	type TransparentAnalysisAiSynthesisInput,
+} from "@/lib/analysis/transparent-analysis-ai-production";
 import type { AnalysisPanelAvailableResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 
 const panel: AnalysisPanelAvailableResponse = {
 	version: "1.0.0",
 	status: "ready",
-	instrument: {
-		canonicalKey: "equity:xnas:aapl",
-		displaySymbol: "AAPL",
-		name: "Apple Inc.",
-		currency: "USD",
-	},
+	instrument: { canonicalKey: "equity:xnas:aapl", displaySymbol: "AAPL", name: "Apple Inc.", currency: "USD" },
 	asOf: "2026-08-21T20:00:00.000Z",
 	timeframe: { interval: "1d", description: "Daily context" },
 	context: "mixed",
 	factors: {
-		trend: { state: "mixed", evidence: ["Trend evidence."], counterEvidence: ["Trend counter-evidence."] },
-		momentum: { state: "bullish", evidence: ["Momentum evidence."], counterEvidence: [] },
-		volatility: { state: "normal", evidence: ["Volatility evidence."], counterEvidence: [] },
-		participation: { state: "normal", evidence: ["Participation evidence."], counterEvidence: [] },
+		trend: { state: "bearish", evidence: ["Price is below its 200-day moving average."], counterEvidence: [] },
+		momentum: { state: "bullish", evidence: ["Daily MACD momentum is positive."], counterEvidence: [] },
+		volatility: { state: "high", evidence: ["20-day realized volatility is 50.52%."], counterEvidence: [] },
+		participation: { state: "normal", evidence: ["Latest volume is -0.76 standard deviations from its 20-day baseline."], counterEvidence: [] },
 	},
-	levels: { support: [], resistance: [] },
-	dataQuality: {
-		provider: "massive",
-		interval: "1d",
-		adjusted: true,
-		barsUsed: 500,
-		firstBarAt: "2024-08-22T04:00:00.000Z",
-		lastBarAt: "2026-08-21T04:00:00.000Z",
-		completedThrough: "2026-08-21T20:00:00.000Z",
-		warnings: [],
+	levels: {
+		support: [{ kind: "support", price: "220.50", distancePercent: -2.4, touches: 3, source: "swing_cluster" }],
+		resistance: [{ kind: "resistance", price: "235.10", distancePercent: 4.1, touches: 2, source: "range_boundary" }],
 	},
+	dataQuality: { provider: "massive", interval: "1d", adjusted: true, barsUsed: 500, firstBarAt: "2024-08-22", lastBarAt: "2026-08-21", completedThrough: "2026-08-21", warnings: [] },
 	disclaimer: "Descriptive market context—not investment advice or a trading signal.",
 };
 
-function validProvider(onRequest?: (request: Parameters<TransparentAnalysisAiProvider["generate"]>[0]) => void): TransparentAnalysisAiProvider {
+function validSynthesis(input: TransparentAnalysisAiSynthesisInput): TransparentAnalysisAiSynthesis {
 	return {
-		generate: async (request) => {
-			onRequest?.(request);
-			const input = request.input as typeof request.input & { requiredOverviewFactIds: string[] };
-			return {
-				version: "1.0.0",
-				overviewFactIds: [...input.requiredOverviewFactIds].reverse(),
-				factors: ["trend", "momentum", "volatility", "participation"].map((factor) => ({
-					factor,
-					factIds: input.factors[factor as keyof typeof input.factors].facts.map(({ id }) => id).reverse(),
-				})),
-			};
+		version: input.version,
+		interpretation: {
+			text: "Positive momentum is developing against a bearish broader trend, leaving the daily picture mixed.",
+			factIds: ["trend.1", "momentum.1"],
 		},
+		conflict: {
+			text: "Trend and momentum disagree, so directional confirmation is limited.",
+			factIds: ["trend.1", "momentum.1"],
+		},
+		risk: {
+			text: "High volatility suggests larger price movement, while current participation provides limited confirmation.",
+			factIds: ["volatility.1", "participation.1"],
+		},
+		watchNext: {
+			text: "Watch how price behaves around the nearest support and resistance boundaries.",
+			factIds: ["support.1", "resistance.1"],
+		},
+		disclaimer: panel.disclaimer,
 	};
 }
 
-describe("production AI analysis generation", () => {
-	it("uses the accepted v1.6 ID-only protocol without changing fact text", async () => {
+describe("production AI analysis synthesis", () => {
+	it("provides factors and levels for a narrow, cited interpretation", () => {
+		const input = buildTransparentAnalysisAiSynthesisInput(panel)!;
+		assert.deepEqual(input.factorStates, {
+			trend: "bearish",
+			momentum: "bullish",
+			volatility: "high",
+			participation: "normal",
+		});
+		assert.ok(input.facts.some(({ id, text }) => id === "support.1" && text.includes("220.50")));
+		assert.equal(validateTransparentAnalysisAiSynthesis(input, validSynthesis(input)), true);
+	});
+
+	it("rejects invented numbers, advice, unsupported claims, and missing category citations", () => {
+		const input = buildTransparentAnalysisAiSynthesisInput(panel)!;
+		const valid = validSynthesis(input);
+		for (const invalid of [
+			{ ...valid, risk: { ...valid.risk, text: "Volatility may rise to 90%." } },
+			{ ...valid, interpretation: { ...valid.interpretation, text: "Buy because momentum is positive." } },
+			{ ...valid, risk: { ...valid.risk, text: "News sentiment confirms the move." } },
+			{ ...valid, conflict: { ...valid.conflict, factIds: ["trend.1"] } },
+			{ ...valid, interpretation: { text: panel.factors.trend.evidence[0], factIds: ["trend.1", "momentum.1"] } },
+		]) {
+			assert.equal(validateTransparentAnalysisAiSynthesis(input, invalid), false);
+		}
+	});
+
+	it("accepts whichever price-level categories are actually available", () => {
+		const supportOnlyPanel = structuredClone(panel);
+		supportOnlyPanel.levels.resistance = [];
+		const input = buildTransparentAnalysisAiSynthesisInput(supportOnlyPanel)!;
+		const value = validSynthesis(input);
+		value.watchNext.factIds = ["support.1"];
+		assert.equal(validateTransparentAnalysisAiSynthesis(input, value), true);
+	});
+
+	it("uses the synthesis prompt and the caller's cancellation signal", async () => {
 		const signal = new AbortController().signal;
 		let receivedSignal: AbortSignal | undefined;
 		const result = await generateTransparentAnalysisAiProductionOverview({
 			panel,
-			provider: validProvider((request) => {
-				receivedSignal = request.signal;
-				assert.equal(request.promptVersion, "1.1.0");
-				assert.match(request.systemPrompt, /Return fact IDs only/);
-			}),
+			provider: {
+				generate: async (request) => {
+					receivedSignal = request.signal;
+					assert.equal(request.promptVersion, "2.0.0");
+					assert.match(request.systemPrompt, /do not merely repeat/);
+					return validSynthesis(request.input);
+				},
+			},
 			signal,
 		});
-
 		assert.equal(receivedSignal, signal);
 		assert.equal(result.kind, "ready");
-		if (result.kind !== "ready") return;
-		assert.match(result.explanation.overview.text, /evidence/i);
-		assert.doesNotMatch(result.explanation.overview.text, /buy|sell|hold/i);
 	});
 
-	it("falls back safely on provider failure or invalid output", async () => {
+	it("falls back safely on provider failure, invalid output, or unavailable analysis", async () => {
 		const signal = new AbortController().signal;
-		const providerFailure = await generateTransparentAnalysisAiProductionOverview({
+		const failure = await generateTransparentAnalysisAiProductionOverview({
 			panel,
-			provider: { generate: async () => { throw new Error("provider details"); } },
+			provider: { generate: async () => { throw new Error("private provider error"); } },
 			signal,
 		});
-		const invalidOutput = await generateTransparentAnalysisAiProductionOverview({
+		const invalid = await generateTransparentAnalysisAiProductionOverview({
 			panel,
-			provider: { generate: async () => ({ version: "1.0.0", overviewFactIds: ["invented"], factors: [] }) },
+			provider: { generate: async () => ({ version: "2.0.0" }) },
 			signal,
 		});
-
-		assert.deepEqual(providerFailure, { kind: "fallback", reason: "provider_failure" });
-		assert.deepEqual(invalidOutput, { kind: "fallback", reason: "invalid_output" });
-	});
-
-	it("does not call Gemini when deterministic analysis is unavailable", async () => {
 		let calls = 0;
-		const result = await generateTransparentAnalysisAiProductionOverview({
-			panel: {
-				version: "1.0.0",
-				status: "unavailable",
-				reason: "insufficient_history",
-				message: "Not enough history.",
-				disclaimer: panel.disclaimer,
-			},
+		const unavailable = await generateTransparentAnalysisAiProductionOverview({
+			panel: { version: "1.0.0", status: "unavailable", reason: "insufficient_history", message: "Unavailable.", disclaimer: panel.disclaimer },
 			provider: { generate: async () => { calls += 1; } },
-			signal: new AbortController().signal,
+			signal,
 		});
 
-		assert.deepEqual(result, { kind: "not_requested", reason: "analysis_unavailable" });
+		assert.deepEqual(failure, { kind: "fallback", reason: "provider_failure" });
+		assert.deepEqual(invalid, { kind: "fallback", reason: "invalid_output" });
+		assert.deepEqual(unavailable, { kind: "not_requested", reason: "analysis_unavailable" });
 		assert.equal(calls, 0);
 	});
 });
