@@ -146,3 +146,16 @@ new registered Gemini evaluation or evidence that the generated text is useful
 across instruments. The user's manual result established that v1.6 lacked
 product value; the replacement still requires direct product testing. No
 strategy validation or holdout data was accessed.
+
+## Lightweight production observation
+
+The click-triggered synthesis endpoint records one privacy-safe operational
+event per request. It stores only the outcome (`ready`, `invalid_output`,
+`provider_failure`, or a request-boundary outcome), HTTP status, and one of four
+coarse latency buckets. It never stores the user, instrument, prompt, facts,
+levels, citations, generated text, provider response, or exact duration.
+
+In local development these events append to
+`artifacts/telemetry/transparent-analysis-v1.jsonl`, alongside the deterministic
+analysis events. This observation measures reliability and response time only;
+whether an explanation is useful still requires human review.

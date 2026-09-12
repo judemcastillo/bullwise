@@ -7,6 +7,7 @@ import {
 } from "@/lib/analysis/transparent-analysis-ai-production-route";
 import type { TransparentAnalysisAiSynthesis } from "@/lib/analysis/transparent-analysis-ai-production";
 import type { AnalysisPanelAvailableResponse } from "@/lib/analysis/transparent-analysis-panel.types";
+import type { TransparentAnalysisTelemetryEvent } from "@/lib/analysis/transparent-analysis-telemetry";
 import { AuthenticationError } from "@/lib/auth/access-policy";
 
 const synthesis: TransparentAnalysisAiSynthesis = {
@@ -98,7 +99,7 @@ describe("production AI analysis API boundary", () => {
 					transportStatus: 200,
 					response: availablePanel,
 				}),
-				generate: async () => ({ kind: "fallback" }),
+				generate: async () => ({ kind: "fallback", reason: "invalid_output" }),
 			}),
 		);
 
@@ -113,6 +114,8 @@ describe("production AI analysis API boundary", () => {
 	it("returns the validated synthesis without exposing the deterministic panel", async () => {
 		const signal = new AbortController().signal;
 		let receivedSignal: AbortSignal | undefined;
+		const events: TransparentAnalysisTelemetryEvent[] = [];
+		const ticks = [100, 22_600];
 		const response = await handleTransparentAnalysisAiProductionRequest(
 			"equity:xnas:aapl",
 			signal,
@@ -122,6 +125,8 @@ describe("production AI analysis API boundary", () => {
 					receivedSignal = requestSignal;
 					return { kind: "ready", synthesis };
 				},
+				monotonicNow: () => ticks.shift()!,
+				recordTelemetry: (event) => events.push(event),
 			}),
 		);
 
@@ -129,6 +134,13 @@ describe("production AI analysis API boundary", () => {
 		assert.equal(receivedSignal, signal);
 		assert.deepEqual(await response.json(), { version: "1.0.0", status: "ready", synthesis });
 		assert.equal(response.headers.get("cache-control"), "private, no-store");
+		assert.deepEqual(events, [{
+			version: "1.0.0",
+			event: "transparent_analysis_ai_request",
+			outcome: "ready",
+			httpStatus: 200,
+			duration: "20s_to_39_99s",
+		}]);
 	});
 
 	it("keeps the production route click-only and ignores request bodies", () => {

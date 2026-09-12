@@ -17,6 +17,21 @@ export type TransparentAnalysisDurationBucket =
 	| "3s_to_9_99s"
 	| "10s_or_more";
 
+export type TransparentAnalysisAiDurationBucket =
+	| "under_10s"
+	| "10s_to_19_99s"
+	| "20s_to_39_99s"
+	| "40s_or_more";
+
+export type TransparentAnalysisAiRequestOutcome =
+	| "authentication_required"
+	| "invalid_request"
+	| "not_found"
+	| "analysis_unavailable"
+	| "provider_failure"
+	| "invalid_output"
+	| "ready";
+
 export type TransparentAnalysisWarningCode =
 	| "incomplete_bar_excluded"
 	| "bars_reordered"
@@ -31,6 +46,13 @@ export type TransparentAnalysisPartialReason =
 	| "data_quality_warning";
 
 export type TransparentAnalysisTelemetryEvent =
+	| {
+			version: typeof TRANSPARENT_ANALYSIS_TELEMETRY_VERSION;
+			event: "transparent_analysis_ai_request";
+			outcome: TransparentAnalysisAiRequestOutcome;
+			httpStatus: 200 | 400 | 401 | 404 | 409 | 503;
+			duration: TransparentAnalysisAiDurationBucket;
+	  }
 	| {
 			version: typeof TRANSPARENT_ANALYSIS_TELEMETRY_VERSION;
 			event: "transparent_analysis_request";
@@ -82,6 +104,15 @@ export function transparentAnalysisDurationBucket(
 	if (durationMs < 3_000) return "1s_to_2_99s";
 	if (durationMs < 10_000) return "3s_to_9_99s";
 	return "10s_or_more";
+}
+
+export function transparentAnalysisAiDurationBucket(
+	durationMs: number,
+): TransparentAnalysisAiDurationBucket {
+	if (durationMs < 10_000) return "under_10s";
+	if (durationMs < 20_000) return "10s_to_19_99s";
+	if (durationMs < 40_000) return "20s_to_39_99s";
+	return "40s_or_more";
 }
 
 function warningCodes(warnings: readonly string[]) {
@@ -151,5 +182,19 @@ export function buildTransparentAnalysisOperationalFailureTelemetry(input: {
 		event: "transparent_analysis_operational_failure",
 		stage: input.stage,
 		category: input.category,
+	};
+}
+
+export function buildTransparentAnalysisAiRequestTelemetry(input: {
+	outcome: TransparentAnalysisAiRequestOutcome;
+	httpStatus: 200 | 400 | 401 | 404 | 409 | 503;
+	durationMs: number;
+}): Extract<TransparentAnalysisTelemetryEvent, { event: "transparent_analysis_ai_request" }> {
+	return {
+		version: TRANSPARENT_ANALYSIS_TELEMETRY_VERSION,
+		event: "transparent_analysis_ai_request",
+		outcome: input.outcome,
+		httpStatus: input.httpStatus,
+		duration: transparentAnalysisAiDurationBucket(Math.max(0, input.durationMs)),
 	};
 }

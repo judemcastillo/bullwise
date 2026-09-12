@@ -6,7 +6,9 @@ import { describe, it } from "node:test";
 import type { AnalysisPanelAvailableResponse } from "@/lib/analysis/transparent-analysis-panel.types";
 import {
 	buildTransparentAnalysisOperationalFailureTelemetry,
+	buildTransparentAnalysisAiRequestTelemetry,
 	buildTransparentAnalysisRequestTelemetry,
+	transparentAnalysisAiDurationBucket,
 	transparentAnalysisDurationBucket,
 } from "@/lib/analysis/transparent-analysis-telemetry";
 import {
@@ -85,6 +87,27 @@ describe("transparent analysis telemetry", () => {
 		assert.equal(transparentAnalysisDurationBucket(1_000), "1s_to_2_99s");
 		assert.equal(transparentAnalysisDurationBucket(3_000), "3s_to_9_99s");
 		assert.equal(transparentAnalysisDurationBucket(10_000), "10s_or_more");
+	});
+
+	it("records AI outcomes and useful coarse latency without request content", () => {
+		assert.equal(transparentAnalysisAiDurationBucket(9_999), "under_10s");
+		assert.equal(transparentAnalysisAiDurationBucket(10_000), "10s_to_19_99s");
+		assert.equal(transparentAnalysisAiDurationBucket(20_000), "20s_to_39_99s");
+		assert.equal(transparentAnalysisAiDurationBucket(40_000), "40s_or_more");
+		assert.deepEqual(
+			buildTransparentAnalysisAiRequestTelemetry({
+				outcome: "invalid_output",
+				httpStatus: 503,
+				durationMs: 22_500,
+			}),
+			{
+				version: "1.0.0",
+				event: "transparent_analysis_ai_request",
+				outcome: "invalid_output",
+				httpStatus: 503,
+				duration: "20s_to_39_99s",
+			},
+		);
 	});
 
 	it("reduces a partial response to aggregate reason and warning codes", () => {
