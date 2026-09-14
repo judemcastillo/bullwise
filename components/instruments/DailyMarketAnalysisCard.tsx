@@ -485,6 +485,10 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 				setState({ kind: "error", message: "Sign in again to generate AI analysis." });
 				return;
 			}
+			if (result.status === 429) {
+				setState({ kind: "error", message: "AI analysis limit reached. Please try again later." });
+				return;
+			}
 			const payload: unknown = await result.json();
 			if (!result.ok || !isAiAnalysisResponse(payload, response)) {
 				throw new Error("AI analysis was unavailable");

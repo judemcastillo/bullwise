@@ -159,3 +159,18 @@ In local development these events append to
 `artifacts/telemetry/transparent-analysis-v1.jsonl`, alongside the deterministic
 analysis events. This observation measures reliability and response time only;
 whether an explanation is useful still requires human review.
+
+## Cache and quota protection
+
+Validated synthesis results are cached in MongoDB for 48 hours using a SHA-256
+key derived from the complete deterministic model input and prompt identity.
+Repeated requests for unchanged analysis return that cached result without a
+Gemini call or quota charge. Cached documents contain the validated synthesis
+and expire through a TTL index.
+
+Each authenticated user may start at most 20 uncached generations in a rolling
+hour. The MongoDB counter uses optimistic revisions so concurrent requests
+cannot bypass the quota, and its documents also expire through a TTL index.
+Cache hits are checked before quota consumption. Telemetry distinguishes
+`cache_hit` and `rate_limited` outcomes without recording user or instrument
+identity.

@@ -43,6 +43,9 @@ function dependencies(
 	return {
 		authenticate: async () => ({ id: "user-1" }),
 		getAnalysis: async () => ({ kind: "not_found" }),
+		getCached: async () => null,
+		consumeQuota: async () => true,
+		cache: async () => undefined,
 		generate: async () => ({ kind: "ready", synthesis }),
 		...overrides,
 	};
@@ -111,11 +114,56 @@ describe("production AI analysis API boundary", () => {
 		});
 	});
 
+	it("returns a cache hit without consuming quota or calling Gemini", async () => {
+		let quotaCalls = 0;
+		let generationCalls = 0;
+		const response = await handleTransparentAnalysisAiProductionRequest(
+			"equity:xnas:aapl",
+			new AbortController().signal,
+			dependencies({
+				getAnalysis: async () => ({ kind: "response", transportStatus: 200, response: availablePanel }),
+				getCached: async () => synthesis,
+				consumeQuota: async () => { quotaCalls += 1; return true; },
+				generate: async () => { generationCalls += 1; return { kind: "ready", synthesis }; },
+			}),
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(quotaCalls, 0);
+		assert.equal(generationCalls, 0);
+		assert.deepEqual(await response.json(), { version: "1.0.0", status: "ready", synthesis });
+	});
+
+	it("returns 429 without calling Gemini after the uncached quota is exhausted", async () => {
+		let generationCalls = 0;
+		const response = await handleTransparentAnalysisAiProductionRequest(
+			"equity:xnas:aapl",
+			new AbortController().signal,
+			dependencies({
+				getAnalysis: async () => ({ kind: "response", transportStatus: 200, response: availablePanel }),
+				consumeQuota: async (userId) => {
+					assert.equal(userId, "user-1");
+					return false;
+				},
+				generate: async () => { generationCalls += 1; return { kind: "ready", synthesis }; },
+			}),
+		);
+
+		assert.equal(response.status, 429);
+		assert.equal(generationCalls, 0);
+		assert.deepEqual(await response.json(), {
+			version: "1.0.0",
+			status: "unavailable",
+			message: "AI analysis request limit reached. Please try again later.",
+		});
+	});
+
 	it("returns the validated synthesis without exposing the deterministic panel", async () => {
 		const signal = new AbortController().signal;
 		let receivedSignal: AbortSignal | undefined;
 		const events: TransparentAnalysisTelemetryEvent[] = [];
 		const ticks = [100, 22_600];
+		let cacheWrites = 0;
 		const response = await handleTransparentAnalysisAiProductionRequest(
 			"equity:xnas:aapl",
 			signal,
@@ -125,6 +173,10 @@ describe("production AI analysis API boundary", () => {
 					receivedSignal = requestSignal;
 					return { kind: "ready", synthesis };
 				},
+				cache: async (_panel, value) => {
+					assert.equal(value, synthesis);
+					cacheWrites += 1;
+				},
 				monotonicNow: () => ticks.shift()!,
 				recordTelemetry: (event) => events.push(event),
 			}),
@@ -132,6 +184,7 @@ describe("production AI analysis API boundary", () => {
 
 		assert.equal(response.status, 200);
 		assert.equal(receivedSignal, signal);
+		assert.equal(cacheWrites, 1);
 		assert.deepEqual(await response.json(), { version: "1.0.0", status: "ready", synthesis });
 		assert.equal(response.headers.get("cache-control"), "private, no-store");
 		assert.deepEqual(events, [{

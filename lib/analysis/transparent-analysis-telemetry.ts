@@ -30,6 +30,8 @@ export type TransparentAnalysisAiRequestOutcome =
 	| "analysis_unavailable"
 	| "provider_failure"
 	| "invalid_output"
+	| "cache_hit"
+	| "rate_limited"
 	| "ready";
 
 export type TransparentAnalysisWarningCode =
@@ -50,7 +52,7 @@ export type TransparentAnalysisTelemetryEvent =
 			version: typeof TRANSPARENT_ANALYSIS_TELEMETRY_VERSION;
 			event: "transparent_analysis_ai_request";
 			outcome: TransparentAnalysisAiRequestOutcome;
-			httpStatus: 200 | 400 | 401 | 404 | 409 | 503;
+			httpStatus: 200 | 400 | 401 | 404 | 409 | 429 | 503;
 			duration: TransparentAnalysisAiDurationBucket;
 	  }
 	| {
@@ -187,7 +189,7 @@ export function buildTransparentAnalysisOperationalFailureTelemetry(input: {
 
 export function buildTransparentAnalysisAiRequestTelemetry(input: {
 	outcome: TransparentAnalysisAiRequestOutcome;
-	httpStatus: 200 | 400 | 401 | 404 | 409 | 503;
+	httpStatus: 200 | 400 | 401 | 404 | 409 | 429 | 503;
 	durationMs: number;
 }): Extract<TransparentAnalysisTelemetryEvent, { event: "transparent_analysis_ai_request" }> {
 	return {

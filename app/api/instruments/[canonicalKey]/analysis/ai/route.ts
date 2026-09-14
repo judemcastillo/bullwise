@@ -1,4 +1,9 @@
 import { GoogleTransparentAnalysisAiProvider } from "@/lib/analysis/google-transparent-analysis-ai-provider";
+import {
+	cacheTransparentAnalysisAiSynthesis,
+	consumeTransparentAnalysisAiQuota,
+	getCachedTransparentAnalysisAiSynthesis,
+} from "@/lib/analysis/transparent-analysis-ai-access";
 import { generateTransparentAnalysisAiProductionOverview } from "@/lib/analysis/transparent-analysis-ai-production";
 import { handleTransparentAnalysisAiProductionRequest } from "@/lib/analysis/transparent-analysis-ai-production-route";
 import { getTransparentAnalysisPanel } from "@/lib/analysis/transparent-analysis-service";
@@ -19,6 +24,16 @@ export async function POST(
 		{
 			authenticate: requireUser,
 			getAnalysis: getTransparentAnalysisPanel,
+			getCached: async (panel) =>
+				panel.status === "unavailable"
+					? null
+					: getCachedTransparentAnalysisAiSynthesis(panel),
+			consumeQuota: consumeTransparentAnalysisAiQuota,
+			cache: async (panel, synthesis) => {
+				if (panel.status !== "unavailable") {
+					await cacheTransparentAnalysisAiSynthesis(panel, synthesis);
+				}
+			},
 			monotonicNow: () => performance.now(),
 			recordTelemetry: recordTransparentAnalysisTelemetry,
 			generate: async (panel, signal) => {

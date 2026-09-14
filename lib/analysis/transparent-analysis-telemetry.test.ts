@@ -108,6 +108,20 @@ describe("transparent analysis telemetry", () => {
 				duration: "20s_to_39_99s",
 			},
 		);
+		assert.deepEqual(
+			buildTransparentAnalysisAiRequestTelemetry({
+				outcome: "rate_limited",
+				httpStatus: 429,
+				durationMs: 500,
+			}),
+			{
+				version: "1.0.0",
+				event: "transparent_analysis_ai_request",
+				outcome: "rate_limited",
+				httpStatus: 429,
+				duration: "under_10s",
+			},
+		);
 	});
 
 	it("reduces a partial response to aggregate reason and warning codes", () => {

@@ -27,8 +27,11 @@ export type TransparentAnalysisAiResponse =
 	  };
 
 export type TransparentAnalysisAiProductionRouteDependencies = {
-	authenticate(): Promise<unknown>;
+	authenticate(): Promise<{ id: string }>;
 	getAnalysis(canonicalKey: string): Promise<TransparentAnalysisOrchestrationResult>;
+	getCached(panel: AnalysisPanelResponse): Promise<TransparentAnalysisAiSynthesis | null>;
+	consumeQuota(userId: string): Promise<boolean>;
+	cache(panel: AnalysisPanelResponse, synthesis: TransparentAnalysisAiSynthesis): Promise<void>;
 	generate(
 		panel: AnalysisPanelResponse,
 		signal: AbortSignal,
@@ -53,7 +56,7 @@ export async function handleTransparentAnalysisAiProductionRequest(
 	const startedAt = now();
 	const finish = (
 		body: unknown,
-		status: 200 | 400 | 401 | 404 | 409 | 503,
+		status: 200 | 400 | 401 | 404 | 409 | 429 | 503,
 		outcome: TransparentAnalysisAiRequestOutcome,
 	) => {
 		try {
@@ -70,8 +73,9 @@ export async function handleTransparentAnalysisAiProductionRequest(
 		return json(body, status);
 	};
 
+	let user: { id: string };
 	try {
-		await dependencies.authenticate();
+		user = await dependencies.authenticate();
 	} catch (error) {
 		if (error instanceof AuthenticationError) {
 			return finish({ error: "Authentication required." }, 401, "authentication_required");
@@ -98,6 +102,45 @@ export async function handleTransparentAnalysisAiProductionRequest(
 		);
 	}
 
+	let cached: TransparentAnalysisAiSynthesis | null;
+	let quotaAllowed: boolean;
+	try {
+		cached = await dependencies.getCached(analysis.response);
+		if (cached) {
+			return finish(
+				{
+					version: TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION,
+					status: "ready",
+					synthesis: cached,
+				} satisfies TransparentAnalysisAiResponse,
+				200,
+				"cache_hit",
+			);
+		}
+		quotaAllowed = await dependencies.consumeQuota(user.id);
+	} catch {
+		return finish(
+			{
+				version: TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION,
+				status: "unavailable",
+				message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
+			} satisfies TransparentAnalysisAiResponse,
+			503,
+			"provider_failure",
+		);
+	}
+	if (!quotaAllowed) {
+		return finish(
+			{
+				version: TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION,
+				status: "unavailable",
+				message: "AI analysis request limit reached. Please try again later.",
+			} satisfies TransparentAnalysisAiResponse,
+			429,
+			"rate_limited",
+		);
+	}
+
 	const generated = await dependencies.generate(analysis.response, requestSignal);
 	if (generated.kind !== "ready") {
 		return finish(
@@ -109,6 +152,11 @@ export async function handleTransparentAnalysisAiProductionRequest(
 			503,
 			generated.kind === "fallback" ? generated.reason : "analysis_unavailable",
 		);
+	}
+	try {
+		await dependencies.cache(analysis.response, generated.synthesis);
+	} catch {
+		// A cache write failure must not hide a valid generated result.
 	}
 
 	return finish(
