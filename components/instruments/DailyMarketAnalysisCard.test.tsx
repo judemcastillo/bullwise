@@ -5,6 +5,7 @@ import {
 	DailyMarketAnalysisError,
 	DailyMarketAnalysisLoading,
 	DailyMarketAnalysisView,
+	aiAnalysisUnavailableMessage,
 	aiAnalysisEndpointForInstrument,
 	analysisEndpointForInstrument,
 	isAiAnalysisResponse,
@@ -120,6 +121,18 @@ describe("daily market analysis UI", () => {
 			}, readyResponse),
 			false,
 		);
+	});
+
+	it("uses the API's safe explanation for an unavailable AI response", () => {
+		assert.equal(
+			aiAnalysisUnavailableMessage({
+				version: "1.0.0",
+				status: "unavailable",
+				message: "Gemini returned an answer that could not be verified. Please try again.",
+			}),
+			"Gemini returned an answer that could not be verified. Please try again.",
+		);
+		assert.equal(aiAnalysisUnavailableMessage({ error: "private provider error" }), null);
 	});
 
 	it("validates the allow-listed API response before rendering", () => {

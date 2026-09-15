@@ -16,7 +16,7 @@ It does not measure strategy profitability, user behavior outside this endpoint,
 
 ## Sink and event schema
 
-V1 emits one structured event per handled request and a separate structured event for an internal operational failure. During local development, the server-only logger appends JSON Lines to `artifacts/telemetry/transparent-analysis-v1.jsonl`. Each local line includes a UTC `recordedDate` (`YYYY-MM-DD`) so the review can verify calendar-day coverage without storing a precise request timestamp. The directory is ignored by Git and the file is created with owner-only permissions. In other environments, events go to the deployment's server log sink because serverless local files may be ephemeral.
+V1 emits one structured event per handled deterministic or user-requested AI request and a separate structured event for an internal operational failure. During local development, the server-only logger appends JSON Lines to `artifacts/telemetry/transparent-analysis-v1.jsonl`. Each local line includes a UTC `recordedDate` (`YYYY-MM-DD`) so the review can verify calendar-day coverage without storing a precise request timestamp. The directory is ignored by Git and the file is created with owner-only permissions. In other environments, events go to the deployment's server log sink because serverless local files may be ephemeral.
 
 `transparent_analysis_request` contains only:
 
@@ -34,6 +34,15 @@ V1 emits one structured event per handled request and a separate structured even
 - failure stage;
 - closed failure category.
 
+`transparent_analysis_ai_request` contains only:
+
+- schema version `1.0.0`;
+- closed request outcome and HTTP status;
+- coarse AI duration bucket;
+- for `invalid_output` only, fixed validation issue objects containing a closed section name and closed issue code.
+
+AI validation issues identify rules such as an invalid citation, unsupported number, prohibited advice, copied fact, or missing required evidence category. They never retain generated prose or model input. AI duration buckets are `<10s`, `10–19.99s`, `20–39.99s`, and `40s+`.
+
 The duration buckets are `<250ms`, `250–999ms`, `1–2.99s`, `3–9.99s`, and `10s+`. Exact durations are deliberately not recorded.
 
 ## Prohibited data
@@ -46,7 +55,7 @@ Telemetry must never contain:
 - provider names, URLs, response bodies, error messages, or credentials;
 - raw bars, timestamps from bars, prices, levels, indicators, evidence, or counter-evidence;
 - raw warning prose;
-- research artifacts, strategy fields, validation data, or holdout data.
+- research artifacts, strategy fields, strategy/model validation data, or holdout data.
 
 Unknown warning text collapses to `other_data_quality_warning`. Unknown failures collapse to `unknown`. Telemetry failures must never change the API response.
 

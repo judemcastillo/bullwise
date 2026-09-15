@@ -8,6 +8,28 @@ export const TRANSPARENT_ANALYSIS_AI_SYNTHESIS_PROMPT_SHA256 =
 
 const SECTIONS = ["interpretation", "conflict", "risk", "watchNext"] as const;
 type SynthesisSection = (typeof SECTIONS)[number];
+export type TransparentAnalysisAiValidationSection = "root" | SynthesisSection;
+export type TransparentAnalysisAiValidationIssueCode =
+	| "invalid_shape"
+	| "invalid_version"
+	| "invalid_disclaimer"
+	| "invalid_text"
+	| "invalid_citation"
+	| "prohibited_advice"
+	| "unsupported_domain"
+	| "missing_interpretive_language"
+	| "copied_fact"
+	| "unsupported_number"
+	| "missing_required_category";
+
+export type TransparentAnalysisAiValidationIssue = {
+	section: TransparentAnalysisAiValidationSection;
+	code: TransparentAnalysisAiValidationIssueCode;
+};
+
+export type TransparentAnalysisAiValidationResult =
+	| { ok: true; value: TransparentAnalysisAiSynthesis }
+	| { ok: false; issues: TransparentAnalysisAiValidationIssue[] };
 type SynthesisFactCategory =
 	| "trend"
 	| "momentum"
@@ -59,7 +81,12 @@ type TransparentAnalysisAiSynthesisProvider = {
 
 export type TransparentAnalysisAiProductionResult =
 	| { kind: "not_requested"; reason: "analysis_unavailable" }
-	| { kind: "fallback"; reason: "provider_failure" | "invalid_output" }
+	| { kind: "fallback"; reason: "provider_failure" }
+	| {
+			kind: "fallback";
+			reason: "invalid_output";
+			validationIssues: TransparentAnalysisAiValidationIssue[];
+	  }
 	| { kind: "ready"; synthesis: TransparentAnalysisAiSynthesis };
 
 const citedTextSchema = {
@@ -184,47 +211,75 @@ const INTERPRETIVE_LANGUAGE: Record<SynthesisSection, RegExp> = {
 	watchNext: /\b(?:watch|monitor|observe|whether)\b/i,
 };
 
-function validSection(
+function inspectSection(
 	section: SynthesisSection,
 	value: unknown,
 	facts: Map<string, TransparentAnalysisAiSynthesisFact>,
 	availableLevelCategories: SynthesisFactCategory[],
-) {
-	if (!isRecord(value) || !exactKeys(value, ["text", "factIds"])) return false;
-	if (typeof value.text !== "string" || value.text.trim().length === 0 || value.text.length > 360) return false;
+): TransparentAnalysisAiValidationIssue[] {
+	const issue = (code: TransparentAnalysisAiValidationIssueCode) => [{ section, code }];
+	if (!isRecord(value) || !exactKeys(value, ["text", "factIds"])) {
+		return issue("invalid_shape");
+	}
+	if (typeof value.text !== "string" || value.text.trim().length === 0 || value.text.length > 360) {
+		return issue("invalid_text");
+	}
 	if (
 		!Array.isArray(value.factIds) ||
 		value.factIds.length === 0 ||
 		value.factIds.some((id) => typeof id !== "string" || !facts.has(id)) ||
 		new Set(value.factIds).size !== value.factIds.length
-	) return false;
-	if (PROHIBITED_ADVICE.test(value.text) || UNSUPPORTED_DOMAIN.test(value.text)) return false;
+	) return issue("invalid_citation");
+	if (PROHIBITED_ADVICE.test(value.text)) return issue("prohibited_advice");
+	if (UNSUPPORTED_DOMAIN.test(value.text)) return issue("unsupported_domain");
 	const cited = value.factIds.map((id) => facts.get(id as string)!);
-	if (!INTERPRETIVE_LANGUAGE[section].test(value.text)) return false;
+	if (!INTERPRETIVE_LANGUAGE[section].test(value.text)) {
+		return issue("missing_interpretive_language");
+	}
 	const normalizedText = value.text.trim().replace(/\s+/g, " ");
-	if (cited.some((fact) => fact.text.trim().replace(/\s+/g, " ") === normalizedText)) return false;
+	if (cited.some((fact) => fact.text.trim().replace(/\s+/g, " ") === normalizedText)) {
+		return issue("copied_fact");
+	}
 	const allowedNumbers = new Set(cited.flatMap((fact) => numbers(fact.text)));
-	if (numbers(value.text).some((number) => !allowedNumbers.has(number))) return false;
+	if (numbers(value.text).some((number) => !allowedNumbers.has(number))) {
+		return issue("unsupported_number");
+	}
 	const citedCategories = new Set(cited.map(({ category }) => category));
 	return requiredCategories(section, availableLevelCategories).every((category) =>
-		citedCategories.has(category));
+		citedCategories.has(category))
+		? []
+		: issue("missing_required_category");
+}
+
+export function inspectTransparentAnalysisAiSynthesis(
+	input: TransparentAnalysisAiSynthesisInput,
+	value: unknown,
+): TransparentAnalysisAiValidationResult {
+	if (!isRecord(value) || !exactKeys(value, ["version", ...SECTIONS, "disclaimer"])) {
+		return { ok: false, issues: [{ section: "root", code: "invalid_shape" }] };
+	}
+	if (value.version !== TRANSPARENT_ANALYSIS_AI_SYNTHESIS_VERSION) {
+		return { ok: false, issues: [{ section: "root", code: "invalid_version" }] };
+	}
+	if (value.disclaimer !== TRANSPARENT_ANALYSIS_PANEL_DISCLAIMER) {
+		return { ok: false, issues: [{ section: "root", code: "invalid_disclaimer" }] };
+	}
+	const facts = new Map(input.facts.map((fact) => [fact.id, fact]));
+	const availableLevelCategories = (["support", "resistance"] as const).filter(
+		(category) => input.facts.some((fact) => fact.category === category),
+	);
+	const issues = SECTIONS.flatMap((section) =>
+		inspectSection(section, value[section], facts, availableLevelCategories));
+	return issues.length === 0
+		? { ok: true, value: value as TransparentAnalysisAiSynthesis }
+		: { ok: false, issues };
 }
 
 export function validateTransparentAnalysisAiSynthesis(
 	input: TransparentAnalysisAiSynthesisInput,
 	value: unknown,
 ): value is TransparentAnalysisAiSynthesis {
-	if (!isRecord(value) || !exactKeys(value, ["version", ...SECTIONS, "disclaimer"])) return false;
-	if (
-		value.version !== TRANSPARENT_ANALYSIS_AI_SYNTHESIS_VERSION ||
-		value.disclaimer !== TRANSPARENT_ANALYSIS_PANEL_DISCLAIMER
-	) return false;
-	const facts = new Map(input.facts.map((fact) => [fact.id, fact]));
-	const availableLevelCategories = (["support", "resistance"] as const).filter(
-		(category) => input.facts.some((fact) => fact.category === category),
-	);
-	return SECTIONS.every((section) =>
-		validSection(section, value[section], facts, availableLevelCategories));
+	return inspectTransparentAnalysisAiSynthesis(input, value).ok;
 }
 
 export async function generateTransparentAnalysisAiProductionOverview(input: {
@@ -248,8 +303,13 @@ export async function generateTransparentAnalysisAiProductionOverview(input: {
 	} catch {
 		return { kind: "fallback", reason: "provider_failure" };
 	}
-	if (!validateTransparentAnalysisAiSynthesis(modelInput, output)) {
-		return { kind: "fallback", reason: "invalid_output" };
+	const validation = inspectTransparentAnalysisAiSynthesis(modelInput, output);
+	if (!validation.ok) {
+		return {
+			kind: "fallback",
+			reason: "invalid_output",
+			validationIssues: validation.issues,
+		};
 	}
-	return { kind: "ready", synthesis: output };
+	return { kind: "ready", synthesis: validation.value };
 }

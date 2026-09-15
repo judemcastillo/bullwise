@@ -99,6 +99,9 @@ describe("transparent analysis telemetry", () => {
 				outcome: "invalid_output",
 				httpStatus: 503,
 				durationMs: 22_500,
+				validationIssues: [
+					{ section: "watchNext", code: "missing_required_category" },
+				],
 			}),
 			{
 				version: "1.0.0",
@@ -106,6 +109,9 @@ describe("transparent analysis telemetry", () => {
 				outcome: "invalid_output",
 				httpStatus: 503,
 				duration: "20s_to_39_99s",
+				validationIssues: [
+					{ section: "watchNext", code: "missing_required_category" },
+				],
 			},
 		);
 		assert.deepEqual(

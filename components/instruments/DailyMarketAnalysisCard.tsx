@@ -208,6 +208,15 @@ export function isAiAnalysisResponse(
 	);
 }
 
+export function aiAnalysisUnavailableMessage(value: unknown) {
+	return isRecord(value) &&
+		value.version === "1.0.0" &&
+		value.status === "unavailable" &&
+		typeof value.message === "string"
+		? value.message
+		: null;
+}
+
 function formatTimestamp(value: string) {
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return "Unknown session";
@@ -490,7 +499,15 @@ function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResp
 				return;
 			}
 			const payload: unknown = await result.json();
-			if (!result.ok || !isAiAnalysisResponse(payload, response)) {
+			if (!result.ok) {
+				setState({
+					kind: "error",
+					message: aiAnalysisUnavailableMessage(payload) ??
+						"AI analysis is temporarily unavailable. The market analysis above is still valid.",
+				});
+				return;
+			}
+			if (!isAiAnalysisResponse(payload, response)) {
 				throw new Error("AI analysis was unavailable");
 			}
 			setState({ kind: "ready", synthesis: payload.synthesis });

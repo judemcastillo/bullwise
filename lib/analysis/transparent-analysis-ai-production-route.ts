@@ -1,6 +1,7 @@
 import type {
 	TransparentAnalysisAiProductionResult,
 	TransparentAnalysisAiSynthesis,
+	TransparentAnalysisAiValidationIssue,
 } from "@/lib/analysis/transparent-analysis-ai-production";
 import type { TransparentAnalysisOrchestrationResult } from "@/lib/analysis/transparent-analysis-orchestrator";
 import type { AnalysisPanelResponse } from "@/lib/analysis/transparent-analysis-panel.types";
@@ -58,6 +59,7 @@ export async function handleTransparentAnalysisAiProductionRequest(
 		body: unknown,
 		status: 200 | 400 | 401 | 404 | 409 | 429 | 503,
 		outcome: TransparentAnalysisAiRequestOutcome,
+		validationIssues?: TransparentAnalysisAiValidationIssue[],
 	) => {
 		try {
 			dependencies.recordTelemetry?.(
@@ -65,6 +67,7 @@ export async function handleTransparentAnalysisAiProductionRequest(
 					outcome,
 					httpStatus: status,
 					durationMs: now() - startedAt,
+					validationIssues,
 				}),
 			);
 		} catch {
@@ -143,14 +146,18 @@ export async function handleTransparentAnalysisAiProductionRequest(
 
 	const generated = await dependencies.generate(analysis.response, requestSignal);
 	if (generated.kind !== "ready") {
+		const invalidOutput = generated.kind === "fallback" && generated.reason === "invalid_output";
 		return finish(
 			{
 				version: TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION,
 				status: "unavailable",
-				message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
+				message: invalidOutput
+					? "Gemini returned an answer that could not be verified. Please try again."
+					: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
 			} satisfies TransparentAnalysisAiResponse,
 			503,
 			generated.kind === "fallback" ? generated.reason : "analysis_unavailable",
+			invalidOutput ? generated.validationIssues : undefined,
 		);
 	}
 	try {

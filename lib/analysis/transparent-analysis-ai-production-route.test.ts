@@ -93,6 +93,7 @@ describe("production AI analysis API boundary", () => {
 	});
 
 	it("returns a safe unavailable response when generation fails", async () => {
+		const events: TransparentAnalysisTelemetryEvent[] = [];
 		const response = await handleTransparentAnalysisAiProductionRequest(
 			"equity:xnas:aapl",
 			new AbortController().signal,
@@ -102,7 +103,12 @@ describe("production AI analysis API boundary", () => {
 					transportStatus: 200,
 					response: availablePanel,
 				}),
-				generate: async () => ({ kind: "fallback", reason: "invalid_output" }),
+				generate: async () => ({
+					kind: "fallback",
+					reason: "invalid_output",
+					validationIssues: [{ section: "watchNext", code: "missing_required_category" }],
+				}),
+				recordTelemetry: (event) => events.push(event),
 			}),
 		);
 
@@ -110,7 +116,15 @@ describe("production AI analysis API boundary", () => {
 		assert.deepEqual(await response.json(), {
 			version: "1.0.0",
 			status: "unavailable",
-			message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
+			message: "Gemini returned an answer that could not be verified. Please try again.",
+		});
+		assert.deepEqual(events[0], {
+			version: "1.0.0",
+			event: "transparent_analysis_ai_request",
+			outcome: "invalid_output",
+			httpStatus: 503,
+			duration: "under_10s",
+			validationIssues: [{ section: "watchNext", code: "missing_required_category" }],
 		});
 	});
 

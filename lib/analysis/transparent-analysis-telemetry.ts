@@ -1,4 +1,5 @@
 import type { AnalysisPanelResponse } from "@/lib/analysis/transparent-analysis-panel.types";
+import type { TransparentAnalysisAiValidationIssue } from "@/lib/analysis/transparent-analysis-ai-production";
 
 export const TRANSPARENT_ANALYSIS_TELEMETRY_VERSION = "1.0.0";
 
@@ -54,6 +55,7 @@ export type TransparentAnalysisTelemetryEvent =
 			outcome: TransparentAnalysisAiRequestOutcome;
 			httpStatus: 200 | 400 | 401 | 404 | 409 | 429 | 503;
 			duration: TransparentAnalysisAiDurationBucket;
+			validationIssues?: TransparentAnalysisAiValidationIssue[];
 	  }
 	| {
 			version: typeof TRANSPARENT_ANALYSIS_TELEMETRY_VERSION;
@@ -191,6 +193,7 @@ export function buildTransparentAnalysisAiRequestTelemetry(input: {
 	outcome: TransparentAnalysisAiRequestOutcome;
 	httpStatus: 200 | 400 | 401 | 404 | 409 | 429 | 503;
 	durationMs: number;
+	validationIssues?: TransparentAnalysisAiValidationIssue[];
 }): Extract<TransparentAnalysisTelemetryEvent, { event: "transparent_analysis_ai_request" }> {
 	return {
 		version: TRANSPARENT_ANALYSIS_TELEMETRY_VERSION,
@@ -198,5 +201,8 @@ export function buildTransparentAnalysisAiRequestTelemetry(input: {
 		outcome: input.outcome,
 		httpStatus: input.httpStatus,
 		duration: transparentAnalysisAiDurationBucket(Math.max(0, input.durationMs)),
+		...(input.outcome === "invalid_output" && input.validationIssues?.length
+			? { validationIssues: input.validationIssues }
+			: {}),
 	};
 }

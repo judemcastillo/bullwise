@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
 	buildTransparentAnalysisAiSynthesisInput,
 	generateTransparentAnalysisAiProductionOverview,
+	inspectTransparentAnalysisAiSynthesis,
 	validateTransparentAnalysisAiSynthesis,
 	type TransparentAnalysisAiSynthesis,
 	type TransparentAnalysisAiSynthesisInput,
@@ -80,6 +81,17 @@ describe("production AI analysis synthesis", () => {
 		}
 	});
 
+	it("reports fixed validation codes without retaining generated text", () => {
+		const input = buildTransparentAnalysisAiSynthesisInput(panel)!;
+		const value = validSynthesis(input);
+		value.risk.text = "Volatility may rise to 90%.";
+
+		assert.deepEqual(inspectTransparentAnalysisAiSynthesis(input, value), {
+			ok: false,
+			issues: [{ section: "risk", code: "unsupported_number" }],
+		});
+	});
+
 	it("accepts whichever price-level categories are actually available", () => {
 		const supportOnlyPanel = structuredClone(panel);
 		supportOnlyPanel.levels.resistance = [];
@@ -128,7 +140,11 @@ describe("production AI analysis synthesis", () => {
 		});
 
 		assert.deepEqual(failure, { kind: "fallback", reason: "provider_failure" });
-		assert.deepEqual(invalid, { kind: "fallback", reason: "invalid_output" });
+		assert.deepEqual(invalid, {
+			kind: "fallback",
+			reason: "invalid_output",
+			validationIssues: [{ section: "root", code: "invalid_shape" }],
+		});
 		assert.deepEqual(unavailable, { kind: "not_requested", reason: "analysis_unavailable" });
 		assert.equal(calls, 0);
 	});
