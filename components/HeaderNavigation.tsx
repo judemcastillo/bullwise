@@ -4,12 +4,9 @@ import { useState } from "react";
 import NavItems from "./NavItems";
 import SearchCommand from "./SearchCommand";
 import UserDropdown from "./UserDropdown";
+import NotificationBell from "./notifications/NotificationBell";
 
-export default function HeaderNavigation({
-	user,
-}: {
-	user: User;
-}) {
+export default function HeaderNavigation({ user }: { user: User }) {
 	const [searchOpen, setSearchOpen] = useState(false);
 	const openSearch = () => setSearchOpen(true);
 
@@ -18,14 +15,11 @@ export default function HeaderNavigation({
 			<nav className="hidden sm:block">
 				<NavItems onOpenSearch={openSearch} />
 			</nav>
-			<UserDropdown
-				user={user}
-				onOpenSearch={openSearch}
-			/>
-			<SearchCommand
-				open={searchOpen}
-				setOpen={setSearchOpen}
-			/>
+			<div className="flex shrink-0 items-center gap-3">
+				<NotificationBell />
+				<UserDropdown user={user} onOpenSearch={openSearch} />
+			</div>
+			<SearchCommand open={searchOpen} setOpen={setSearchOpen} />
 		</>
 	);
 }
