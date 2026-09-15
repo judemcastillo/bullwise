@@ -1,15 +1,19 @@
 import UserProfile from "@/database/models/user-profile.model";
 import { notificationDatabase } from "./store";
-import type { ClientSession } from "mongoose";
+import { Types, type ClientSession } from "mongoose";
 
-// A stable user-id cursor supports both Better Auth id shapes without exposing identities to clients.
+// Better Auth's MongoDB adapter stores identities in the indexed ObjectId _id field.
 export async function eligibleRecipientPage(
 	cutoff: Date,
 	afterUserId = "",
 	session?: ClientSession,
+	limit = 100,
 ) {
 	await notificationDatabase();
-	return UserProfile.aggregate<{ userId: string }>([
+	const candidates = await UserProfile.aggregate<{
+		userId: string;
+		identity: { _id: Types.ObjectId }[];
+	}>([
 		{
 			$match: {
 				userId: { $gt: afterUserId },
@@ -17,33 +21,57 @@ export async function eligibleRecipientPage(
 			},
 		},
 		{ $sort: { userId: 1 } },
+		{ $limit: limit },
+		{
+			$set: {
+				identityId: {
+					$convert: { input: "$userId", to: "objectId", onError: null, onNull: null },
+				},
+			},
+		},
 		{
 			$lookup: {
 				from: "user",
-				let: { uid: "$userId" },
+				localField: "identityId",
+				foreignField: "_id",
 				pipeline: [
-					{
-						$match: {
-							emailVerified: true,
-							$expr: {
-								$or: [
-									{ $eq: ["$id", "$$uid"] },
-									{ $eq: [{ $toString: "$_id" }, "$$uid"] },
-								],
-							},
-						},
-					},
+					{ $match: { emailVerified: true } },
 					{ $project: { _id: 1 } },
 				],
 				as: "identity",
 			},
 		},
-		{ $match: { "identity.0": { $exists: true } } },
-		{ $limit: 100 },
-		{ $project: { _id: 0, userId: 1 } },
+		{ $project: { _id: 0, userId: 1, identity: 1 } },
 	]).session(session ?? null);
+	return {
+		recipients: candidates
+			.filter(({ identity }) => identity.length > 0)
+			.map(({ userId }) => ({ userId })),
+		// Advance past unverified/missing identities, including entirely ineligible batches.
+		nextCursor: candidates.length === limit ? candidates.at(-1)!.userId : null,
+	};
 }
+
+// Fill an eligible page without skipping recipients or joining unbounded candidates.
+export async function filledEligibleRecipientPage(
+	cutoff: Date,
+	afterUserId = "",
+	session?: ClientSession,
+) {
+	const recipients: { userId: string }[] = [];
+	let nextCursor: string | null = afterUserId;
+	do {
+		const page = await eligibleRecipientPage(
+			cutoff, nextCursor, session, 100 - recipients.length,
+		);
+		recipients.push(...page.recipients);
+		nextCursor = page.nextCursor;
+	} while (nextCursor !== null && recipients.length < 100);
+	return { recipients, nextCursor };
+}
+
 export async function isEligibleRecipient(userId: string) {
+	if (!Types.ObjectId.isValid(userId)) return false;
 	const db = await notificationDatabase();
 	const profile = await UserProfile.exists({
 		userId,
@@ -52,15 +80,7 @@ export async function isEligibleRecipient(userId: string) {
 	if (!profile) return false;
 	return Boolean(
 		await db.collection("user").findOne(
-			{
-				emailVerified: true,
-				$expr: {
-					$or: [
-						{ $eq: ["$id", userId] },
-						{ $eq: [{ $toString: "$_id" }, userId] },
-					],
-				},
-			},
+			{ _id: new Types.ObjectId(userId), emailVerified: true },
 			{ projection: { _id: 1 } },
 		),
 	);

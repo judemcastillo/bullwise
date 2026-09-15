@@ -1,11 +1,11 @@
 # Graph Report - bullwise  (2026-09-15)
 
 ## Corpus Check
-- 608 files · ~315,382 words
+- 608 files · ~315,511 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3795 nodes · 9243 edges · 165 communities (158 shown, 7 thin omitted)
+- 3795 nodes · 9245 edges · 171 communities (164 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 114 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
@@ -20,7 +20,7 @@
 - technical-analysis.types.ts
 - dependencies
 - functions.ts
-- data/instruments.ts
+- utils.ts
 - transparent-analysis-ai-selection-evaluation-v1-5.ts
 - batch-diagnostics.ts
 - symmetric-regime-history-source.ts
@@ -40,11 +40,11 @@
 - combined-broad-episode-dataset.ts
 - constants.ts
 - backtest.ts
-- combined-broad-strategy-target-audit-runner.ts
+- analysis/run-tests.ts
 - processor.ts
 - symmetric-regime-strategy-runner.ts
 - onboarding/service.ts
-- market-news-preference.ts
+- NotificationsForm.tsx
 - DailyMarketAnalysisCard.tsx
 - transparent-analysis-ai-topic-routing-v2-evaluation.ts
 - global.d.ts
@@ -56,13 +56,13 @@
 - unsubscribe-token.ts
 - finnhub-client.ts
 - cn
-- email-rendering.ts
+- index.ts
 - setup-scan.ts
 - buildTransparentAnalysisAiInput
 - equity-catalog.ts
 - devDependencies
 - transparent-analysis-ai-question-routing-evaluation.ts
-- types/notifications.ts
+- store.test.ts
 - communication-policy.ts
 - transparent-analysis-ai-provider.ts
 - cross-sectional-momentum-runner.ts
@@ -73,13 +73,13 @@
 - transparent-analysis-orchestrator.ts
 - inngest/notifications.ts
 - transparent-analysis-daily-observation.ts
-- CountrySelectField.tsx
+- SearchCommand.tsx
 - risk-controlled-momentum-v3-history.ts
 - transparent-analysis-ai-question-routing-prompt.test.ts
 - risk-controlled-momentum-v3-development.ts
 - broad-dataset.types.ts
-- content-safety.ts
-- analysis/run-tests.ts
+- email-rendering.ts
+- canonical-key.ts
 - us-equity-session.ts
 - cross-sectional-momentum-source.ts
 - mongoose.ts
@@ -101,7 +101,7 @@
 - transparent-analysis-ai-question-routing-fixtures.ts
 - risk-controlled-momentum-v2-history.ts
 - alerts/run-tests.ts
-- NotificationList.tsx
+- button.tsx
 - transparent-analysis-ai-evaluation.ts
 - Q: Why does connectToDatabase() bridge 17 distinct communities?
 - fetch-backtest-batch.ts
@@ -112,11 +112,11 @@
 - objective-features.ts
 - episode-dataset.ts
 - Transparent analysis AI explanation v1 preregistration
-- NotificationBell.tsx
+- HeaderNavigation.tsx
 - forex-catalog.ts
 - email-template.test.ts
-- AlertDialogs.tsx
-- canonical-key.ts
+- InAppNotificationsForm.tsx
+- commodity-catalog.ts
 - market-data/service.ts
 - market-data/finnhub.ts
 - package.json
@@ -159,29 +159,34 @@
 - analysis-dataset.types.ts
 - broad-development-universe.ts
 - Transparent analysis grounded AI question routing v1
-- transparent-analysis-ai-production-route.ts
+- ai/route.ts
 - Transparent analysis AI deterministic-overview ordering v1.6 preregistration
 - types/instruments.ts
 - watchlist/page.tsx
-- announcements.ts
+- OnboardingForm.tsx
 - auth.actions.ts
 - risk-controlled-momentum-v2-universe.ts
-- utils.ts
+- AlertDialogs.tsx
 - email-client-compatibility.test.ts
 - evaluator.ts
 - combined-broad-fold-dataset.ts
 - risk-controlled-momentum-v3-source.ts
 - communication-eligibility.ts
-- store.test.ts
+- WatchlistTable.tsx
 - google-transparent-analysis-ai-provider.ts
 - backtest.test.ts
-- market-news-preference-workflow.ts
+- market-news-preference.ts
 - In-app notifications
+- finnhub-forex-client.ts
+- transparent-analysis-ai-access.ts
+- getRequestSession
+- TradingViewWidget.tsx
+- settings/notifications/page.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 104 edges
 2. `scripts` - 81 edges
-3. `connectToDatabase()` - 66 edges
+3. `connectToDatabase()` - 65 edges
 4. `MarketBars` - 40 edges
 5. `buildTransparentAnalysisAiInput()` - 39 edges
 6. `requireCompletedUser()` - 29 edges
@@ -197,10 +202,10 @@
   .agents/skills/bullwise-analysis-research/SKILL.md → docs/daily-swing-backtesting.md
 - `Fixed Splits and Sealed Test Policy` --semantically_similar_to--> `Holdout Safeguards`  [INFERRED] [semantically similar]
   docs/daily-swing-broad-dataset-v2.md → .agents/skills/bullwise-analysis-research/SKILL.md
-- `NotificationsPage()` --calls--> `requireCompletedUser()`  [EXTRACTED]
-  app/(root)/notifications/page.tsx → lib/auth/require-user.ts
 - `Home()` --calls--> `getWatchlistWithData()`  [EXTRACTED]
   app/(root)/page.tsx → lib/data/watchlist.ts
+- `VerifyEmailPage()` --calls--> `getRequestSession`  [EXTRACTED]
+  app/(verification)/verify-email/page.tsx → lib/auth/require-user.ts
 
 ## Import Cycles
 - 4-file cycle: `lib/analysis/analysis-dataset.ts -> lib/analysis/setup-scan.types.ts -> lib/analysis/objective-features.types.ts -> lib/analysis/broad-development-universe.ts -> lib/analysis/analysis-dataset.ts`
@@ -217,7 +222,7 @@
 - **Outcome-Blind Broad Dataset Pipeline** — docs_daily_swing_broad_development_v1_outcome_blind_liquidity_policy, docs_daily_swing_broad_development_v2_sample_coverage_expansion, docs_daily_swing_broad_combined_dataset_v3_label_blind_combination, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 - **Sealed Research Evidence Safeguards** — _agents_skills_bullwise_analysis_research_holdout_safeguards, docs_daily_swing_backtesting_episode_first_one_shot_validation, docs_daily_swing_broad_dataset_v2_split_and_sealed_test_policy, docs_daily_swing_broad_combined_episode_training_v1_train_only_materialization [INFERRED 0.95]
 
-## Communities (165 total, 7 thin omitted)
+## Communities (171 total, 7 thin omitted)
 
 ### Community 0 - "scripts"
 Cohesion: 0.02
@@ -236,12 +241,12 @@ Cohesion: 0.04
 Nodes (47): @base-ui/react, better-auth, class-variance-authority, clsx, cmdk, country-flag-icons, inngest, lucide-react (+39 more)
 
 ### Community 4 - "functions.ts"
-Cohesion: 0.08
-Nodes (44): MarketNewsDeliveryLogDocument, marketNewsDeliveryLogSchema, MarketNewsDeliveryStatus, deliverAlertEmailOutbox(), BetterAuthUser, getVerifiedMarketNewsRecipient(), listMarketNewsRecipientIdsPage(), MarketNewsRecipientPage (+36 more)
+Cohesion: 0.07
+Nodes (46): MarketNewsDeliveryLogDocument, marketNewsDeliveryLogSchema, MarketNewsDeliveryStatus, deliverAlertEmailOutbox(), BetterAuthUser, getVerifiedMarketNewsRecipient(), listMarketNewsRecipientIdsPage(), MarketNewsRecipientPage (+38 more)
 
-### Community 5 - "data/instruments.ts"
-Cohesion: 0.16
-Nodes (20): isDuplicateKeyError(), normalizeFinnhubSymbol(), resolveFinnhubEquityCatalogInstrument(), resolveFinnhubEquityInstrument(), DashboardProfileData, DashboardQuoteData, getListedSecurityQuoteDetails, getStockMetrics (+12 more)
+### Community 5 - "utils.ts"
+Cohesion: 0.09
+Nodes (24): DashboardWatchlist(), DashboardWatchlistItem, StockLogo(), StockLogoProps, ScrollArea(), ScrollBar(), DashboardProfileData, DashboardQuoteData (+16 more)
 
 ### Community 6 - "transparent-analysis-ai-selection-evaluation-v1-5.ts"
 Cohesion: 0.12
@@ -260,8 +265,8 @@ Cohesion: 0.10
 Nodes (20): AlpacaBar, AlpacaBarsPayload, AlpacaBarsProvider, AlpacaBarsProviderOptions, parseBar(), validateRequest(), errorMessage(), parseBar() (+12 more)
 
 ### Community 10 - "connectToDatabase"
-Cohesion: 0.12
-Nodes (32): InstrumentPage(), WatchlistContent(), WatchlistButton(), connectToDatabase(), addToWatchlist(), removeFromWatchlist(), revalidateWatchlistViews(), mapWithConcurrency() (+24 more)
+Cohesion: 0.10
+Nodes (36): WatchlistContent(), WatchlistButton(), connectToDatabase(), addToWatchlist(), removeFromWatchlist(), revalidateWatchlistViews(), mapWithConcurrency(), addToCurrentUserWatchlist() (+28 more)
 
 ### Community 11 - "email-delivery.ts"
 Cohesion: 0.09
@@ -276,8 +281,8 @@ Cohesion: 0.16
 Nodes (24): compareClassificationToConstantBaseline(), evaluateClassificationMetrics(), fitBaselineLinearModel(), linearPrediction(), predictBaselineProbabilities(), sigmoid(), average(), binaryTargets() (+16 more)
 
 ### Community 14 - "transparent-analysis-ai-topic-routing-v3-evaluation.ts"
-Cohesion: 0.21
-Nodes (17): generateTransparentAnalysisAiTopicRoutingV2Answer(), assertFrozenState(), boundaryMetrics(), evaluateTransparentAnalysisAiTopicRoutingV3(), EvaluationRow, evaluationRows(), exactExpansion(), exactSelectionSatisfied() (+9 more)
+Cohesion: 0.20
+Nodes (18): buildTransparentAnalysisAiTopicRoutingV2Input(), generateTransparentAnalysisAiTopicRoutingV2Answer(), assertFrozenState(), boundaryMetrics(), evaluateTransparentAnalysisAiTopicRoutingV3(), EvaluationRow, evaluationRows(), exactExpansion() (+10 more)
 
 ### Community 15 - "broad-development-v2-universe.ts"
 Cohesion: 0.13
@@ -292,8 +297,8 @@ Cohesion: 0.14
 Nodes (34): addTurnover(), candidateAt(), Costs, EquityPoint, evaluateGates(), executeTargets(), formationBars(), median() (+26 more)
 
 ### Community 18 - "combined-broad-train-diagnostic-runner.ts"
-Cohesion: 0.12
-Nodes (28): CombinedBroadFeatureEncoder, average(), averageRanks(), buildCohorts(), categoricalValue(), CohortMetric, EpisodeRow, featureDrift() (+20 more)
+Cohesion: 0.08
+Nodes (43): DailySwingCombinedBroadEpisodeRow, clip(), COMBINED_BROAD_CATEGORICAL_FEATURES, COMBINED_BROAD_NUMERIC_FEATURES, CombinedBroadFeatureEncoder, encodeCombinedBroadFeatureRows(), finite(), fitCombinedBroadFeatureEncoder() (+35 more)
 
 ### Community 19 - "episode-validation.ts"
 Cohesion: 0.11
@@ -312,16 +317,16 @@ Cohesion: 0.17
 Nodes (20): AnalysisDatasetSplitSummary, DailySwingBroadWalkForwardFold, DAILY_SWING_COMBINED_BROAD_DATASET_VERSION, DAILY_SWING_COMBINED_BROAD_UNIVERSE_NAME, DailySwingCombinedBroadDataset, DailySwingCombinedBroadSourceScan, buildDailySwingCombinedBroadEpisodeDataset(), finiteUtility() (+12 more)
 
 ### Community 23 - "constants.ts"
-Cohesion: 0.09
-Nodes (25): Home(), MARKET_SUMMARY_WIDGET_CONFIG, StockAlertButton(), DASHBOARD_TOP_STORIES_WIDGET_CONFIG, DashboardNews(), InstrumentDashboard(), InstrumentDashboardProps, TradingViewWidget() (+17 more)
+Cohesion: 0.11
+Nodes (21): Home(), MARKET_SUMMARY_WIDGET_CONFIG, StockAlertButton(), DASHBOARD_TOP_STORIES_WIDGET_CONFIG, DashboardNews(), InstrumentDashboard(), InstrumentDashboardProps, ALERT_TYPE_OPTIONS (+13 more)
 
 ### Community 24 - "backtest.ts"
 Cohesion: 0.06
 Nodes (50): applySlippage(), buyAndHoldReturn(), calculateBaselines(), DailySwingBacktestDependencies, entryBasePrice(), groupMetrics(), isStopTouched(), isTargetTouched() (+42 more)
 
-### Community 25 - "combined-broad-strategy-target-audit-runner.ts"
-Cohesion: 0.13
-Nodes (23): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+15 more)
+### Community 25 - "analysis/run-tests.ts"
+Cohesion: 0.10
+Nodes (26): DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_ID, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_PROTOCOL, DAILY_SWING_COMBINED_BROAD_STRATEGY_TARGET_AUDIT_VERSION, AuditRow, average(), buildCandidates(), buildCohorts(), COHORT_DEFINITIONS (+18 more)
 
 ### Community 26 - "processor.ts"
 Cohesion: 0.14
@@ -332,20 +337,20 @@ Cohesion: 0.12
 Nodes (24): DailySwingInstrumentSetupScan, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_ID, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_PROTOCOL, DAILY_SWING_SYMMETRIC_REGIME_DEVELOPMENT_VERSION, assertFrozenConfiguration(), buildDailySwingSymmetricCandidateRows(), calculateShortBorrowStress(), cohortMetrics() (+16 more)
 
 ### Community 28 - "onboarding/service.ts"
-Cohesion: 0.07
-Nodes (44): CountrySelectField(), defaultValues, OnboardingForm(), stepFields, stepLabels, SelectField(), PreferencesForm(), cachedSchemaIsCurrent (+36 more)
+Cohesion: 0.12
+Nodes (22): allowedInvestmentExperiences, allowedInvestmentGoals, allowedPreferredIndustries, allowedPreferredMarkets, allowedRiskTolerances, CompleteOnboardingResult, createOnboardingDefaults(), getRecord() (+14 more)
 
-### Community 29 - "market-news-preference.ts"
-Cohesion: 0.21
-Nodes (12): categoryLabels, frequencyOptions, NotificationsForm(), preferenceKey(), updateMarketNewsPreference(), MarketNewsPreferenceInput, MarketNewsPreferenceView, validateMarketNewsPreferenceInput() (+4 more)
+### Community 29 - "NotificationsForm.tsx"
+Cohesion: 0.29
+Nodes (8): categoryLabels, frequencyOptions, NotificationsForm(), preferenceKey(), updateMarketNewsPreference(), MarketNewsPreferenceInput, MarketNewsPreferenceView, validateMarketNewsPreferenceInput()
 
 ### Community 30 - "DailyMarketAnalysisCard.tsx"
 Cohesion: 0.10
-Nodes (28): aiAnalysisEndpointForInstrument(), AiAnalysisOverview(), AiAnalysisState, aiAnalysisUnavailableMessage(), analysisEndpointForInstrument(), AnalysisLoadState, AvailableAnalysis(), DailyMarketAnalysisCard() (+20 more)
+Nodes (29): aiAnalysisEndpointForInstrument(), AiAnalysisOverview(), AiAnalysisState, aiAnalysisUnavailableMessage(), analysisEndpointForInstrument(), AnalysisLoadState, AvailableAnalysis(), DailyMarketAnalysisCard() (+21 more)
 
 ### Community 31 - "transparent-analysis-ai-topic-routing-v2-evaluation.ts"
 Cohesion: 0.09
-Nodes (33): boundaryMetrics(), evaluateTransparentAnalysisAiTopicRoutingV2(), exactExpansion(), exactSelectionSatisfied(), expectedSelectionSatisfied(), expectedTransparentAnalysisAiTopicRoutingV2Output(), GenerationResult, InvalidFixture (+25 more)
+Nodes (32): boundaryMetrics(), evaluateTransparentAnalysisAiTopicRoutingV2(), exactExpansion(), exactSelectionSatisfied(), expectedSelectionSatisfied(), expectedTransparentAnalysisAiTopicRoutingV2Output(), GenerationResult, InvalidFixture (+24 more)
 
 ### Community 32 - "global.d.ts"
 Cohesion: 0.07
@@ -380,12 +385,12 @@ Cohesion: 0.16
 Nodes (11): FakeProvider, getFinnhubApiKey(), marketStateForCalendar(), FinnhubQuotePayload, FinnhubQuoteProvider, FinnhubQuoteProviderOptions, createFinnhubQuoteProvider(), FakeQuoteProvider (+3 more)
 
 ### Community 40 - "cn"
-Cohesion: 0.06
-Nodes (49): Avatar(), AvatarBadge(), AvatarFallback(), AvatarGroup(), AvatarGroupCount(), AvatarImage(), Checkbox(), DropdownMenu() (+41 more)
+Cohesion: 0.10
+Nodes (31): Avatar(), AvatarBadge(), AvatarFallback(), AvatarGroup(), AvatarGroupCount(), AvatarImage(), Checkbox(), DropdownMenu() (+23 more)
 
-### Community 41 - "email-rendering.ts"
-Cohesion: 0.17
-Nodes (20): getEmailEligibilityByEmail(), requireSafeEmailUrl(), EmailBranding, getApplicationBaseUrl(), getEmailBranding(), getMarketingEmailBranding(), MarketingEmailBranding, ENV_KEYS (+12 more)
+### Community 41 - "index.ts"
+Cohesion: 0.20
+Nodes (14): getEmailEligibilityByEmail(), EmailBranding, getApplicationBaseUrl(), getEmailBranding(), getMarketingEmailBranding(), MarketingEmailBranding, ENV_KEYS, sendSignUpEmail (+6 more)
 
 ### Community 42 - "setup-scan.ts"
 Cohesion: 0.19
@@ -397,7 +402,7 @@ Nodes (49): request(), buildTransparentAnalysisAiInput(), facts(), limitations()
 
 ### Community 44 - "equity-catalog.ts"
 Cohesion: 0.21
-Nodes (16): applyChanges, EquityInstrument, listingKey(), run(), typeCounts(), entryKey(), EquityCatalogEntry, normalizeFinnhubEquityCatalogEntry() (+8 more)
+Nodes (17): applyChanges, EquityInstrument, listingKey(), run(), typeCounts(), prepareEquityCatalog(), entryKey(), EquityCatalogEntry (+9 more)
 
 ### Community 45 - "devDependencies"
 Cohesion: 0.08
@@ -407,9 +412,9 @@ Nodes (25): eslint, eslint-config-next, @next/env, devDependencies, eslint, esli
 Cohesion: 0.14
 Nodes (22): boundaryMetrics(), containsAll(), containsOnly(), evaluateTransparentAnalysisAiQuestionRoutingV1(), exactRenderedText(), expectedSelectionSatisfied(), expectedTransparentAnalysisAiQuestionRoutingOutput(), GenerationFixture (+14 more)
 
-### Community 47 - "types/notifications.ts"
-Cohesion: 0.14
-Nodes (13): main(), PreferenceRecord, schema, NotificationRecord, schema, deliverInboxNewsWorkflow(), InboxNewsRequest, NewsDeliveryDependencies (+5 more)
+### Community 47 - "store.test.ts"
+Cohesion: 0.09
+Nodes (20): main(), PreferenceRecord, schema, NotificationRecord, schema, deliverInboxNewsWorkflow(), InboxNewsRequest, NewsDeliveryDependencies (+12 more)
 
 ### Community 48 - "communication-policy.ts"
 Cohesion: 0.13
@@ -429,31 +434,31 @@ Nodes (7): Decision rule, Development result, Frozen architecture, Frozen gates,
 
 ### Community 52 - "baseline-model.ts"
 Cohesion: 0.09
-Nodes (31): DailySwingAnalysisDataset, auc(), BASELINE_TRAINING_CONFIGURATION, binaryTarget(), CATEGORICAL_FEATURES, compareRegressionToConstantBaseline(), EncodedBaselineRows, evaluateRegressionMetrics() (+23 more)
+Nodes (30): auc(), BASELINE_TRAINING_CONFIGURATION, binaryTarget(), CATEGORICAL_FEATURES, compareRegressionToConstantBaseline(), EncodedBaselineRows, evaluateRegressionMetrics(), finiteNumeric() (+22 more)
 
 ### Community 53 - "components.json"
 Cohesion: 0.09
 Nodes (21): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+13 more)
 
 ### Community 54 - "require-user.ts"
-Cohesion: 0.12
-Nodes (20): GET(), GET(), Layout(), OnboardingPage(), Layout(), PreferencesSettingsPage(), AccessControlError, assertCompletedUser() (+12 more)
+Cohesion: 0.14
+Nodes (14): TransparentAnalysisOrchestrationResult, handleTransparentAnalysisRequest(), json(), PRIVATE_JSON_HEADERS, unavailableResponse, TransparentAnalysisRouteDependencies, AccessControlError, assertCompletedUser() (+6 more)
 
 ### Community 55 - "transparent-analysis-orchestrator.ts"
 Cohesion: 0.12
 Nodes (28): AnalysisCatalogInstrument, classifyTransparentAnalysisOperationalFailure(), hasEnabledBarsBinding(), isEligibleBenchmark(), isEligibleTarget(), loadBenchmarkBars(), orchestrateTransparentAnalysis(), reportFailure() (+20 more)
 
 ### Community 56 - "inngest/notifications.ts"
-Cohesion: 0.18
-Nodes (19): { GET, POST, PUT }, NotificationSettingsPage(), InAppNotificationsForm(), getMarketNewsPeriodKey(), inngest, monitorPriceAlerts, sendSignUpEmail, dailyInboxNews (+11 more)
+Cohesion: 0.15
+Nodes (26): { GET, POST, PUT }, getMarketNewsPeriodKey(), inngest, dailyInboxNews, deliverInboxNewsDigest, deliverInboxPriceAlerts, newsSchedule(), queueInboxNews (+18 more)
 
 ### Community 57 - "transparent-analysis-daily-observation.ts"
 Cohesion: 0.12
 Nodes (28): DAILY_CANDIDATES, increment(), incrementStringArray(), isRecordedDate(), isValidInstrumentRequest(), StoredTelemetryLine, summarizeTransparentAnalysisObservation(), TRANSPARENT_ANALYSIS_OBSERVATION_MINIMUM_DAYS (+20 more)
 
-### Community 58 - "CountrySelectField.tsx"
+### Community 58 - "SearchCommand.tsx"
 Cohesion: 0.12
-Nodes (18): CountrySelect(), CountrySelectProps, Command(), CommandDialog(), CommandEmpty(), CommandGroup(), CommandInput(), CommandItem() (+10 more)
+Nodes (20): CountrySelect(), CountrySelectField(), CountrySelectProps, ASSET_FILTERS, SECURITY_TYPE_FILTERS, Command(), CommandDialog(), CommandEmpty() (+12 more)
 
 ### Community 59 - "risk-controlled-momentum-v3-history.ts"
 Cohesion: 0.22
@@ -471,13 +476,13 @@ Nodes (12): RISK_CONTROLLED_MOMENTUM_V2_DEVELOPMENT_ID, RISK_CONTROLLED_MOMENTUM
 Cohesion: 0.13
 Nodes (25): AnalysisDatasetLabels, DAILY_SWING_BROAD_WALK_FORWARD_FOLDS, DailySwingBroadDataset, DailySwingBroadDatasetRow, buildDailySwingBroadEpisodeDataset(), finiteUtility(), requireSource(), rowsBefore() (+17 more)
 
-### Community 63 - "content-safety.ts"
+### Community 63 - "email-rendering.ts"
 Cohesion: 0.26
-Nodes (14): dashboardUrl(), formatPrice(), formatTimestamp(), renderAlertEmail(), controlledTag(), escapeHtml(), PARAGRAPH_ATTRIBUTES, parseSafeHttpUrl() (+6 more)
+Nodes (16): controlledTag(), escapeHtml(), PARAGRAPH_ATTRIBUTES, parseSafeHttpUrl(), requireSafeEmailUrl(), sanitizeEmailHeader(), sanitizeGeneratedMarketNewsHtml(), sanitizeGeneratedWelcomeHtml() (+8 more)
 
-### Community 64 - "analysis/run-tests.ts"
-Cohesion: 0.14
-Nodes (20): DailySwingBroadFeatureVector, DailySwingCombinedBroadEpisodeRow, DailySwingCombinedBroadFoldDataset, clip(), COMBINED_BROAD_CATEGORICAL_FEATURES, COMBINED_BROAD_NUMERIC_FEATURES, encodeCombinedBroadFeatureRows(), finite() (+12 more)
+### Community 64 - "canonical-key.ts"
+Cohesion: 0.10
+Nodes (25): InstrumentResolutionError, isDuplicateKeyError(), normalizeFinnhubSymbol(), resolveFinnhubEquityCatalogInstrument(), resolveFinnhubEquityInstrument(), CANONICAL_KEY_MAX_LENGTH, CANONICAL_KEY_PATTERN, CanonicalInstrumentIdentity (+17 more)
 
 ### Community 65 - "us-equity-session.ts"
 Cohesion: 0.16
@@ -488,32 +493,32 @@ Cohesion: 0.15
 Nodes (17): ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_ID, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_PROTOCOL, ETF_CROSS_SECTIONAL_MOMENTUM_DEVELOPMENT_VERSION, writeMomentumDevelopmentReport(), MomentumBenchmarkHistory, MomentumSleeveId, MomentumSourceScan, assertMarketProvenance() (+9 more)
 
 ### Community 67 - "mongoose.ts"
-Cohesion: 0.09
-Nodes (23): runMigration(), applyChanges, EquityInstrument, run(), applyChanges, FinnhubProfile, getFinnhubProfile(), isDuplicateKeyError() (+15 more)
+Cohesion: 0.12
+Nodes (16): runMigration(), applyChanges, EquityInstrument, run(), applyChanges, FinnhubProfile, getFinnhubProfile(), isDuplicateKeyError() (+8 more)
 
 ### Community 68 - "Transparent analysis AI latency observation v1 preregistration"
 Cohesion: 0.33
 Nodes (5): Frozen protocol, Interpretation boundary, Question, Recorded observation, Transparent analysis AI latency observation v1 preregistration
 
 ### Community 69 - "sync-instrument-catalog.ts"
-Cohesion: 0.10
-Nodes (39): applyChanges, bindingKey(), deactivateOnly, ExistingInstrument, matchingExistingInstruments(), normalizeCatalog(), omittedInstrumentFields(), OPTIONAL_INSTRUMENT_FIELDS (+31 more)
+Cohesion: 0.14
+Nodes (22): applyChanges, bindingKey(), deactivateOnly, ExistingInstrument, matchingExistingInstruments(), normalizeCatalog(), OPTIONAL_INSTRUMENT_FIELDS, prepareCryptoCatalog() (+14 more)
 
 ### Community 70 - "Transparent analysis AI provider pacing v1 preregistration"
 Cohesion: 0.33
 Nodes (5): Basis, Frozen gates, Frozen protocol, Recorded observation, Transparent analysis AI provider pacing v1 preregistration
 
 ### Community 71 - "requireCompletedUser"
-Cohesion: 0.10
-Nodes (36): AlertDetailsDialogState(), AlertEventItem, alertEventSchema, EmailDeliveryStatus, AlertItem, alertSchema, actionError(), deleteAlertAction() (+28 more)
+Cohesion: 0.09
+Nodes (38): NotificationPage(), NotificationsPage(), AlertDetailsDialogState(), AlertEventItem, alertEventSchema, EmailDeliveryStatus, AlertItem, alertSchema (+30 more)
 
 ### Community 72 - "boosted-model.ts"
 Cohesion: 0.15
 Nodes (19): binaryTarget(), BOOSTED_DEVELOPMENT_THRESHOLDS, BOOSTED_TRAINING_CONFIGURATION, CandidateThresholds, fitStump(), minimum(), rawPredictions(), sigmoid() (+11 more)
 
 ### Community 73 - "transparent-analysis-ai-topic-routing-v2.ts"
-Cohesion: 0.11
-Nodes (28): buildTransparentAnalysisAiTopicRoutingV2Input(), expandTransparentAnalysisAiTopicRoutingV2(), FACTOR_ORDER, FACTORS_BY_TOPIC, hasExactKeys(), isRecord(), isUniqueTopicArray(), LIMITATION_TEXT (+20 more)
+Cohesion: 0.10
+Nodes (28): expandTransparentAnalysisAiTopicRoutingV2(), FACTOR_ORDER, FACTORS_BY_TOPIC, hasExactKeys(), isRecord(), isUniqueTopicArray(), LIMITATION_TEXT, TransparentAnalysisAiTopicRoutingV2GenerationResult (+20 more)
 
 ### Community 74 - "technical-analysis.ts"
 Cohesion: 0.08
@@ -549,7 +554,7 @@ Nodes (4): Answer, Outcome, Q: Can you make the terms and privacy to be separate
 
 ### Community 82 - "transparent-analysis-telemetry.ts"
 Cohesion: 0.09
-Nodes (32): dynamic, GET(), runtime, TransparentAnalysisOrchestrationResult, handleTransparentAnalysisRequest(), json(), PRIVATE_JSON_HEADERS, unavailableResponse (+24 more)
+Nodes (27): handleTransparentAnalysisAiProductionRequest(), json(), availablePanel, synthesis, TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION, TransparentAnalysisAiProductionRouteDependencies, TransparentAnalysisAiResponse, TransparentAnalysisAiProductionResult (+19 more)
 
 ### Community 83 - "transparent-analysis-ai-question-routing-fixtures.ts"
 Cohesion: 0.14
@@ -563,9 +568,9 @@ Nodes (13): buildRiskControlledMomentumV2HistoryArtifact(), RISK_CONTROLLED_MOME
 Cohesion: 0.19
 Nodes (6): ALERT_EMAIL_DELIVERY_CRON, ALERT_EMAIL_DELIVERY_EVENT, ALERT_EMAIL_DELIVERY_FUNCTION_CONFIG, ALERT_MONITORING_CRON, ALERT_MONITORING_EVENT, ALERT_MONITORING_FUNCTION_CONFIG
 
-### Community 86 - "NotificationList.tsx"
-Cohesion: 0.20
-Nodes (15): NotificationPage(), NotificationsPage(), NotificationDetail(), announceNotificationChange(), NotificationChange, NotificationList(), Separator(), failure() (+7 more)
+### Community 86 - "button.tsx"
+Cohesion: 0.17
+Nodes (13): NotificationDetail(), announceNotificationChange(), NotificationChange, NotificationList(), NOTIFICATIONS_CHANGED, Badge(), badgeVariants, Button() (+5 more)
 
 ### Community 87 - "transparent-analysis-ai-evaluation.ts"
 Cohesion: 0.08
@@ -607,25 +612,25 @@ Nodes (14): AnalysisDatasetSplit, DAILY_SWING_ANALYSIS_DATASET_VERSION, buildDai
 Cohesion: 0.20
 Nodes (9): Authorized next step, Development results, Failure and caching contract, Frozen evaluation suite, Frozen input boundary, Frozen output boundary, Local candidate evaluation, Purpose (+1 more)
 
-### Community 97 - "NotificationBell.tsx"
-Cohesion: 0.13
-Nodes (14): Header(), HeaderNavigation(), NavItems(), NotificationBell(), NOTIFICATIONS_CHANGED, Badge(), badgeVariants, Popover() (+6 more)
+### Community 97 - "HeaderNavigation.tsx"
+Cohesion: 0.33
+Nodes (5): HeaderNavigation(), NavItems(), NotificationBell(), SearchCommand(), NAV_ITEMS
 
 ### Community 98 - "forex-catalog.ts"
 Cohesion: 0.18
 Nodes (10): normalizeFinnhubOandaCatalogEntry(), ForexCatalogEntry, pairKey(), reconcileForexCatalogs(), tradingViewBinding(), normalizeMassiveForexCatalogEntry(), parseMassiveForexTicker(), usesUsd() (+2 more)
 
 ### Community 99 - "email-template.test.ts"
-Cohesion: 0.29
-Nodes (10): NEWS_SUMMARY_EMAIL_PROMPT, PERSONALIZED_WELCOME_EMAIL_PROMPT, TRADINGVIEW_SYMBOL_MAPPING_PROMPT, INACTIVE_USER_REMINDER_EMAIL_TEMPLATE, NEWS_SUMMARY_EMAIL_TEMPLATE, STOCK_ALERT_LOWER_EMAIL_TEMPLATE, STOCK_ALERT_UPPER_EMAIL_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE (+2 more)
+Cohesion: 0.44
+Nodes (7): INACTIVE_USER_REMINDER_EMAIL_TEMPLATE, NEWS_SUMMARY_EMAIL_TEMPLATE, STOCK_ALERT_LOWER_EMAIL_TEMPLATE, STOCK_ALERT_UPPER_EMAIL_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, VOLUME_ALERT_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE
 
-### Community 100 - "AlertDialogs.tsx"
-Cohesion: 0.09
-Nodes (32): AlertDetailsDialog(), AlertDetailsDialogProps, CreateAlertDialog(), CreateAlertDialogProps, CreateAlertDialogState(), instrumentKey(), suggestedThreshold(), InputField() (+24 more)
+### Community 100 - "InAppNotificationsForm.tsx"
+Cohesion: 0.15
+Nodes (16): InputField(), MultiSelectField(), SelectField(), labels, Label(), Select(), SelectContent(), SelectGroup() (+8 more)
 
-### Community 101 - "canonical-key.ts"
-Cohesion: 0.11
-Nodes (26): applyChanges, LegacyMetalInstrument, runMigration(), targetDefinition(), buildCanonicalKey(), CANONICAL_KEY_MAX_LENGTH, CANONICAL_KEY_PATTERN, CanonicalInstrumentIdentity (+18 more)
+### Community 101 - "commodity-catalog.ts"
+Cohesion: 0.24
+Nodes (14): applyChanges, LegacyMetalInstrument, runMigration(), targetDefinition(), prepareCommodityCatalog(), buildCanonicalKey(), CommoditySpotCatalogEntry, commoditySpotPricePrecision() (+6 more)
 
 ### Community 102 - "market-data/service.ts"
 Cohesion: 0.16
@@ -653,7 +658,7 @@ Nodes (9): ETF Cross-Sectional Momentum Development v1 Result, Rejected Cross-Se
 
 ### Community 108 - "broad-dataset.ts"
 Cohesion: 0.07
-Nodes (52): applyDailySwingBroadSplitPolicy(), BASE_NULLABLE_FEATURES, baseFeatures(), buildDailySwingBroadDataset(), buildWalkForwardFolds(), collectDailySwingBroadRows(), DailySwingBroadCandidateRow, labels() (+44 more)
+Nodes (50): applyDailySwingBroadSplitPolicy(), BASE_NULLABLE_FEATURES, baseFeatures(), buildDailySwingBroadDataset(), buildWalkForwardFolds(), collectDailySwingBroadRows(), DailySwingBroadCandidateRow, labels() (+42 more)
 
 ### Community 109 - "Signalist Dashboard Preview"
 Cohesion: 0.31
@@ -720,16 +725,16 @@ Cohesion: 0.67
 Nodes (4): Email Client Rendering Checklist, Email Rendering Compatibility Contract, Real-Inbox Rendering Smoke Test, Price Alert Email Template
 
 ### Community 127 - "transparent-analysis-ai-production.ts"
-Cohesion: 0.07
-Nodes (46): dynamic, POST(), runtime, AnalysisAiCacheDocument, analysisAiCacheSchema, AnalysisAiRateLimitDocument, analysisAiRateLimitSchema, ANALYSIS_AI_CACHE_TTL_MS (+38 more)
+Cohesion: 0.10
+Nodes (25): CitedSynthesisText, citedTextSchema, exactKeys(), factorFacts(), inspectSection(), inspectTransparentAnalysisAiSynthesis(), INTERPRETIVE_LANGUAGE, isRecord() (+17 more)
 
 ### Community 129 - "Bull and Rising Market Chart Motif"
 Cohesion: 1.00
 Nodes (3): Bull and Rising Market Chart Motif, Bull Wise Email Logo, Bull Wise Wordmark
 
 ### Community 130 - "store.ts"
-Cohesion: 0.28
-Nodes (14): selectDigestArticles(), decodeCursor(), DEFAULT_IN_APP_NEWS, encodeCursor(), internalDestination(), objectId(), parseAnnouncement(), parsePreference() (+6 more)
+Cohesion: 0.15
+Nodes (26): GET(), GET(), InAppNotificationsForm(), failure(), readAllNotifications(), updateInAppNewsPreference(), notificationHttpError(), selectDigestArticles() (+18 more)
 
 ### Community 138 - "Transparent analysis AI v1.6 acceptance v1 preregistration"
 Cohesion: 0.22
@@ -756,8 +761,8 @@ Cohesion: 0.12
 Nodes (15): Authorization boundary and next checkpoint, Decision and purpose, Durable evaluator and finalizer implementation result, Durable one-shot execution protocol, Final product decision, Frozen automated and manual gates, Frozen interruption and recovery rule, Frozen product behavior (+7 more)
 
 ### Community 144 - "analysis-dataset.types.ts"
-Cohesion: 0.23
-Nodes (12): AnalysisDatasetFeatureVector, AnalysisDatasetRow, dataset(), features(), row(), featureVector(), nonlinearDataset(), row() (+4 more)
+Cohesion: 0.24
+Nodes (13): AnalysisDatasetFeatureVector, AnalysisDatasetRow, DailySwingAnalysisDataset, dataset(), features(), row(), featureVector(), nonlinearDataset() (+5 more)
 
 ### Community 145 - "broad-development-universe.ts"
 Cohesion: 0.24
@@ -767,25 +772,25 @@ Nodes (10): BROAD_DEVELOPMENT_CATEGORIES, BROAD_DEVELOPMENT_DATA_POLICY, BROAD_D
 Cohesion: 0.13
 Nodes (14): Decision and purpose, Decision rule and authorized next step, Development fixtures, Explicit interaction contract, Fixture and fake-evaluator implementation result, Frozen development evaluation result, Frozen development gates, Frozen prompt and Google-adapter implementation result (+6 more)
 
-### Community 147 - "transparent-analysis-ai-production-route.ts"
-Cohesion: 0.17
-Nodes (12): handleTransparentAnalysisAiProductionRequest(), json(), availablePanel, synthesis, TRANSPARENT_ANALYSIS_AI_RESPONSE_VERSION, TransparentAnalysisAiProductionRouteDependencies, TransparentAnalysisAiResponse, TransparentAnalysisAiProductionResult (+4 more)
+### Community 147 - "ai/route.ts"
+Cohesion: 0.16
+Nodes (22): dynamic, POST(), runtime, dynamic, GET(), runtime, InstrumentPage(), cacheKey() (+14 more)
 
 ### Community 148 - "Transparent analysis AI deterministic-overview ordering v1.6 preregistration"
 Cohesion: 0.22
 Nodes (8): Decision rule, Development result, Frozen deterministic overview, Frozen gates, Frozen protocol, Frozen rendering and failure behavior, Purpose, Transparent analysis AI deterministic-overview ordering v1.6 preregistration
 
 ### Community 149 - "types/instruments.ts"
-Cohesion: 0.08
-Nodes (46): applyChanges, EquityInstrument, listingKey(), run(), INSTRUMENT_TYPES_BY_ASSET_CLASS, InstrumentContract, instrumentContractSchema, InstrumentItem (+38 more)
+Cohesion: 0.09
+Nodes (40): INSTRUMENT_TYPES_BY_ASSET_CLASS, InstrumentContract, instrumentContractSchema, InstrumentItem, instrumentSchema, providerBindingSchema, omittedInstrumentFields(), persistCatalog() (+32 more)
 
 ### Community 150 - "watchlist/page.tsx"
-Cohesion: 0.23
-Nodes (8): WatchlistSearchParams, WatchlistAlerts(), WatchlistNews(), WatchlistNewsLoading(), WatchlistNewsSection(), WatchlistPageLoading(), WatchlistPagination(), formatTimeAgo()
+Cohesion: 0.20
+Nodes (9): WatchlistSearchParams, WatchlistAlerts(), WatchlistNews(), WatchlistNewsLoading(), WatchlistNewsSection(), WatchlistPageLoading(), WatchlistPagination(), WatchlistSearch() (+1 more)
 
-### Community 151 - "announcements.ts"
-Cohesion: 0.30
-Nodes (11): AnnouncementInput, assertSamePublication(), countRecipients(), Publication, publishAnnouncement(), Recipient, snapshotAudience(), eligibleRecipientPage() (+3 more)
+### Community 151 - "OnboardingForm.tsx"
+Cohesion: 0.14
+Nodes (19): defaultValues, OnboardingForm(), stepFields, stepLabels, cachedSchemaIsCurrent, cachedUserProfile, UserProfileDocument, userProfileSchema (+11 more)
 
 ### Community 152 - "auth.actions.ts"
 Cohesion: 0.05
@@ -795,21 +800,21 @@ Nodes (51): handler(), SignInPage(), SignUpPage(), VerifyEmailPage(), AuthDivide
 Cohesion: 0.21
 Nodes (9): Candidate, Exchange, RISK_CONTROLLED_MOMENTUM_V2_COMPUTED_MANIFEST_SHA256, RISK_CONTROLLED_MOMENTUM_V2_EXCLUDED_SYMBOLS, RISK_CONTROLLED_MOMENTUM_V2_INCEPTION_CUTOFF, RISK_CONTROLLED_MOMENTUM_V2_METADATA_VERIFIED_AT, RISK_CONTROLLED_MOMENTUM_V2_SLEEVES, RISK_CONTROLLED_MOMENTUM_V2_UNIVERSE_VERSION (+1 more)
 
-### Community 154 - "utils.ts"
-Cohesion: 0.16
-Nodes (6): DashboardWatchlist(), DashboardWatchlistItem, StockLogo(), StockLogoProps, formatCurrencyValue(), ValidNewsArticle
+### Community 154 - "AlertDialogs.tsx"
+Cohesion: 0.15
+Nodes (16): AlertDetailsDialog(), AlertDetailsDialogProps, CreateAlertDialog(), CreateAlertDialogProps, CreateAlertDialogState(), instrumentKey(), suggestedThreshold(), Dialog() (+8 more)
 
 ### Community 155 - "email-client-compatibility.test.ts"
-Cohesion: 0.15
-Nodes (5): createAlertJob(), emailBranding, EmailFixture, marketingEmailBranding, RenderedEmail
+Cohesion: 0.17
+Nodes (10): dashboardUrl(), formatPrice(), formatTimestamp(), renderAlertEmail(), createAlertJob(), createFixtures(), emailBranding, EmailFixture (+2 more)
 
 ### Community 156 - "evaluator.ts"
 Cohesion: 0.26
 Nodes (10): AlertEvaluationInput, AlertEvaluationResult, comparePriceValues(), DEFAULT_MAX_QUOTE_AGE_MS, evaluatePriceAlert(), ParsedDecimal, parsePositiveDecimal(), evaluate() (+2 more)
 
 ### Community 157 - "combined-broad-fold-dataset.ts"
-Cohesion: 0.22
-Nodes (13): DailySwingCombinedBroadDatasetRow, buildDailySwingCombinedBroadFoldDataset(), episodeRow(), materializeDailySwingCombinedBroadFoldRows(), rowsBefore(), rowsBetween(), timestamp(), DAILY_SWING_COMBINED_BROAD_FINAL_EPISODE_SHA256 (+5 more)
+Cohesion: 0.17
+Nodes (17): DailySwingBroadFeatureVector, DailySwingCombinedBroadDatasetRow, buildDailySwingCombinedBroadFoldDataset(), episodeRow(), materializeDailySwingCombinedBroadFoldRows(), rowsBefore(), rowsBetween(), timestamp() (+9 more)
 
 ### Community 158 - "risk-controlled-momentum-v3-source.ts"
 Cohesion: 0.33
@@ -819,9 +824,9 @@ Nodes (11): RiskControlledMomentumBenchmarkHistory, RiskControlledMomentumSleeve
 Cohesion: 0.20
 Nodes (9): BetterAuthUser, getEmailEligibility(), getPreference(), EmailEligibilityRequest, EmailEligibilityResult, evaluateEmailEligibility(), hasAuditableConsent(), streamForMessage() (+1 more)
 
-### Community 160 - "store.test.ts"
-Cohesion: 0.22
-Nodes (7): compare(), Filter, matches(), Row, rows, sort(), timestamp
+### Community 160 - "WatchlistTable.tsx"
+Cohesion: 0.17
+Nodes (17): Table(), TableBody(), TableCaption(), TableCell(), TableFooter(), TableHead(), TableHeader(), TableRow() (+9 more)
 
 ### Community 161 - "google-transparent-analysis-ai-provider.ts"
 Cohesion: 0.12
@@ -831,13 +836,33 @@ Nodes (21): geminiCompatibleSchema(), GeminiResponse, GoogleTransparentAnalysisA
 Cohesion: 0.24
 Nodes (6): bar(), historicalBars(), longPlan(), SIGNAL_AT, simulate(), DailySwingAnalysisInput
 
-### Community 163 - "market-news-preference-workflow.ts"
-Cohesion: 0.39
-Nodes (5): COMMUNICATION_POLICY_VERSION, EmailSubscriptionPreferenceSnapshot, MarketNewsPreferenceWriteRepository, saveMarketNewsPreferenceWorkflow(), now
+### Community 163 - "market-news-preference.ts"
+Cohesion: 0.33
+Nodes (7): COMMUNICATION_POLICY_VERSION, EmailSubscriptionPreferenceSnapshot, replaceOrInsertMarketNewsSubscription(), saveMarketNewsPreference(), MarketNewsPreferenceWriteRepository, saveMarketNewsPreferenceWorkflow(), now
 
 ### Community 164 - "In-app notifications"
 Cohesion: 0.33
 Nodes (5): Announcements, Enable after deployment, In-app notifications, Interfaces and verification, News
+
+### Community 165 - "finnhub-forex-client.ts"
+Cohesion: 0.17
+Nodes (16): applyChanges, EquityInstrument, listingKey(), run(), FinnhubCryptoSymbol, FinnhubEquitySymbol, listFinnhubCryptoSymbols(), listFinnhubOandaSymbols() (+8 more)
+
+### Community 166 - "transparent-analysis-ai-access.ts"
+Cohesion: 0.20
+Nodes (12): AnalysisAiCacheDocument, analysisAiCacheSchema, AnalysisAiRateLimitDocument, analysisAiRateLimitSchema, ANALYSIS_AI_CACHE_TTL_MS, consumeTransparentAnalysisAiQuota(), isDuplicateKeyError(), TRANSPARENT_ANALYSIS_AI_SYNTHESIS_PROMPT_SHA256 (+4 more)
+
+### Community 167 - "getRequestSession"
+Cohesion: 0.24
+Nodes (9): Layout(), OnboardingPage(), Layout(), PreferencesSettingsPage(), Header(), PreferencesForm(), getRequestSession, getOnboardingProfile() (+1 more)
+
+### Community 168 - "TradingViewWidget.tsx"
+Cohesion: 0.60
+Nodes (3): TradingViewWidget(), TradingViewWidgetProps, useTradingViewWidget()
+
+### Community 169 - "settings/notifications/page.tsx"
+Cohesion: 0.67
+Nodes (3): NotificationSettingsPage(), defaultView(), getMarketNewsPreference()
 
 ## Knowledge Gaps
 - **938 isolated node(s):** `metadata`, `sections`, `metadata`, `sections`, `MARKET_SUMMARY_WIDGET_CONFIG` (+933 more)
@@ -847,11 +872,11 @@ Nodes (5): Announcements, Enable after deployment, In-app notifications, Interfa
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `connectToDatabase()` connect `connectToDatabase` to `store.ts`, `functions.ts`, `data/instruments.ts`, `email-delivery.ts`, `types/instruments.ts`, `announcements.ts`, `auth.actions.ts`, `processor.ts`, `onboarding/service.ts`, `market-news-preference.ts`, `communication-eligibility.ts`, `email-suppression.ts`, `email-rendering.ts`, `require-user.ts`, `inngest/notifications.ts`, `mongoose.ts`, `requireCompletedUser`, `transparent-analysis-telemetry.ts`, `NotificationList.tsx`, `transparent-analysis-ai-production.ts`?**
+- **Why does `connectToDatabase()` connect `connectToDatabase` to `store.ts`, `functions.ts`, `email-delivery.ts`, `ai/route.ts`, `types/instruments.ts`, `OnboardingForm.tsx`, `auth.actions.ts`, `processor.ts`, `communication-eligibility.ts`, `market-news-preference.ts`, `email-suppression.ts`, `transparent-analysis-ai-access.ts`, `getRequestSession`, `index.ts`, `settings/notifications/page.tsx`, `inngest/notifications.ts`, `canonical-key.ts`, `mongoose.ts`, `requireCompletedUser`?**
   _High betweenness centrality (0.050) - this node is a cross-community bridge._
-- **Why does `EquitySecurityType` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.types.ts`, `AlertDialogs.tsx`, `cn`, `technical-analysis.ts`, `connectToDatabase`, `equity-catalog.ts`, `massive-bars-client.ts`, `transparent-analysis-orchestrator.ts`?**
+- **Why does `EquitySecurityType` connect `types/instruments.ts` to `WatchlistTable.tsx`, `global.d.ts`, `technical-analysis.types.ts`, `technical-analysis.ts`, `connectToDatabase`, `equity-catalog.ts`, `massive-bars-client.ts`, `transparent-analysis-orchestrator.ts`, `SearchCommand.tsx`?**
   _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `AssetClass` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.types.ts`, `AlertDialogs.tsx`, `sync-instrument-catalog.ts`, `requireCompletedUser`, `MarketBars`, `connectToDatabase`, `types.ts`, `massive-bars-client.ts`, `processor.ts`?**
+- **Why does `AssetClass` connect `types/instruments.ts` to `global.d.ts`, `technical-analysis.types.ts`, `processor.ts`, `sync-instrument-catalog.ts`, `requireCompletedUser`, `MarketBars`, `connectToDatabase`, `types.ts`, `massive-bars-client.ts`, `SearchCommand.tsx`?**
   _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `metadata`, `sections`, `metadata` to the rest of the system?**
   _938 weakly-connected nodes found - possible documentation gaps or missing edges._

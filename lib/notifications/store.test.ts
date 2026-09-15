@@ -182,6 +182,83 @@ describe("notification persistence behavior", () => {
 	});
 });
 
+describe("recipient candidate pagination", () => {
+	it("fills pages across empty batches and resumes without omissions", async () => {
+		const { default: UserProfile } = await import("@/database/models/user-profile.model");
+		const { eligibleRecipientPage, filledEligibleRecipientPage } = await import("./recipients");
+		const candidates = Array.from({ length: 351 }, (_, i) => ({
+			userId: (i + 1).toString(16).padStart(24, "0"),
+			identity: i >= 200 && i % 2 === 0 ? [{ _id: new Types.ObjectId() }] : [],
+		}));
+		const originalDb = mongoose.connection.db;
+		Object.assign(mongoose.connection, { db: {} });
+		const session = {} as mongoose.ClientSession;
+		const aggregate = mock.method(UserProfile, "aggregate", (pipeline: mongoose.PipelineStage[]) => {
+			const match = pipeline[0] as mongoose.PipelineStage.Match;
+			assert.deepEqual(match.$match.onboardingCompletedAt, { $type: "date", $lte: timestamp });
+			const limit = (pipeline[2] as mongoose.PipelineStage.Limit).$limit;
+			assert.ok(limit > 0 && limit <= 100);
+			const lookup = pipeline.find((stage) => "$lookup" in stage) as mongoose.PipelineStage.Lookup;
+			assert.equal(lookup.$lookup.localField, "identityId");
+			assert.equal(lookup.$lookup.foreignField, "_id");
+			assert.ok(pipeline.indexOf(lookup) > 2);
+			return { session: (actual: mongoose.ClientSession) => {
+				assert.equal(actual, session);
+				return Promise.resolve(candidates.filter((r) => r.userId > match.$match.userId.$gt).slice(0, limit));
+			} };
+		});
+		try {
+			const empty = await eligibleRecipientPage(timestamp, "", session);
+			assert.deepEqual(empty.recipients, []);
+			assert.equal(empty.nextCursor, candidates[99].userId);
+			// Add enough verified candidates to force a full page and a partial final page.
+			candidates.push(...Array.from({ length: 100 }, (_, i) => ({
+				userId: (352 + i).toString(16).padStart(24, "0"),
+				identity: [{ _id: new Types.ObjectId() }],
+			})));
+			const first = await filledEligibleRecipientPage(timestamp, "", session);
+			assert.equal(first.recipients.length, 100);
+			assert.ok(first.nextCursor);
+			const second = await filledEligibleRecipientPage(timestamp, first.nextCursor!, session);
+			assert.equal(second.nextCursor, null);
+			assert.deepEqual([...first.recipients, ...second.recipients], candidates.filter((r) => r.identity.length).map(({ userId }) => ({ userId })));
+		} finally {
+			Object.assign(mongoose.connection, { db: originalDb });
+			aggregate.mock.restore();
+		}
+	});
+	it("checks a single recipient by indexed ObjectId and rejects invalid IDs", async () => {
+		const { default: UserProfile } = await import("@/database/models/user-profile.model");
+		const { isEligibleRecipient } = await import("./recipients");
+		const id = new Types.ObjectId();
+		const originalDb = mongoose.connection.db;
+		let verified = true;
+		let onboarded = true;
+		let lookups = 0;
+		Object.assign(mongoose.connection, { db: { collection: (name: string) => {
+			assert.equal(name, "user");
+			return { findOne: async (filter: unknown) => {
+				lookups++;
+				assert.deepEqual(filter, { _id: id, emailVerified: true });
+				return verified ? { _id: id } : null;
+			} };
+		} } });
+		const exists = mock.method(UserProfile, "exists", async () => onboarded ? { _id: id } : null);
+		try {
+			assert.equal(await isEligibleRecipient(id.toHexString()), true);
+			verified = false;
+			assert.equal(await isEligibleRecipient(id.toHexString()), false);
+			onboarded = false;
+			assert.equal(await isEligibleRecipient(id.toHexString()), false);
+			assert.equal(await isEligibleRecipient("invalid"), false);
+			assert.equal(lookups, 2);
+		} finally {
+			Object.assign(mongoose.connection, { db: originalDb });
+			exists.mock.restore();
+		}
+	});
+});
+
 describe("background sources", () => {
 	it("blocks preference writes before indexes are initialized", async () => {
 		const { default: Preference } =
@@ -276,7 +353,7 @@ describe("background sources", () => {
 		const originalDb = mongoose.connection.db;
 		Object.assign(mongoose.connection, { db });
 		const aggregate = mock.method(UserProfile, "aggregate", () => ({
-			session: () => Promise.resolve(audience.map((userId) => ({ userId }))),
+			session: () => Promise.resolve(audience.map((userId) => ({ userId, identity: [{ _id: new Types.ObjectId() }] }))),
 		}));
 		const session = mock.method(mongoose, "startSession", async () => ({
 			withTransaction: async (fn: () => Promise<unknown>) => fn(),

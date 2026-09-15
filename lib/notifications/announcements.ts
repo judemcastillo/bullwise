@@ -4,7 +4,7 @@ import {
 	notificationDatabase,
 	notificationsEnabledAt,
 } from "./store";
-import { eligibleRecipientPage } from "./recipients";
+import { filledEligibleRecipientPage } from "./recipients";
 import { parseAnnouncement } from "./policy";
 import type { ClientSession } from "mongoose";
 
@@ -23,10 +23,10 @@ async function countRecipients(cutoff: Date) {
 	let count = 0;
 	let cursor = "";
 	while (true) {
-		const page = await eligibleRecipientPage(cutoff, cursor);
-		count += page.length;
-		if (page.length < 100) return count;
-		cursor = page.at(-1)!.userId;
+		const page = await filledEligibleRecipientPage(cutoff, cursor);
+		count += page.recipients.length;
+		if (page.nextCursor === null) return count;
+		cursor = page.nextCursor;
 	}
 }
 function assertSamePublication(
@@ -61,19 +61,19 @@ async function snapshotAudience(
 	let cursor = "";
 	// Snapshot read concern freezes verification and onboarding eligibility for the publication.
 	while (true) {
-		const page = await eligibleRecipientPage(publishedAt, cursor, session);
-		if (page.length)
+		const page = await filledEligibleRecipientPage(publishedAt, cursor, session);
+		if (page.recipients.length)
 			await recipients.insertMany(
-				page.map(({ userId }) => ({
+				page.recipients.map(({ userId }) => ({
 					key: input.key,
 					userId,
 					delivered: false,
 				})),
 				{ session },
 			);
-		audienceCount += page.length;
-		if (page.length < 100) break;
-		cursor = page.at(-1)!.userId;
+		audienceCount += page.recipients.length;
+		if (page.nextCursor === null) break;
+		cursor = page.nextCursor;
 	}
 	const publication = { ...input, publishedAt, audienceCount, complete: false };
 	await publications.insertOne(publication, { session });

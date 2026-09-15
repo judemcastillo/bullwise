@@ -9,7 +9,7 @@ import {
 	getInAppPreference,
 	notificationsEnabledAt,
 } from "@/lib/notifications/store";
-import { eligibleRecipientPage } from "@/lib/notifications/recipients";
+import { filledEligibleRecipientPage } from "@/lib/notifications/recipients";
 import { deliverAlertNotifications } from "@/lib/notifications/alert-delivery";
 import {
 	deliverInboxNews,
@@ -56,7 +56,7 @@ export const queueInboxNews = inngest.createFunction(
 			const enabledAt = await notificationsEnabledAt();
 			if (!enabledAt || new Date(scheduledAt) < enabledAt)
 				return { userIds: [], nextCursor: null };
-			const recipients = await eligibleRecipientPage(
+			const { recipients, nextCursor } = await filledEligibleRecipientPage(
 				new Date(scheduledAt),
 				afterUserId,
 			);
@@ -69,8 +69,7 @@ export const queueInboxNews = inngest.createFunction(
 			}
 			return {
 				userIds,
-				nextCursor:
-					recipients.length === 100 ? recipients.at(-1)!.userId : null,
+				nextCursor,
 			};
 		});
 		const periodKey = getMarketNewsPeriodKey(frequency, new Date(scheduledAt));
