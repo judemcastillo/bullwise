@@ -121,7 +121,7 @@ export async function createNotification(
 					readAt: null,
 				},
 			},
-			{ upsert: true },
+			{ upsert: true, runValidators: true },
 		);
 	} catch (error) {
 		if (!(
