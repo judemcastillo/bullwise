@@ -9,12 +9,7 @@ import {
 import type { AlertOperator } from "@/types/alerts";
 
 export type EmailDeliveryStatus =
-	| "not_requested"
-	| "pending"
-	| "processing"
-	| "sent"
-	| "suppressed"
-	| "failed";
+	"not_requested" | "pending" | "processing" | "sent" | "suppressed" | "failed";
 
 export interface AlertEventItem extends Document {
 	dedupeKey: string;
@@ -34,6 +29,7 @@ export interface AlertEventItem extends Document {
 		quoteCurrency: string;
 	};
 	delivery: {
+		inApp?: { status: "pending" | "delivered"; deliveredAt?: Date };
 		email: {
 			status: EmailDeliveryStatus;
 			attempts: number;
@@ -128,6 +124,10 @@ const alertEventSchema = new Schema<AlertEventItem>(
 			},
 		},
 		delivery: {
+			inApp: {
+				status: { type: String, enum: ["pending", "delivered"] },
+				deliveredAt: { type: Date },
+			},
 			email: {
 				status: {
 					type: String,
@@ -156,6 +156,7 @@ const alertEventSchema = new Schema<AlertEventItem>(
 	{ timestamps: true },
 );
 
+alertEventSchema.index({ "delivery.inApp.status": 1, createdAt: 1 });
 alertEventSchema.index({ alertId: 1, triggeredAt: -1 });
 alertEventSchema.index({ userId: 1, triggeredAt: -1 });
 alertEventSchema.index({

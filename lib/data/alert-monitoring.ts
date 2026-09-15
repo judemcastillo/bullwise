@@ -181,6 +181,7 @@ export class MongoAlertMonitoringStore implements AlertMonitoringStore {
 								quoteCurrency: alert.instrument.quoteCurrency,
 							},
 							delivery: {
+								inApp: { status: "pending" },
 								email: {
 									status: alert.emailEnabled ? "pending" : "not_requested",
 									attempts: 0,
