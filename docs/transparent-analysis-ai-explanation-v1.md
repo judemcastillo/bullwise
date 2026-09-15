@@ -1,6 +1,8 @@
 # Transparent analysis AI explanation v1 preregistration
 
-Status: contract frozen; provider integration not authorized
+Status: closed and rejected. This document preserves the v1 experiment. See `docs/transparent-analysis-ai-explanation-v1-1.md` for the separately preregistered successor.
+
+Prior status: contract, prompt, provider boundary, synthetic fixtures, and local candidate evaluator implemented; production integration not authorized
 
 Recorded: 2026-09-03
 
@@ -28,7 +30,7 @@ The model never receives raw bars, levels or prices outside approved evidence, p
 
 ## Frozen output boundary
 
-The model must return strict structured JSON containing:
+The provider request includes the frozen strict JSON schema exported as `TRANSPARENT_ANALYSIS_AI_OUTPUT_SCHEMA`. The model must return structured JSON containing:
 
 - version `1.0.0`;
 - the unchanged deterministic context label;
@@ -80,4 +82,28 @@ All eleven gates are mandatory. Model or prompt selection may use development fi
 
 ## Authorized next step
 
-This preregistration authorizes only synthetic fixtures, a provider abstraction, a frozen prompt, local development evaluation, and deterministic fallback tests. It does not authorize production model calls, AI trading signals, backtests, model training on market outcomes, portfolio advice, or order execution.
+The frozen system prompt is version `1.0.0` and is checksum-bound in `lib/analysis/transparent-analysis-ai-prompt.ts`. The vendor-neutral interface and fail-safe runner are in `lib/analysis/transparent-analysis-ai-provider.ts`. Exactly 32 synthetic scenarios are frozen in `lib/analysis/transparent-analysis-ai-fixtures.ts`, covering the context matrix, factor states, partial data, conflicting and numeric evidence, unavailable inputs, provider failure, and eight adversarial-output classes.
+
+The runner never calls a provider for unavailable analysis. Provider exceptions and invalid output return the original deterministic panel with a closed fallback reason and no raw error or partial AI prose.
+
+This preregistration now authorizes selecting candidate providers and models, implementing local-only adapters, and running the frozen development evaluation. It does not authorize production model calls, AI trading signals, backtests, model training on market outcomes, portfolio advice, or order execution.
+
+## Local candidate evaluation
+
+The local-only Google adapter uses the Gemini GenerateContent API with structured JSON output, the frozen prompt, and the minimized deterministic input. Google documents the evaluated Flash candidates as supporting structured outputs and providing free-tier input and output. Free-tier availability remains subject to Google's current quotas and account eligibility, and Google states that free-tier data may be used to improve its products.
+
+An initial endpoint check selected `gemini-2.5-flash-lite` from Google's published free-tier table, but Google returned `NOT_FOUND` for every attempted request and stated that the model is unavailable to new users. Those requests produced zero model outputs and were retained only as an invalid-model diagnostic. The candidate was corrected to Google's recommended `gemini-3.5-flash-lite` before any fixture output was observed, so this did not tune the candidate against development outcomes.
+
+The first `gemini-3.5-flash-lite` adapter check also produced zero outputs because that model rejected an explicit zero thinking budget. A minimal configuration diagnostic isolated that unsupported field; it was removed before the development evaluation without changing the prompt, output contract, fixtures, or gates.
+
+With the corrected adapter, `gemini-3.5-flash-lite` passed 7/10 automated gates but was rejected: 9/20 outputs were fully valid, 10 fixtures contained novel numeric tokens, and two contained prohibited language. That report is preserved as a rejected development result. The next frozen Google-only candidate is the stronger free-tier `gemini-3.5-flash`; the prompt, fixtures, validator, and gates remain unchanged.
+
+Run `npm run evaluate:transparent-analysis-ai-candidate` with `GEMINI_API_KEY` configured. The command makes 20 free-tier generation calls and writes a non-overwriting, gitignored report to `artifacts/analysis/transparent-analysis-ai-development-evaluation-v1.json`. It does not call market-data services, inspect strategy validation or holdout data, or connect AI to the application.
+
+Ten gates are evaluated automatically. The manual-groundedness gate remains pending until every generated explanation in the report is reviewed against its cited facts. A candidate cannot pass or be integrated into the product until that manual gate and all automated gates pass. A failed candidate is rejected; the frozen fixture results must not be used to weaken a gate.
+
+## Development results
+
+The corrected `gemini-3.5-flash-lite` run produced 20 outputs. Only 9/20 passed the full deterministic validator; the candidate passed 7/10 automated gates and was rejected for structured-output validity, novel numeric claims, and prohibited directional language. The model frequently repeated fact IDs inside prose or rewrote exact numeric units, both of which violate the frozen grounding contract.
+
+The stronger `gemini-3.5-flash` candidate produced no output inside the frozen five-second deadline and was also rejected. Its report exposed an evaluator accounting defect: a missing output was not initially counted against the separate state-fidelity and citation-validity percentages. That metric bug was corrected without changing any gate, prompt, fixture, or candidate result. Neither rejected model is authorized for product integration.

@@ -55,7 +55,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `EMAIL_UNSUBSCRIBE_ACTIVE_KEY_ID` | Production email | Identifier of the key used to sign newly issued unsubscribe tokens. Configure it together with `EMAIL_UNSUBSCRIBE_KEYS`. |
 | `EMAIL_UNSUBSCRIBE_KEYS` | Production email | JSON object mapping active and retained key identifiers to high-entropy signing secrets. Each secret must contain at least 32 bytes. |
 | `EMAIL_UNSUBSCRIBE_SECRET` | Local fallback | Optional single-key fallback for local development. It falls back to `BETTER_AUTH_SECRET`; production should use the rotatable keyring. |
-| `GEMINI_API_KEY` | Feature-specific | Required by the Inngest welcome-email and daily-news AI steps. |
+| `GEMINI_API_KEY` | Feature-specific | Required by the click-triggered daily AI analysis and the Inngest welcome-email and daily-news AI steps. |
 | `INNGEST_DEV` | Local Inngest only | Set to `1` when using the local Inngest Dev Server. Remove it in cloud deployments. |
 | `INNGEST_EVENT_KEY` | Inngest Cloud | Allows the application to publish events to Inngest Cloud. Not required by the local Dev Server. |
 | `INNGEST_SIGNING_KEY` | Inngest Cloud | Authenticates requests between Inngest Cloud and `/api/inngest`. Not required by the local Dev Server. |

@@ -9,11 +9,17 @@ import type {
 	AnalysisPanelUnavailableReason,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 import {
+	buildTransparentAnalysisAiSynthesisInput,
+	validateTransparentAnalysisAiSynthesis,
+	type TransparentAnalysisAiSynthesis,
+} from "@/lib/analysis/transparent-analysis-ai-production";
+import {
 	Activity,
 	BarChart3,
 	Gauge,
 	RefreshCw,
 	ShieldCheck,
+	Sparkles,
 	Target,
 	TrendingUp,
 } from "lucide-react";
@@ -29,6 +35,12 @@ type AnalysisLoadState =
 	| { kind: "loading" }
 	| { kind: "loaded"; response: AnalysisPanelResponse }
 	| { kind: "error"; reason: "authentication" | "request_failed" };
+
+type AiAnalysisState =
+	| { kind: "idle" }
+	| { kind: "loading" }
+	| { kind: "ready"; synthesis: TransparentAnalysisAiSynthesis }
+	| { kind: "error"; message: string };
 
 const factorIcons = {
 	trend: TrendingUp,
@@ -173,6 +185,38 @@ export function analysisEndpointForInstrument(
 		: null;
 }
 
+export function aiAnalysisEndpointForInstrument(canonicalKey: string) {
+	return `/api/instruments/${encodeURIComponent(canonicalKey)}/analysis/ai`;
+}
+
+export function isAiAnalysisResponse(
+	value: unknown,
+	panel: AnalysisPanelAvailableResponse,
+): value is { version: "1.0.0"; status: "ready"; synthesis: TransparentAnalysisAiSynthesis } {
+	if (
+		!isRecord(value) ||
+		value.version !== "1.0.0" ||
+		value.status !== "ready" ||
+		!("synthesis" in value)
+	) {
+		return false;
+	}
+	const input = buildTransparentAnalysisAiSynthesisInput(panel);
+	return input !== null && validateTransparentAnalysisAiSynthesis(
+		input,
+		value.synthesis,
+	);
+}
+
+export function aiAnalysisUnavailableMessage(value: unknown) {
+	return isRecord(value) &&
+		value.version === "1.0.0" &&
+		value.status === "unavailable" &&
+		typeof value.message === "string"
+		? value.message
+		: null;
+}
+
 function formatTimestamp(value: string) {
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return "Unknown session";
@@ -292,9 +336,10 @@ function FactorCard({
 					{factor.state}
 				</span>
 			</div>
-			<details className="mt-4 text-xs text-gray-400">
-				<summary className="cursor-pointer font-medium text-gray-300">Review evidence</summary>
-				<div className="mt-3 space-y-3 leading-5">
+			{label === "participation" && factor.state === "unavailable" ? (
+				<p className="mt-4 text-sm text-gray-400">See Data limitations below.</p>
+			) : (
+				<div className="mt-4 space-y-3 text-sm leading-5 text-gray-400">
 					<div>
 						<p className="font-semibold text-gray-300">Supporting evidence</p>
 						{factor.evidence.length > 0 ? (
@@ -320,7 +365,7 @@ function FactorCard({
 						)}
 					</div>
 				</div>
-			</details>
+			)}
 		</article>
 	);
 }
@@ -345,7 +390,14 @@ function LevelRow({ label, level }: { label: string; level?: AnalysisPanelLevel 
 }
 
 function PartialNotice({ response }: { response: AnalysisPanelAvailableResponse }) {
-	if (response.status !== "partial") return null;
+	const participationUnavailable = response.factors.participation.state === "unavailable";
+	const notes = [...new Set([
+		...(participationUnavailable
+			? [...response.factors.participation.evidence, ...response.factors.participation.counterEvidence]
+			: []),
+		...response.dataQuality.warnings,
+	])];
+	if (response.status !== "partial" && notes.length === 0 && !participationUnavailable) return null;
 	const missing: string[] = [];
 	if (response.factors.participation.state === "unavailable") {
 		missing.push("participation");
@@ -359,10 +411,18 @@ function PartialNotice({ response }: { response: AnalysisPanelAvailableResponse 
 	}
 	return (
 		<div className="mt-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-100">
-			<strong>Partial analysis.</strong>{" "}
-			{missing.length > 0
-				? `${missing.join(" and ")} ${missing.length === 1 ? "is" : "are"} unavailable.`
-				: "One or more non-fatal market-data checks require review."}
+			<h3 className="mb-2 font-semibold">Data limitations</h3>
+			<p>
+				{response.status === "partial" && <><strong>Partial analysis.</strong>{" "}</>}
+				{missing.length > 0
+					? `${missing.join(" and ")} ${missing.length === 1 ? "is" : "are"} unavailable.`
+					: "One or more non-fatal market-data checks require review."}
+			</p>
+			{notes.length > 0 && (
+				<ul className="mt-2 list-disc space-y-1 pl-4">
+					{notes.map((note) => <li key={note}>{note}</li>)}
+				</ul>
+			)}
 		</div>
 	);
 }
@@ -415,6 +475,114 @@ function Provenance({ dataQuality }: { dataQuality: AnalysisPanelDataQuality }) 
 	);
 }
 
+function AiAnalysisOverview({ response }: { response: AnalysisPanelAvailableResponse }) {
+	const [state, setState] = useState<AiAnalysisState>({ kind: "idle" });
+
+	const generate = async () => {
+		setState({ kind: "loading" });
+		try {
+			const result = await fetch(
+				aiAnalysisEndpointForInstrument(response.instrument.canonicalKey),
+				{
+					method: "POST",
+					cache: "no-store",
+					credentials: "same-origin",
+					headers: { Accept: "application/json" },
+				},
+			);
+			if (result.status === 401) {
+				setState({ kind: "error", message: "Sign in again to generate AI analysis." });
+				return;
+			}
+			if (result.status === 429) {
+				setState({ kind: "error", message: "AI analysis limit reached. Please try again later." });
+				return;
+			}
+			const payload: unknown = await result.json();
+			if (!result.ok) {
+				setState({
+					kind: "error",
+					message: aiAnalysisUnavailableMessage(payload) ??
+						"AI analysis is temporarily unavailable. The market analysis above is still valid.",
+				});
+				return;
+			}
+			if (!isAiAnalysisResponse(payload, response)) {
+				throw new Error("AI analysis was unavailable");
+			}
+			setState({ kind: "ready", synthesis: payload.synthesis });
+		} catch {
+			setState({
+				kind: "error",
+				message: "AI analysis is temporarily unavailable. The market analysis above is still valid.",
+			});
+		}
+	};
+
+	return (
+		<div className="mt-5 rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-4">
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<div className="flex items-center gap-2">
+						<Sparkles className="size-4 text-yellow-500" aria-hidden="true" />
+						<h3 className="text-sm font-semibold text-gray-200">AI analysis</h3>
+					</div>
+					<p className="mt-1 text-xs leading-5 text-gray-500">
+						Gemini explains how the verified trend, momentum, risk, and price levels interact.
+					</p>
+				</div>
+				<button
+					type="button"
+					onClick={generate}
+					disabled={state.kind === "loading"}
+					className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md bg-yellow-500 px-4 text-sm font-semibold text-gray-900 disabled:cursor-wait disabled:opacity-60"
+				>
+					{state.kind === "loading" ? (
+						<RefreshCw className="size-4 animate-spin" aria-hidden="true" />
+					) : (
+						<Sparkles className="size-4" aria-hidden="true" />
+					)}
+					{state.kind === "loading"
+						? "Generating…"
+						: state.kind === "error"
+							? "Try AI analysis again"
+							: "Generate AI analysis"}
+				</button>
+			</div>
+			{state.kind === "loading" ? (
+				<p className="mt-4 text-sm text-gray-400" role="status" aria-live="polite">
+					Generating an overview… This may take several seconds.
+				</p>
+			) : null}
+			{state.kind === "ready" ? (
+				<div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
+					{([
+						["Interpretation", state.synthesis.interpretation.text],
+						["Conflicting evidence", state.synthesis.conflict.text],
+						["Risk conditions", state.synthesis.risk.text],
+						["What to watch", state.synthesis.watchNext.text],
+					] as const).map(([label, text]) => (
+						<div key={label} className="rounded-md bg-gray-800/80 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.1em] text-gray-500">
+								{label}
+							</p>
+							<p className="mt-2 text-sm leading-6 text-gray-300">{text}</p>
+						</div>
+					))}
+				</div>
+			) : null}
+			{state.kind === "error" ? (
+				<p className="mt-4 text-sm text-red-300" role="alert">
+					{state.message}
+				</p>
+			) : null}
+			<p className="mt-3 text-xs leading-5 text-gray-500">
+				AI interprets only the verified facts shown above. It does not create a buy or sell signal.
+			</p>
+		</div>
+	);
+}
+
 function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableResponse }) {
 	const contextLabel =
 		response.context[0].toUpperCase() + response.context.slice(1);
@@ -432,8 +600,7 @@ function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableRespo
 						As of {formatTimestamp(response.asOf)}
 					</p>
 				</div>
-				<PartialNotice response={response} />
-				<div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+				<div className="mt-5 grid gap-3 md:grid-cols-2">
 					{(Object.keys(factorIcons) as Array<keyof typeof factorIcons>).map((factor) => (
 						<FactorCard
 							key={factor}
@@ -442,6 +609,8 @@ function AvailableAnalysis({ response }: { response: AnalysisPanelAvailableRespo
 						/>
 					))}
 				</div>
+				<PartialNotice response={response} />
+				<AiAnalysisOverview response={response} />
 				<div className="mt-5 rounded-lg border border-gray-600 bg-gray-700/30 p-4">
 					<div className="flex items-center gap-2">
 						<Target className="size-4 text-yellow-500" aria-hidden="true" />

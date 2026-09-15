@@ -5,7 +5,7 @@ import {
 	type AnalysisPanelResponse,
 } from "@/lib/analysis/transparent-analysis-panel.types";
 
-export const TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION = "1.0.0";
+export const TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION = "1.1.0";
 
 export const TRANSPARENT_ANALYSIS_AI_FACTOR_NAMES = [
 	"trend",
@@ -73,7 +73,17 @@ export type TransparentAnalysisAiExplanation = {
 
 export type TransparentAnalysisAiValidationResult =
 	| { ok: true; value: TransparentAnalysisAiExplanation }
-	| { ok: false; reasons: string[] };
+	| { ok: false; reasons: string[]; issueCodes: TransparentAnalysisAiValidationIssueCode[] };
+
+export type TransparentAnalysisAiValidationIssueCode =
+	| "schema"
+	| "state_fidelity"
+	| "citation"
+	| "novel_numeric"
+	| "prohibited_advice"
+	| "unsupported_domain"
+	| "limitation_fidelity"
+	| "disclaimer_fidelity";
 
 export const TRANSPARENT_ANALYSIS_AI_EVALUATION_GATES = [
 	{ id: "structured_output_valid", comparison: "=", threshold: 100, unit: "percent" },
@@ -98,6 +108,8 @@ const FACTOR_STATES = {
 
 const PROHIBITED_ADVICE =
 	/\b(?:buy|sell|hold|long|short|entry|enter|exit|trade|recommend(?:ation|ed)?|position\s+siz(?:e|ing)|stop[ -]?loss|take[ -]?profit|price\s+target|should\s+(?:invest|buy|sell|hold))\b/i;
+const TEMPORAL_LONG_SHORT_PHRASE =
+	/\b(?:long|short)(?:[ -]?term|\s*-\s*and\s+(?:short|medium|long)[ -]?term)\b/gi;
 const UNSUPPORTED_DOMAINS =
 	/\b(?:news|earnings|revenue|fundamentals?|sentiment|options?|order\s+book|market\s+depth|liquidity|supply|demand|order\s+blocks?)\b/i;
 const NUMERIC_TOKEN = /[$€£]?\d+(?:[.,]\d+)*(?:%|[a-z]{0,2})?/gi;
@@ -194,9 +206,11 @@ function validateCitedText(input: {
 	knownFacts: Map<string, TransparentAnalysisAiFact>;
 	allowedFactor?: TransparentAnalysisAiFactorName;
 	reasons: string[];
+	issueCodes: TransparentAnalysisAiValidationIssueCode[];
 }) {
 	if (!isRecord(input.value) || !exactKeys(input.value, ["text", "factIds"])) {
 		input.reasons.push(`${input.label} must contain only text and factIds.`);
+		input.issueCodes.push("schema");
 		return;
 	}
 	if (
@@ -205,38 +219,47 @@ function validateCitedText(input: {
 		input.value.text.length > input.maximumLength
 	) {
 		input.reasons.push(`${input.label} text is empty or too long.`);
+		input.issueCodes.push("schema");
 		return;
 	}
 	if (!isStringArray(input.value.factIds) || input.value.factIds.length === 0) {
 		input.reasons.push(`${input.label} must cite at least one fact ID.`);
+		input.issueCodes.push("citation");
 		return;
 	}
 	if (new Set(input.value.factIds).size !== input.value.factIds.length) {
 		input.reasons.push(`${input.label} contains duplicate fact IDs.`);
+		input.issueCodes.push("citation");
 	}
 	const citedFacts = input.value.factIds
 		.map((id) => input.knownFacts.get(id))
 		.filter((fact): fact is TransparentAnalysisAiFact => Boolean(fact));
 	if (citedFacts.length !== input.value.factIds.length) {
 		input.reasons.push(`${input.label} cites an unknown fact ID.`);
+		input.issueCodes.push("citation");
 	}
 	if (
 		input.allowedFactor &&
 		input.value.factIds.some((id) => !id.startsWith(`${input.allowedFactor}.`))
 	) {
 		input.reasons.push(`${input.label} cites a fact from another factor.`);
+		input.issueCodes.push("citation");
 	}
-	if (PROHIBITED_ADVICE.test(input.value.text)) {
+	const adviceCandidate = input.value.text.replace(TEMPORAL_LONG_SHORT_PHRASE, "");
+	if (PROHIBITED_ADVICE.test(adviceCandidate)) {
 		input.reasons.push(`${input.label} contains prohibited trading advice.`);
+		input.issueCodes.push("prohibited_advice");
 	}
 	if (UNSUPPORTED_DOMAINS.test(input.value.text)) {
 		input.reasons.push(`${input.label} claims an unsupported data domain.`);
+		input.issueCodes.push("unsupported_domain");
 	}
 	const allowedNumbers = new Set(
 		citedFacts.flatMap((fact) => numericTokens(fact.text)),
 	);
 	if (numericTokens(input.value.text).some((token) => !allowedNumbers.has(token))) {
 		input.reasons.push(`${input.label} contains an uncited numeric claim.`);
+		input.issueCodes.push("novel_numeric");
 	}
 }
 
@@ -245,6 +268,7 @@ export function validateTransparentAnalysisAiExplanation(
 	value: unknown,
 ): TransparentAnalysisAiValidationResult {
 	const reasons: string[] = [];
+	const issueCodes: TransparentAnalysisAiValidationIssueCode[] = [];
 	if (
 		!isRecord(value) ||
 		!exactKeys(value, [
@@ -256,22 +280,30 @@ export function validateTransparentAnalysisAiExplanation(
 			"disclaimer",
 		])
 	) {
-		return { ok: false, reasons: ["Explanation does not match the strict top-level schema."] };
+		return {
+			ok: false,
+			reasons: ["Explanation does not match the strict top-level schema."],
+			issueCodes: ["schema"],
+		};
 	}
 	if (value.version !== TRANSPARENT_ANALYSIS_AI_CONTRACT_VERSION) {
 		reasons.push("Explanation contract version is invalid.");
+		issueCodes.push("schema");
 	}
 	if (value.context !== input.context) {
 		reasons.push("The context label does not match the deterministic input.");
+		issueCodes.push("state_fidelity");
 	}
 	if (value.disclaimer !== TRANSPARENT_ANALYSIS_PANEL_DISCLAIMER) {
 		reasons.push("The fixed disclaimer was changed.");
+		issueCodes.push("disclaimer_fidelity");
 	}
 	if (
 		!isStringArray(value.limitations) ||
 		JSON.stringify(value.limitations) !== JSON.stringify(input.limitations)
 	) {
 		reasons.push("Limitations do not exactly match the deterministic input.");
+		issueCodes.push("limitation_fidelity");
 	}
 	const knownFacts = new Map(
 		TRANSPARENT_ANALYSIS_AI_FACTOR_NAMES.flatMap((factor) =>
@@ -284,9 +316,11 @@ export function validateTransparentAnalysisAiExplanation(
 		maximumLength: 480,
 		knownFacts,
 		reasons,
+		issueCodes,
 	});
 	if (!Array.isArray(value.factors) || value.factors.length !== 4) {
 		reasons.push("Explanation must contain exactly four factor explanations.");
+		issueCodes.push("schema");
 	} else {
 		value.factors.forEach((factorValue, index) => {
 			const expectedFactor = TRANSPARENT_ANALYSIS_AI_FACTOR_NAMES[index];
@@ -295,10 +329,12 @@ export function validateTransparentAnalysisAiExplanation(
 				!exactKeys(factorValue, ["factor", "state", "explanation"])
 			) {
 				reasons.push(`Factor ${index + 1} does not match the strict schema.`);
+				issueCodes.push("schema");
 				return;
 			}
 			if (factorValue.factor !== expectedFactor) {
 				reasons.push(`Factor ${index + 1} is missing or out of order.`);
+				issueCodes.push("schema");
 				return;
 			}
 			if (
@@ -307,6 +343,7 @@ export function validateTransparentAnalysisAiExplanation(
 				factorValue.state !== input.factors[expectedFactor].state
 			) {
 				reasons.push(`${expectedFactor} state does not match the deterministic input.`);
+				issueCodes.push("state_fidelity");
 			}
 			validateCitedText({
 				value: factorValue.explanation,
@@ -315,10 +352,15 @@ export function validateTransparentAnalysisAiExplanation(
 				knownFacts,
 				allowedFactor: expectedFactor,
 				reasons,
+				issueCodes,
 			});
 		});
 	}
 	return reasons.length === 0
 		? { ok: true, value: value as TransparentAnalysisAiExplanation }
-		: { ok: false, reasons: [...new Set(reasons)] };
+		: {
+				ok: false,
+				reasons: [...new Set(reasons)],
+				issueCodes: [...new Set(issueCodes)],
+			};
 }

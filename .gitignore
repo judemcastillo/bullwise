@@ -14,6 +14,7 @@
 /coverage
 /artifacts/backtests/*.json
 /artifacts/analysis/*.json
+/artifacts/analysis/transparent-analysis-ai-topic-routing-v3-runs/
 /artifacts/telemetry/
 
 # next.js

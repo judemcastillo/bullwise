@@ -61,7 +61,7 @@ function response(): AnalysisPanelResponse {
 
 function validExplanation() {
 	return {
-		version: "1.0.0",
+		version: "1.1.0",
 		context: "constructive",
 		overview: {
 			text: "Daily evidence is constructive, while participation could not be calculated.",
@@ -162,6 +162,34 @@ describe("transparent analysis AI explanation contract", () => {
 			assert.match(result.reasons.join(" "), /uncited numeric claim/);
 			assert.match(result.reasons.join(" "), /state does not match/);
 			assert.match(result.reasons.join(" "), /another factor/);
+		}
+	});
+
+	it("allows temporal long and short wording but rejects position language", () => {
+		const input = buildTransparentAnalysisAiInput(response());
+		assert.ok(input);
+		for (const text of [
+			"Short-term and long-term trends are mixed.",
+			"Short- and medium-term moving-average slopes disagree.",
+		]) {
+			const explanation = validExplanation();
+			explanation.overview.text = text;
+			assert.equal(
+				validateTransparentAnalysisAiExplanation(input, explanation).ok,
+				true,
+			);
+		}
+
+		for (const text of [
+			"Go short while momentum is weak.",
+			"Take a long position while the trend is constructive.",
+			"This is a short setup.",
+		]) {
+			const explanation = validExplanation();
+			explanation.overview.text = text;
+			const result = validateTransparentAnalysisAiExplanation(input, explanation);
+			assert.equal(result.ok, false);
+			if (!result.ok) assert.ok(result.issueCodes.includes("prohibited_advice"));
 		}
 	});
 

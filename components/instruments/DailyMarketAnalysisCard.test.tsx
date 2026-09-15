@@ -5,9 +5,13 @@ import {
 	DailyMarketAnalysisError,
 	DailyMarketAnalysisLoading,
 	DailyMarketAnalysisView,
+	aiAnalysisUnavailableMessage,
+	aiAnalysisEndpointForInstrument,
 	analysisEndpointForInstrument,
+	isAiAnalysisResponse,
 	isAnalysisPanelResponse,
 } from "@/components/instruments/DailyMarketAnalysisCard";
+import type { TransparentAnalysisAiSynthesis } from "@/lib/analysis/transparent-analysis-ai-production";
 import type {
 	AnalysisPanelAvailableResponse,
 	AnalysisPanelResponse,
@@ -88,6 +92,47 @@ describe("daily market analysis UI", () => {
 			analysisEndpointForInstrument("equity:xnas:aapl", true),
 			"/api/instruments/equity%3Axnas%3Aaapl/analysis",
 		);
+		assert.equal(
+			aiAnalysisEndpointForInstrument("equity:xnas:aapl"),
+			"/api/instruments/equity%3Axnas%3Aaapl/analysis/ai",
+		);
+	});
+
+	it("accepts only a grounded AI response for the current deterministic panel", () => {
+		const synthesis: TransparentAnalysisAiSynthesis = {
+			version: "2.0.0",
+			interpretation: { text: "Trend and momentum align, suggesting a consistent picture.", factIds: ["trend.1", "momentum.1"] },
+			conflict: { text: "Trend and momentum currently agree.", factIds: ["trend.1", "momentum.1"] },
+			risk: { text: "Normal volatility and participation may imply ordinary movement.", factIds: ["volatility.1", "participation.1"] },
+			watchNext: { text: "Watch the nearest support and resistance.", factIds: ["support.1", "resistance.1"] },
+			disclaimer: readyResponse.disclaimer,
+		};
+		const valid = {
+			version: "1.0.0",
+			status: "ready",
+			synthesis,
+		};
+
+		assert.equal(isAiAnalysisResponse(valid, readyResponse), true);
+		assert.equal(
+			isAiAnalysisResponse({
+				...valid,
+				synthesis: { ...valid.synthesis, interpretation: { text: "Buy now.", factIds: [] } },
+			}, readyResponse),
+			false,
+		);
+	});
+
+	it("uses the API's safe explanation for an unavailable AI response", () => {
+		assert.equal(
+			aiAnalysisUnavailableMessage({
+				version: "1.0.0",
+				status: "unavailable",
+				message: "Gemini returned an answer that could not be verified. Please try again.",
+			}),
+			"Gemini returned an answer that could not be verified. Please try again.",
+		);
+		assert.equal(aiAnalysisUnavailableMessage({ error: "private provider error" }), null);
 	});
 
 	it("validates the allow-listed API response before rendering", () => {
@@ -118,6 +163,8 @@ describe("daily market analysis UI", () => {
 			"Nearest price levels",
 			"220.50",
 			"Data quality and provenance",
+			"Generate AI analysis",
+			"AI interprets only the verified facts shown above",
 			"massive",
 			"Aug 21, 2026, 4:00 PM EDT",
 			readyResponse.disclaimer,
@@ -147,6 +194,93 @@ describe("daily market analysis UI", () => {
 
 		assert.match(html, /Partial analysis/);
 		assert.match(html, /participation and SPY-relative strength are unavailable/);
+		const participationCard = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)![3];
+		assert.doesNotMatch(participationCard, /Counter evidence|Recent volume participation could not be calculated/);
+		assert.match(html, /Data limitations/);
+		assert.ok(html.indexOf("Recent volume participation could not be calculated.") > html.indexOf("Data limitations</h3>"));
+	});
+
+	it("keeps bearish and positive short-term facts visible together without expanding details", () => {
+		const response = structuredClone(readyResponse);
+		response.context = "defensive";
+		response.factors.trend.state = "bearish";
+		response.factors.trend.evidence = ["The shortest trend slope turned slightly positive."];
+		response.factors.trend.counterEvidence = ["Price is below its 200-day moving average."];
+		response.factors.momentum.state = "bearish";
+		response.factors.momentum.evidence = ["The latest session return is 0.36%."];
+		response.factors.momentum.counterEvidence = ["The 20-day return is negative."];
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+		assert.equal(cards.length, 4);
+		for (const [index, factor] of [response.factors.trend, response.factors.momentum].entries()) {
+			assert.doesNotMatch(cards[index], /<details/);
+			for (const fact of [...factor.evidence, ...factor.counterEvidence]) {
+				assert.ok(cards[index].includes(fact));
+			}
+		}
+		assert.doesNotMatch(html, /Data limitations/);
+	});
+
+	it("keeps mixed indicators grouped under their source factor", () => {
+		const response = structuredClone(readyResponse);
+		response.context = "mixed";
+		response.factors.trend = {
+			state: "mixed",
+			evidence: ["Price is above its 50-day moving average."],
+			counterEvidence: ["Price is below its 200-day moving average."],
+		};
+		response.factors.momentum = {
+			state: "mixed",
+			evidence: ["The latest session return is positive."],
+			counterEvidence: ["The 20-day return is negative."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+
+		assert.match(cards[0], />mixed</);
+		assert.match(cards[0], /Price is above its 50-day moving average/);
+		assert.match(cards[0], /Price is below its 200-day moving average/);
+		assert.doesNotMatch(cards[0], /latest session return|20-day return/);
+		assert.match(cards[1], />mixed</);
+		assert.match(cards[1], /latest session return is positive/);
+		assert.match(cards[1], /20-day return is negative/);
+	});
+
+	it("shows high-volatility evidence and counter-evidence together", () => {
+		const response = structuredClone(readyResponse);
+		response.factors.volatility = {
+			state: "high",
+			evidence: ["Twenty-day realized volatility is 42%."],
+			counterEvidence: ["The latest daily range was narrower than its recent baseline."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const volatilityCard = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)![2];
+
+		assert.match(volatilityCard, />high</);
+		assert.match(volatilityCard, /Twenty-day realized volatility is 42%/);
+		assert.match(volatilityCard, /latest daily range was narrower than its recent baseline/);
+		assert.doesNotMatch(html, /Data limitations/);
+	});
+
+	it("renders explicit empty-state copy for factors with one evidence kind", () => {
+		const response = structuredClone(readyResponse);
+		response.factors.trend = {
+			state: "bullish",
+			evidence: ["Price is above its 200-day moving average."],
+			counterEvidence: [],
+		};
+		response.factors.momentum = {
+			state: "bearish",
+			evidence: [],
+			counterEvidence: ["The 20-day return is negative."],
+		};
+		const html = renderToStaticMarkup(<DailyMarketAnalysisView response={response} />);
+		const cards = html.match(/<article\b[^>]*>[\s\S]*?<\/article>/g)!;
+
+		assert.match(cards[0], /Price is above its 200-day moving average/);
+		assert.match(cards[0], /No counter evidence was identified/);
+		assert.match(cards[1], /No supporting evidence is available/);
+		assert.match(cards[1], /The 20-day return is negative/);
 	});
 
 	it("renders unavailable, loading, authentication, and retry states accessibly", () => {
